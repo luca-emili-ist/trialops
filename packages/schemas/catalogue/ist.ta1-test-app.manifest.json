@@ -1,0 +1,16 @@
+{
+  "app_id": "ist.ta1-test-app",
+  "version": "0.1.0",
+  "publisher": "InSilicoTrials Technologies",
+  "gxp_class": "L1",
+  "hosting": "external",
+  "base_url": "https://ta1-test-app.trialops.example",
+  "auth": { "oidc_redirect_uris": ["https://ta1-test-app.trialops.example/callback", "https://localhost:5174/callback"], "scim": false },
+  "scopes": ["platform:read", "arm:read"],
+  "domains": ["simulation"],
+  "roles": ["ta1test.viewer", "ta1test.designer"],
+  "events": { "subscribe": ["arm.created"], "publish": [] },
+  "task_types": ["simulation.scenario.review"],
+  "ui_extensions": [{ "slot": "arm.detail.tab", "title": "TA1 test app", "url": "/embed/arm/{arm_id}" }],
+  "data_residency": ["EU", "US"]
+}

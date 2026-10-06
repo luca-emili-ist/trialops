@@ -8,6 +8,7 @@ import { createApp, createPool, createVerifier } from '../src/index.ts';
 import type { Services } from '../src/route.ts';
 import type { Reauthenticator } from '../src/lib/reauth.ts';
 import { HttpError } from '../src/errors.ts';
+import { createOidc } from '../src/lib/oidc.ts';
 
 export const TEST_SECRET = 'trialops-test-secret-not-for-production-0000';
 const key = new TextEncoder().encode(TEST_SECRET);
@@ -57,9 +58,11 @@ async function cloneDatabase(): Promise<{ url: string; drop: () => Promise<void>
 export async function startApi(services: Services = {}): Promise<Api> {
   const clone = await cloneDatabase();
   const pool = createPool(clone.url);
-  const server: Server = createApp({ pool, verify: createVerifier({ TRIALOPS_JWT_SECRET: TEST_SECRET }), services: { reauth: testReauth, ...services } }).listen(0);
+  const svc: Services = { reauth: testReauth, ...services };
+  const server: Server = createApp({ pool, verify: createVerifier({ TRIALOPS_JWT_SECRET: TEST_SECRET }), services: svc }).listen(0);
   await new Promise(r => server.once('listening', r));
   const url = `http://127.0.0.1:${(server.address() as AddressInfo).port}`;
+  svc.oidc ??= await createOidc({ issuer: url });   // issuer = this test server, ephemeral key
   const admin = new pg.Client({ connectionString: clone.url });
   await admin.connect();
   const tokenFor = async (sub: string) => {

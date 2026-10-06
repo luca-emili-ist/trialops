@@ -1,103 +1,111 @@
 <?xml version="1.0" encoding="utf-8"?>
 <testsuites>
-	<testcase name="[IAM-02] a user without the platform claim sees no platform data" time="0.059924" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/access.test.mjs"/>
-	<testcase name="[IAM-03] a sponsor sees only its own arm, its contracts and its documents" time="0.005712" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/access.test.mjs"/>
-	<testcase name="[IAM-03] a sponsor cannot write into another arm" time="0.011646" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/access.test.mjs"/>
-	<testcase name="[IAM-04] blinded users never see arm allocation" time="0.004212" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/access.test.mjs"/>
-	<testcase name="[IAM-04] the SAC unblinded role can read allocation" time="0.001044" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/access.test.mjs"/>
-	<testcase name="[IAM-07][AI-11] an agent identity is never unblinded, even with the claim" time="0.004048" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/access.test.mjs"/>
-	<testcase name="[IAM-02] site staff see only their site" time="0.006481" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/access.test.mjs"/>
-	<testcase name="[CMP-01] audit trail hash chain verifies end to end" time="0.038077" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/audit.test.mjs"/>
-	<testcase name="[CMP-01] audit_event cannot be updated, deleted or truncated" time="0.005933" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/audit.test.mjs"/>
-	<testcase name="[CMP-01] tampering is detected by audit_verify" time="0.005319" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/audit.test.mjs"/>
-	<testcase name="[DM-03] update of a GxP record without a change reason is refused" time="0.002138" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/audit.test.mjs"/>
-	<testcase name="[DM-03][CMP-04] update with reason writes who, when, old, new and reason" time="0.003689" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/audit.test.mjs"/>
-	<testcase name="[DM-03] physical delete is refused; void is audited as VOID" time="0.004661" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/audit.test.mjs"/>
-	<testcase name="[CMP-02] signatures are immutable" time="0.002028" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/audit.test.mjs"/>
-	<testcase name="[APP-ID-02][IAM-02] sponsor token gets only its own arm" time="0.038085" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/claims.test.mjs"/>
-	<testcase name="[APP-ID-02][IAM-02] site PI token is restricted to its site" time="0.000505" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/claims.test.mjs"/>
-	<testcase name="[APP-ID-02][IAM-04] only SAC members receive an unblinded token" time="0.000819" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/claims.test.mjs"/>
-	<testcase name="[APP-ID-02] unknown users get no platform" time="0.000334" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/claims.test.mjs"/>
-	<testcase name="[DM-02] an approved Master Protocol version cannot be edited" time="0.035777" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/protocol_arms.test.mjs"/>
-	<testcase name="[DM-02][CMP-02] approval without an approval signature is refused" time="0.003864" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/protocol_arms.test.mjs"/>
-	<testcase name="[M01-04][APP-DT-04] new arm emits arm.created as a CloudEvent" time="0.003862" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/protocol_arms.test.mjs"/>
-	<testcase name="[M01-04] arm lifecycle rejects draft -> active and accepts draft -> approved -> active" time="0.002553" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/protocol_arms.test.mjs"/>
-	<testcase name="[M07-01] serious AE starts a 15-day expedited clock; fatal/life-threatening 7 days" time="0.006805" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/protocol_arms.test.mjs"/>
-	<testcase name="[DM-01] every clinical table carries platform_id" time="0.028758" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/protocol_arms.test.mjs"/>
-	<testcase name="[APP-MF-01] reference manifest of the IST TA1 app is valid" time="0.003639" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/schemas.test.mjs"/>
-	<testcase name="[APP-MF-01] L2/L3 apps must declare a validation package" time="0.000148" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/schemas.test.mjs"/>
-	<testcase name="[APP-MF-01] unknown fields and non-https endpoints are rejected" time="0.000087" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/schemas.test.mjs"/>
-	<testcase name="[APP-DT-04] every event in the catalogue is a dotted lowercase CloudEvents type" time="0.000752" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/schemas.test.mjs"/>
-	<testcase name="[APP-ID-02] token carries sub, email, org_id and the person roles" time="0.036505" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/sites_registry.test.mjs"/>
-	<testcase name="[APP-ID-02] an email already in the identity token is kept" time="0.000443" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/sites_registry.test.mjs"/>
-	<testcase name="[APP-ID-02] unknown users get no roles" time="0.000361" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/sites_registry.test.mjs"/>
-	<testcase name="[M02-01] every demo site has a principal investigator, certifications and capacity" time="0.004577" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/sites_registry.test.mjs"/>
-	<testcase name="[M02-01][IAM-02] a site PI sees only the registry of its own site" time="0.001771" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/sites_registry.test.mjs"/>
-	<testcase name="[M02-01][DM-03] registry changes are audited and need a reason" time="0.004505" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/sites_registry.test.mjs"/>
-	<testcase name="[APP-TK-02] invalid task transitions are refused and valid ones logged" time="0.041465" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/tasks_apps_metrics.test.mjs"/>
-	<testcase name="[APP-TK-04][AI-05] GxP task by an agent cannot skip human review" time="0.001506" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/tasks_apps_metrics.test.mjs"/>
-	<testcase name="[APP-TK-04][AI-05] an agent cannot close its own GxP task even after review" time="0.004045" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/tasks_apps_metrics.test.mjs"/>
-	<testcase name="[APP-TK-04] a person completes a reviewed GxP task with a signature" time="0.005045" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/tasks_apps_metrics.test.mjs"/>
-	<testcase name="[APP-MF-02][APP-MF-04] app scopes are granted on approval and revoked on uninstall" time="0.011882" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/tasks_apps_metrics.test.mjs"/>
-	<testcase name="[M11-01] the SURPASS TA3 metric catalogue is loaded with interim and final targets" time="0.001768" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/tasks_apps_metrics.test.mjs"/>
-	<testcase name="[M11-02] arm onboarding metrics are computed from records, later arms faster" time="0.008060" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/tasks_apps_metrics.test.mjs"/>
-	<testcase name="[M05-02] enrollment funnel is monotonic per site" time="0.000615" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/tasks_apps_metrics.test.mjs"/>
-	<testcase name="[AI-06] AI ledger requires model version and input hash" time="0.001098" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/tasks_apps_metrics.test.mjs"/>
-	<testcase name="[DM-05] demo data is synthetic and complete" time="0.001591" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/tasks_apps_metrics.test.mjs"/>
-	<testcase name="[AI-01][AI-06] POST /api/ai/tasks runs a registered task and records it in the ledger" time="0.507612" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/packages/api/test/ai.test.ts"/>
-	<testcase name="[AI-01] unknown task types and unapproved data classes are refused before any call" time="0.008386" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/packages/api/test/ai.test.ts"/>
-	<testcase name="[AI-06][IAM-03] the ledger is visible within the perimeter only" time="0.008426" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/packages/api/test/ai.test.ts"/>
-	<testcase name="[AI-06][AI-05] a ledger row is immutable except for one human review decision" time="0.005338" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/packages/api/test/ai.test.ts"/>
-	<testcase name="[AI-01] the task type registry is published with model and prompt versions" time="0.002272" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/packages/api/test/ai.test.ts"/>
-	<testcase name="[M11-01] the catalogue exposes definition, formula, source events and both targets" time="0.437162" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/packages/api/test/metrics.test.ts"/>
-	<testcase name="[M11-02] values are judged against interim and final targets" time="0.000129" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/packages/api/test/metrics.test.ts"/>
-	<testcase name="[M11-02] per-arm onboarding metrics are computed from records and later arms are faster" time="0.047533" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/packages/api/test/metrics.test.ts"/>
-	<testcase name="[M11-02] drill-down goes from a value to its source records and domain events" time="0.018769" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/packages/api/test/metrics.test.ts"/>
-	<testcase name="[IAM-03] a sponsor sees metrics and events of its own arm only" time="0.015401" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/packages/api/test/metrics.test.ts"/>
-	<testcase name="[IAM-02] requests without a valid bearer token are refused" time="0.431630" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/packages/api/test/platform.test.ts"/>
-	<testcase name="[APP-ID-02][IAM-02] /v1/me returns the perimeter and roles carried by the token" time="0.043581" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/packages/api/test/platform.test.ts"/>
-	<testcase name="[IAM-02] a user outside the platform sees no platform" time="0.011086" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/packages/api/test/platform.test.ts"/>
-	<testcase name="[IAM-03] the platform overview shows a sponsor only its own arm" time="0.050865" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/packages/api/test/platform.test.ts"/>
-	<testcase name="[IAM-07] an agent token is never unblinded, even if it claims so" time="0.002169" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/packages/api/test/platform.test.ts"/>
-	<testcase name="[APP-DT-01] the OpenAPI 3.1 document is generated from the route registry" time="0.001929" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/packages/api/test/platform.test.ts"/>
-	<testcase name="[M01-04] platform operations create a draft arm; a sponsor cannot" time="0.484878" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/packages/api/test/protocol_arms.test.ts"/>
-	<testcase name="[M01-01] a draft appendix is edited section by section with validated, structured content" time="0.027807" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/packages/api/test/protocol_arms.test.ts"/>
-	<testcase name="[M01-04] an arm cannot be approved before its appendix is approved" time="0.003792" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/packages/api/test/protocol_arms.test.ts"/>
-	<testcase name="[DM-02] only drafts can be edited; a version in review is locked until returned" time="0.006479" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/packages/api/test/protocol_arms.test.ts"/>
-	<testcase name="[IAM-05] the author of a version cannot approve it" time="0.010558" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/packages/api/test/protocol_arms.test.ts"/>
-	<testcase name="[CMP-02][AI-05] approval needs re-authentication by a person; agents cannot sign" time="0.005781" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/packages/api/test/protocol_arms.test.ts"/>
-	<testcase name="[CMP-02][DM-02] a signed approval freezes the version and emits the approval event" time="0.009132" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/packages/api/test/protocol_arms.test.ts"/>
-	<testcase name="[M01-04] with an approved appendix the arm goes approved -> active and changes stage" time="0.030246" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/packages/api/test/protocol_arms.test.ts"/>
-	<testcase name="[M01-01] a new Master Protocol draft starts from the approved content and shows a section diff" time="0.008315" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/packages/api/test/protocol_arms.test.ts"/>
-	<testcase name="[IAM-03] a sponsor cannot read another sponsor arm or its appendix" time="0.003779" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/packages/api/test/protocol_arms.test.ts"/>
-	<testcase name="[M02-01] the registry lists every site with PI, certifications, capacity and enrollment" time="0.520071" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/packages/api/test/sites.test.ts"/>
-	<testcase name="[M02-01][IAM-02] a site PI sees only its own site" time="0.017506" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/packages/api/test/sites.test.ts"/>
-	<testcase name="[M02-01] a candidate site is registered and its registry completed" time="0.050607" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/packages/api/test/sites.test.ts"/>
-	<testcase name="[M02-03] activation steps are dated in order and the green light activates the site" time="0.043602" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/packages/api/test/sites.test.ts"/>
-	<testcase name="[M02-03] a step cannot be dated before the previous one" time="0.013623" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/packages/api/test/sites.test.ts"/>
-	<testcase name="[M02-03] the arm view shows each site with its next step" time="0.002725" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/packages/api/test/sites.test.ts"/>
-	<testcase name="[M01-02] the wizard creates a draft arm, an empty appendix draft and one task per agent" time="0.504085" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/packages/api/test/wizard.test.ts"/>
-	<testcase name="[M01-02][IAM-07] the Protocol author works under its own identity and leaves a proposal waiting for review" time="0.043434" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/packages/api/test/wizard.test.ts"/>
-	<testcase name="[M01-02] the Onboarding planner creates the operational tasks automatically" time="0.031553" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/packages/api/test/wizard.test.ts"/>
-	<testcase name="[AI-05] the reviewer sees the diff and the cited sources before deciding" time="0.003403" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/packages/api/test/wizard.test.ts"/>
-	<testcase name="[AI-05][APP-TK-04] an agent cannot accept its own proposal" time="0.002485" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/packages/api/test/wizard.test.ts"/>
-	<testcase name="[AI-05][CMP-02] a person accepts with a signature: the appendix gets the content and goes to review" time="0.033250" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/packages/api/test/wizard.test.ts"/>
-	<testcase name="[M01-02][IAM-05] another person approves the appendix and the arm is ready within one working day" time="0.009823" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/packages/api/test/wizard.test.ts"/>
-	<testcase name="[AI-05] edits and rejections are recorded and measured per task type" time="0.059400" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/packages/api/test/wizard.test.ts"/>
-	<testcase name="[AI-01] a module importing a provider SDK fails the lint gate" time="0.514946" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/services/ai-runtime/test/boundary.test.ts"/>
-	<testcase name="[AI-01] a module calling a provider endpoint directly fails the lint gate" time="0.003928" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/services/ai-runtime/test/boundary.test.ts"/>
-	<testcase name="[AI-01] the AI runtime is the only place allowed to reach a provider" time="0.003614" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/services/ai-runtime/test/boundary.test.ts"/>
-	<testcase name="[AI-01] only registered task types run; the caller never chooses the model" time="0.002815" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/services/ai-runtime/test/runtime.test.ts"/>
-	<testcase name="[AI-06] every call writes one ledger row with model, prompt version, hashes, tokens, cost and outcome" time="0.018761" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/services/ai-runtime/test/runtime.test.ts"/>
-	<testcase name="[AI-06] failures are recorded too: invalid output, refusal, provider error" time="0.011135" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/services/ai-runtime/test/runtime.test.ts"/>
-	<testcase name="[AI-01][AI-11] STRICT_LOCAL data never reaches a cloud provider" time="0.000260" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/services/ai-runtime/test/runtime.test.ts"/>
-	<testcase name="[AI-01] replay mode answers from recorded responses that satisfy the registered schemas" time="0.025027" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/services/ai-runtime/test/runtime.test.ts"/>
-	<!-- tests 92 -->
+	<testcase name="[IAM-02] a user without the platform claim sees no platform data" time="0.042990" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/access.test.mjs"/>
+	<testcase name="[IAM-03] a sponsor sees only its own arm, its contracts and its documents" time="0.004737" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/access.test.mjs"/>
+	<testcase name="[IAM-03] a sponsor cannot write into another arm" time="0.006889" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/access.test.mjs"/>
+	<testcase name="[IAM-04] blinded users never see arm allocation" time="0.004005" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/access.test.mjs"/>
+	<testcase name="[IAM-04] the SAC unblinded role can read allocation" time="0.001534" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/access.test.mjs"/>
+	<testcase name="[IAM-07][AI-11] an agent identity is never unblinded, even with the claim" time="0.003681" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/access.test.mjs"/>
+	<testcase name="[IAM-02] site staff see only their site" time="0.005947" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/access.test.mjs"/>
+	<testcase name="[CMP-01] audit trail hash chain verifies end to end" time="0.033976" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/audit.test.mjs"/>
+	<testcase name="[CMP-01] audit_event cannot be updated, deleted or truncated" time="0.003864" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/audit.test.mjs"/>
+	<testcase name="[CMP-01] tampering is detected by audit_verify" time="0.002917" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/audit.test.mjs"/>
+	<testcase name="[DM-03] update of a GxP record without a change reason is refused" time="0.001529" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/audit.test.mjs"/>
+	<testcase name="[DM-03][CMP-04] update with reason writes who, when, old, new and reason" time="0.003373" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/audit.test.mjs"/>
+	<testcase name="[DM-03] physical delete is refused; void is audited as VOID" time="0.003797" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/audit.test.mjs"/>
+	<testcase name="[CMP-02] signatures are immutable" time="0.001299" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/audit.test.mjs"/>
+	<testcase name="[APP-ID-02][IAM-02] sponsor token gets only its own arm" time="0.032315" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/claims.test.mjs"/>
+	<testcase name="[APP-ID-02][IAM-02] site PI token is restricted to its site" time="0.000439" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/claims.test.mjs"/>
+	<testcase name="[APP-ID-02][IAM-04] only SAC members receive an unblinded token" time="0.000738" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/claims.test.mjs"/>
+	<testcase name="[APP-ID-02] unknown users get no platform" time="0.000346" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/claims.test.mjs"/>
+	<testcase name="[DM-02] an approved Master Protocol version cannot be edited" time="0.033899" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/protocol_arms.test.mjs"/>
+	<testcase name="[DM-02][CMP-02] approval without an approval signature is refused" time="0.004168" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/protocol_arms.test.mjs"/>
+	<testcase name="[M01-04][APP-DT-04] new arm emits arm.created as a CloudEvent" time="0.003381" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/protocol_arms.test.mjs"/>
+	<testcase name="[M01-04] arm lifecycle rejects draft -> active and accepts draft -> approved -> active" time="0.003021" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/protocol_arms.test.mjs"/>
+	<testcase name="[M07-01] serious AE starts a 15-day expedited clock; fatal/life-threatening 7 days" time="0.006541" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/protocol_arms.test.mjs"/>
+	<testcase name="[DM-01] every clinical table carries platform_id" time="0.015524" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/protocol_arms.test.mjs"/>
+	<testcase name="[APP-MF-01] reference manifest of the IST TA1 app is valid" time="0.003732" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/schemas.test.mjs"/>
+	<testcase name="[APP-MF-01] L2/L3 apps must declare a validation package" time="0.000173" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/schemas.test.mjs"/>
+	<testcase name="[APP-MF-01] unknown fields and non-https endpoints are rejected" time="0.000096" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/schemas.test.mjs"/>
+	<testcase name="[APP-DT-04] every event in the catalogue is a dotted lowercase CloudEvents type" time="0.000526" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/schemas.test.mjs"/>
+	<testcase name="[APP-ID-02] token carries sub, email, org_id and the person roles" time="0.031299" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/sites_registry.test.mjs"/>
+	<testcase name="[APP-ID-02] an email already in the identity token is kept" time="0.000520" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/sites_registry.test.mjs"/>
+	<testcase name="[APP-ID-02] unknown users get no roles" time="0.000427" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/sites_registry.test.mjs"/>
+	<testcase name="[M02-01] every demo site has a principal investigator, certifications and capacity" time="0.003007" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/sites_registry.test.mjs"/>
+	<testcase name="[M02-01][IAM-02] a site PI sees only the registry of its own site" time="0.002018" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/sites_registry.test.mjs"/>
+	<testcase name="[M02-01][DM-03] registry changes are audited and need a reason" time="0.003522" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/sites_registry.test.mjs"/>
+	<testcase name="[APP-TK-02] invalid task transitions are refused and valid ones logged" time="0.036641" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/tasks_apps_metrics.test.mjs"/>
+	<testcase name="[APP-TK-04][AI-05] GxP task by an agent cannot skip human review" time="0.001555" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/tasks_apps_metrics.test.mjs"/>
+	<testcase name="[APP-TK-04][AI-05] an agent cannot close its own GxP task even after review" time="0.003414" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/tasks_apps_metrics.test.mjs"/>
+	<testcase name="[APP-TK-04] a person completes a reviewed GxP task with a signature" time="0.004130" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/tasks_apps_metrics.test.mjs"/>
+	<testcase name="[APP-MF-02][APP-MF-04] app scopes are granted on approval and revoked on uninstall" time="0.006221" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/tasks_apps_metrics.test.mjs"/>
+	<testcase name="[M11-01] the SURPASS TA3 metric catalogue is loaded with interim and final targets" time="0.001097" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/tasks_apps_metrics.test.mjs"/>
+	<testcase name="[M11-02] arm onboarding metrics are computed from records, later arms faster" time="0.005487" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/tasks_apps_metrics.test.mjs"/>
+	<testcase name="[M05-02] enrollment funnel is monotonic per site" time="0.000775" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/tasks_apps_metrics.test.mjs"/>
+	<testcase name="[AI-06] AI ledger requires model version and input hash" time="0.001236" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/tasks_apps_metrics.test.mjs"/>
+	<testcase name="[DM-05] demo data is synthetic and complete" time="0.001137" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/tasks_apps_metrics.test.mjs"/>
+	<testcase name="[AI-01][AI-06] POST /api/ai/tasks runs a registered task and records it in the ledger" time="0.501960" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/packages/api/test/ai.test.ts"/>
+	<testcase name="[AI-01] unknown task types and unapproved data classes are refused before any call" time="0.006424" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/packages/api/test/ai.test.ts"/>
+	<testcase name="[AI-06][IAM-03] the ledger is visible within the perimeter only" time="0.004929" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/packages/api/test/ai.test.ts"/>
+	<testcase name="[AI-06][AI-05] a ledger row is immutable except for one human review decision" time="0.004946" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/packages/api/test/ai.test.ts"/>
+	<testcase name="[AI-01] the task type registry is published with model and prompt versions" time="0.001913" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/packages/api/test/ai.test.ts"/>
+	<testcase name="[APP-MF-01] the catalogue lists publisher, GxP class, scopes, residency and validation package" time="0.563828" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/packages/api/test/apps_sso.test.ts"/>
+	<testcase name="[APP-MF-01] an invalid manifest blocks the installation" time="0.021479" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/packages/api/test/apps_sso.test.ts"/>
+	<testcase name="[APP-MF-02] installation waits for scope approval, approval grants the declared scopes" time="0.081832" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/packages/api/test/apps_sso.test.ts"/>
+	<testcase name="[APP-ID-02] app roles are assigned in TrialOps and only if declared in the manifest" time="0.011632" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/packages/api/test/apps_sso.test.ts"/>
+	<testcase name="[APP-ID-01][APP-ID-02] single sign-on: the app gets a verified identity with the TrialOps claims, no password" time="0.013336" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/packages/api/test/apps_sso.test.ts"/>
+	<testcase name="[APP-ID-01] codes are single use and bound to the PKCE verifier and redirect URI" time="0.012802" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/packages/api/test/apps_sso.test.ts"/>
+	<testcase name="[APP-ID-01][IAM-02] only people of the platform can sign in to its apps" time="0.001899" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/packages/api/test/apps_sso.test.ts"/>
+	<testcase name="[APP-MF-04] uninstalling revokes scopes and stops sign-in at once" time="0.008534" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/packages/api/test/apps_sso.test.ts"/>
+	<testcase name="[M11-01] the catalogue exposes definition, formula, source events and both targets" time="0.488747" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/packages/api/test/metrics.test.ts"/>
+	<testcase name="[M11-02] values are judged against interim and final targets" time="0.000118" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/packages/api/test/metrics.test.ts"/>
+	<testcase name="[M11-02] per-arm onboarding metrics are computed from records and later arms are faster" time="0.043851" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/packages/api/test/metrics.test.ts"/>
+	<testcase name="[M11-02] drill-down goes from a value to its source records and domain events" time="0.019601" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/packages/api/test/metrics.test.ts"/>
+	<testcase name="[IAM-03] a sponsor sees metrics and events of its own arm only" time="0.013913" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/packages/api/test/metrics.test.ts"/>
+	<testcase name="[IAM-02] requests without a valid bearer token are refused" time="0.535201" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/packages/api/test/platform.test.ts"/>
+	<testcase name="[APP-ID-02][IAM-02] /v1/me returns the perimeter and roles carried by the token" time="0.041535" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/packages/api/test/platform.test.ts"/>
+	<testcase name="[IAM-02] a user outside the platform sees no platform" time="0.011219" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/packages/api/test/platform.test.ts"/>
+	<testcase name="[IAM-03] the platform overview shows a sponsor only its own arm" time="0.058433" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/packages/api/test/platform.test.ts"/>
+	<testcase name="[IAM-07] an agent token is never unblinded, even if it claims so" time="0.001800" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/packages/api/test/platform.test.ts"/>
+	<testcase name="[APP-DT-01] the OpenAPI 3.1 document is generated from the route registry" time="0.002158" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/packages/api/test/platform.test.ts"/>
+	<testcase name="[M01-04] platform operations create a draft arm; a sponsor cannot" time="0.601035" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/packages/api/test/protocol_arms.test.ts"/>
+	<testcase name="[M01-01] a draft appendix is edited section by section with validated, structured content" time="0.027435" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/packages/api/test/protocol_arms.test.ts"/>
+	<testcase name="[M01-04] an arm cannot be approved before its appendix is approved" time="0.003262" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/packages/api/test/protocol_arms.test.ts"/>
+	<testcase name="[DM-02] only drafts can be edited; a version in review is locked until returned" time="0.006703" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/packages/api/test/protocol_arms.test.ts"/>
+	<testcase name="[IAM-05] the author of a version cannot approve it" time="0.010233" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/packages/api/test/protocol_arms.test.ts"/>
+	<testcase name="[CMP-02][AI-05] approval needs re-authentication by a person; agents cannot sign" time="0.005092" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/packages/api/test/protocol_arms.test.ts"/>
+	<testcase name="[CMP-02][DM-02] a signed approval freezes the version and emits the approval event" time="0.009236" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/packages/api/test/protocol_arms.test.ts"/>
+	<testcase name="[M01-04] with an approved appendix the arm goes approved -> active and changes stage" time="0.029608" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/packages/api/test/protocol_arms.test.ts"/>
+	<testcase name="[M01-01] a new Master Protocol draft starts from the approved content and shows a section diff" time="0.007920" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/packages/api/test/protocol_arms.test.ts"/>
+	<testcase name="[IAM-03] a sponsor cannot read another sponsor arm or its appendix" time="0.003784" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/packages/api/test/protocol_arms.test.ts"/>
+	<testcase name="[M02-01] the registry lists every site with PI, certifications, capacity and enrollment" time="0.557650" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/packages/api/test/sites.test.ts"/>
+	<testcase name="[M02-01][IAM-02] a site PI sees only its own site" time="0.015643" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/packages/api/test/sites.test.ts"/>
+	<testcase name="[M02-01] a candidate site is registered and its registry completed" time="0.075977" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/packages/api/test/sites.test.ts"/>
+	<testcase name="[M02-03] activation steps are dated in order and the green light activates the site" time="0.046467" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/packages/api/test/sites.test.ts"/>
+	<testcase name="[M02-03] a step cannot be dated before the previous one" time="0.012619" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/packages/api/test/sites.test.ts"/>
+	<testcase name="[M02-03] the arm view shows each site with its next step" time="0.002899" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/packages/api/test/sites.test.ts"/>
+	<testcase name="[M01-02] the wizard creates a draft arm, an empty appendix draft and one task per agent" time="0.470735" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/packages/api/test/wizard.test.ts"/>
+	<testcase name="[M01-02][IAM-07] the Protocol author works under its own identity and leaves a proposal waiting for review" time="0.043936" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/packages/api/test/wizard.test.ts"/>
+	<testcase name="[M01-02] the Onboarding planner creates the operational tasks automatically" time="0.031263" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/packages/api/test/wizard.test.ts"/>
+	<testcase name="[AI-05] the reviewer sees the diff and the cited sources before deciding" time="0.004056" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/packages/api/test/wizard.test.ts"/>
+	<testcase name="[AI-05][APP-TK-04] an agent cannot accept its own proposal" time="0.002613" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/packages/api/test/wizard.test.ts"/>
+	<testcase name="[AI-05][CMP-02] a person accepts with a signature: the appendix gets the content and goes to review" time="0.032142" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/packages/api/test/wizard.test.ts"/>
+	<testcase name="[M01-02][IAM-05] another person approves the appendix and the arm is ready within one working day" time="0.009670" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/packages/api/test/wizard.test.ts"/>
+	<testcase name="[AI-05] edits and rejections are recorded and measured per task type" time="0.060242" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/packages/api/test/wizard.test.ts"/>
+	<testcase name="[AI-01] a module importing a provider SDK fails the lint gate" time="0.496206" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/services/ai-runtime/test/boundary.test.ts"/>
+	<testcase name="[AI-01] a module calling a provider endpoint directly fails the lint gate" time="0.003143" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/services/ai-runtime/test/boundary.test.ts"/>
+	<testcase name="[AI-01] the AI runtime is the only place allowed to reach a provider" time="0.002640" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/services/ai-runtime/test/boundary.test.ts"/>
+	<testcase name="[AI-01] only registered task types run; the caller never chooses the model" time="0.002767" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/services/ai-runtime/test/runtime.test.ts"/>
+	<testcase name="[AI-06] every call writes one ledger row with model, prompt version, hashes, tokens, cost and outcome" time="0.021152" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/services/ai-runtime/test/runtime.test.ts"/>
+	<testcase name="[AI-06] failures are recorded too: invalid output, refusal, provider error" time="0.011865" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/services/ai-runtime/test/runtime.test.ts"/>
+	<testcase name="[AI-01][AI-11] STRICT_LOCAL data never reaches a cloud provider" time="0.000321" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/services/ai-runtime/test/runtime.test.ts"/>
+	<testcase name="[AI-01] replay mode answers from recorded responses that satisfy the registered schemas" time="0.028044" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/services/ai-runtime/test/runtime.test.ts"/>
+	<!-- tests 100 -->
 	<!-- suites 0 -->
-	<!-- pass 92 -->
+	<!-- pass 100 -->
 	<!-- fail 0 -->
 	<!-- cancelled 0 -->
 	<!-- skipped 0 -->
 	<!-- todo 0 -->
-	<!-- duration_ms 8972.607834 -->
+	<!-- duration_ms 9856.320084 -->
 </testsuites>

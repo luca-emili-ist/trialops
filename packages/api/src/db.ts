@@ -10,10 +10,12 @@ export function createPool(connectionString = process.env.DATABASE_URL): pg.Pool
   return new pg.Pool({ connectionString, max: Number(process.env.TRIALOPS_DB_POOL || 5) });
 }
 
-/** Database role for a caller: apps use app_service, people and agents use authenticated. Never a privileged role. */
-export function dbRole(claims: Claims): 'authenticated' | 'app_service' {
-  return claims.actor_type === 'app' ? 'app_service' : 'authenticated';
+/** Database role for a caller: apps use app_service, people and agents authenticated, public endpoints anon.
+ * Never a privileged role. */
+export function dbRole(claims: Claims): 'authenticated' | 'app_service' | 'anon' {
+  return claims.actor_type === 'app' ? 'app_service' : claims.actor_type === 'anon' ? 'anon' : 'authenticated';
 }
+export const ANONYMOUS: Claims = { sub: 'anonymous', actor_type: 'anon' };
 
 export async function withClaims<T>(pool: pg.Pool, claims: Claims, reason: string | undefined, fn: (db: Db) => Promise<T>): Promise<T> {
   const client = await pool.connect();

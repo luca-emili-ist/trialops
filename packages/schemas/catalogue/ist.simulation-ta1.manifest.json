@@ -1,0 +1,18 @@
+{
+  "app_id": "ist.simulation-ta1",
+  "version": "1.4.0",
+  "publisher": "InSilicoTrials Technologies",
+  "gxp_class": "L2",
+  "gamp_category": 4,
+  "hosting": "external",
+  "base_url": "https://sim.insilicotrials.example",
+  "auth": { "oidc_redirect_uris": ["https://sim.insilicotrials.example/callback"], "scim": true },
+  "scopes": ["platform:read", "arm:read", "enrollment.metrics:read", "simulation.results:write"],
+  "domains": ["simulation"],
+  "roles": ["sim.viewer", "sim.designer", "sim.approver"],
+  "events": { "subscribe": ["arm.created", "enrollment.snapshot.published"], "publish": ["simulation.run.completed"] },
+  "task_types": ["simulation.rerun", "simulation.scenario.review"],
+  "ui_extensions": [{ "slot": "arm.detail.tab", "title": "Simulation", "url": "/embed/arm/{arm_id}" }],
+  "data_residency": ["EU", "US"],
+  "validation_package_url": "https://sim.insilicotrials.example/vp/1.4.0.zip"
+}

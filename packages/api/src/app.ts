@@ -2,9 +2,9 @@
 import express, { type Request, type Response, type NextFunction } from 'express';
 import type pg from 'pg';
 import { bearer, type Verifier } from './auth.ts';
-import { withClaims } from './db.ts';
+import { withClaims, ANONYMOUS } from './db.ts';
 import { HttpError, toHttp } from './errors.ts';
-import type { RouteDef, Services } from './route.ts';
+import type { RawResponse, RouteDef, Services } from './route.ts';
 import { openapi } from './openapi.ts';
 import { ajv } from './lib/validate.ts';
 import { routes as allRoutes } from './routes/index.ts';
@@ -20,6 +20,7 @@ export function createApp({ pool, verify, services = {}, routes = allRoutes }: A
   const app = express();
   app.disable('x-powered-by');
   app.use(express.json({ limit: '1mb' }));
+  app.use(express.urlencoded({ extended: false, limit: '64kb' }));   // OAuth token endpoint (form-encoded)
 
   app.get('/v1/openapi.json', (_req, res) => { res.json(openapi(routes)); });
 
@@ -33,15 +34,16 @@ export function createApp({ pool, verify, services = {}, routes = allRoutes }: A
         const reason = req.header('x-change-reason')?.trim() || undefined;
         if (r.needsReason && !reason) throw new HttpError(400, 'reason_required', 'X-Change-Reason header required for this change (DM-03)');
         const ctxBase = { params: req.params as Record<string, string>, query: req.query as Record<string, string | undefined>,
-          body: req.body as never, reason, services };
+          body: req.body as never, reason, services, headers: req.headers as Record<string, string | undefined> };
         let out: unknown;
         if (r.public) {
-          out = await r.handler({ ...ctxBase, db: undefined as never, claims: undefined as never });
+          out = await withClaims(pool, ANONYMOUS, undefined, db => r.handler({ ...ctxBase, db, claims: ANONYMOUS }));
         } else {
           const claims = await verify(bearer(req.header('authorization')));
           out = await withClaims(pool, claims, reason, db => r.handler({ ...ctxBase, db, claims }));
         }
         if (out === undefined) throw new HttpError(404, 'not_found', 'not found');
+        if (r.raw) { const { status, headers, body } = out as RawResponse; res.status(status).set(headers ?? {}).json(body); return; }
         res.status(r.status ?? 200).json(out);
       } catch (e) { next(e); }
     });

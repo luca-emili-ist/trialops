@@ -29,7 +29,7 @@ export default tseslint.config(
   {
     files: ['**/*.{js,mjs,ts,tsx}'],
     languageOptions: { ecmaVersion: 2023, sourceType: 'module', globals: globals.node },
-    rules: { ...aiBoundary, '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }] },
+    rules: { ...aiBoundary, '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_', varsIgnorePattern: '^_', ignoreRestSiblings: true }] },
   },
   // tests read JSON bodies loosely
   { files: ['**/test/**'], rules: { '@typescript-eslint/no-explicit-any': 'off' } },

@@ -13,7 +13,7 @@ export interface Claims extends JWTPayload {
   site_scopes?: string[] | '*';
   roles?: string[];
   blinding?: 'blinded' | 'unblinded';
-  actor_type?: 'user' | 'agent' | 'app';
+  actor_type?: 'user' | 'agent' | 'app' | 'anon';
   app_id?: string;
 }
 

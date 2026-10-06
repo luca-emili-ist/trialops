@@ -2,12 +2,13 @@
   "name": "trialops",
   "version": "0.1.0",
   "private": true,
-  "description": "TrialOps — open source clinical operations platform for adaptive platform trials (TA3)",
+  "description": "TrialOps \u2014 open source clinical operations platform for adaptive platform trials (TA3)",
   "license": "AGPL-3.0-only",
   "type": "module",
   "workspaces": [
     "packages/*",
-    "services/*"
+    "services/*",
+    "examples/*"
   ],
   "engines": {
     "node": ">=22.18"

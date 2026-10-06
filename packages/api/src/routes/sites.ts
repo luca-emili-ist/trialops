@@ -76,16 +76,15 @@ export const siteRoutes = [
     handler: async ({ db, params }) => {
       const site = await getSite(db, params.id!);
       if (!site) return undefined;
-      const [inv, cert, trials, acts] = await Promise.all([
-        db.query(`select id, full_name, investigator_role, specialty, gcp_training_valid_until, status from core.site_investigator
-          where site_id = $1 and status <> 'void' order by investigator_role, full_name`, [site.id]),
-        db.query(`select id, kind, issuer, valid_until, status from core.site_certification where site_id = $1 and status <> 'void' order by kind`, [site.id]),
-        db.query(`select id, title, registry_id, competes_for_population, status from core.site_concurrent_trial
-          where site_id = $1 and status <> 'void' order by title`, [site.id]),
-        db.query(`select x.id, x.arm_id, a.code arm_code, x.status, x.qualified_at, x.contract_executed_at, x.irb_approved_at,
+      // one query at a time: a pg client runs queries sequentially
+      const inv = await db.query(`select id, full_name, investigator_role, specialty, gcp_training_valid_until, status from core.site_investigator
+          where site_id = $1 and status <> 'void' order by investigator_role, full_name`, [site.id]);
+      const cert = await db.query(`select id, kind, issuer, valid_until, status from core.site_certification where site_id = $1 and status <> 'void' order by kind`, [site.id]);
+      const trials = await db.query(`select id, title, registry_id, competes_for_population, status from core.site_concurrent_trial
+          where site_id = $1 and status <> 'void' order by title`, [site.id]);
+      const acts = await db.query(`select x.id, x.arm_id, a.code arm_code, x.status, x.qualified_at, x.contract_executed_at, x.irb_approved_at,
             x.training_done_at, x.green_light_at from core.site_arm_activation x join core.arm a on a.id = x.arm_id
-          where x.site_id = $1 and x.status <> 'void' order by a.code`, [site.id]),
-      ]);
+          where x.site_id = $1 and x.status <> 'void' order by a.code`, [site.id]);
       return { ...site, investigators: inv.rows, certifications: cert.rows, concurrent_trials: trials.rows,
         activations: acts.rows.map(a => ({ ...a, next_step: nextStep(a) })) };
     } }),

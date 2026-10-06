@@ -4,6 +4,7 @@ import type { Db } from './db.ts';
 import type { Claims } from './auth.ts';
 import type { Reauthenticator } from './lib/reauth.ts';
 import type { AiRuntime } from '@trialops/ai-runtime';
+import type { Oidc } from './lib/oidc.ts';
 
 export type JsonSchema = Record<string, unknown>;
 
@@ -14,6 +15,7 @@ export interface Ctx<B = unknown> {
   query: Record<string, string | undefined>;
   body: B;
   reason: string | undefined;
+  headers: Record<string, string | undefined>;
   services: Services;
 }
 
@@ -21,7 +23,10 @@ export interface Ctx<B = unknown> {
 export interface Services {
   ai?: AiRuntime;
   reauth?: Reauthenticator;
+  oidc?: Oidc;
 }
+
+export interface RawResponse { status: number; headers?: Record<string, string>; body: unknown }
 
 export interface RouteDef {
   method: 'get' | 'post' | 'patch' | 'put';
@@ -34,8 +39,10 @@ export interface RouteDef {
   status?: number;
   /** GxP writes must carry a change reason (DM-03); the API reads it from the X-Change-Reason header. */
   needsReason?: boolean;
-  /** Public routes skip authentication (health, OpenAPI document, OIDC discovery). */
+  /** Public routes skip authentication (health, OIDC discovery and token endpoint) and run as the anon role. */
   public?: boolean;
+  /** The handler returns a RawResponse (own status/headers/body), e.g. OAuth error responses. */
+  raw?: boolean;
   handler: (ctx: Ctx<never>) => Promise<unknown>;
 }
 

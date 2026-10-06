@@ -52,14 +52,13 @@ export const armRoutes = [
     handler: async ({ db, params }) => {
       const arm = await getArm(db, params.id!);
       if (!arm) return undefined;
-      const [appendices, stages, activations] = await Promise.all([
-        db.query(`select id, version_label, status, approved_signature_id, created_at from core.arm_appendix_version
-          where arm_id = $1 and status <> 'void' order by created_at`, [arm.id]),
-        db.query(`select from_stage, to_stage, transitioned_at from core.arm_stage_transition where arm_id = $1 and status <> 'void'
-          order by transitioned_at`, [arm.id]),
-        db.query(`select x.id, x.site_id, s.site_number, x.status, x.green_light_at from core.site_arm_activation x
-          join core.site s on s.id = x.site_id where x.arm_id = $1 and x.status <> 'void' order by s.site_number`, [arm.id]),
-      ]);
+      // one query at a time: a pg client runs queries sequentially
+      const appendices = await db.query(`select id, version_label, status, approved_signature_id, created_at from core.arm_appendix_version
+          where arm_id = $1 and status <> 'void' order by created_at`, [arm.id]);
+      const stages = await db.query(`select from_stage, to_stage, transitioned_at from core.arm_stage_transition where arm_id = $1 and status <> 'void'
+          order by transitioned_at`, [arm.id]);
+      const activations = await db.query(`select x.id, x.site_id, s.site_number, x.status, x.green_light_at from core.site_arm_activation x
+          join core.site s on s.id = x.site_id where x.arm_id = $1 and x.status <> 'void' order by s.site_number`, [arm.id]);
       return { ...arm, appendix_versions: appendices.rows, stage_history: stages.rows, site_activations: activations.rows };
     } }),
 

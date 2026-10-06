@@ -1,0 +1,11 @@
+{
+  "name": "@trialops/ta1-test-app",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "TA1 test app: minimal OIDC relying party that signs in with TrialOps (APP-ID-01 demo)",
+  "license": "AGPL-3.0-only",
+  "exports": { ".": "./src/client.ts" },
+  "scripts": { "typecheck": "tsc --noEmit -p .", "start": "node src/server.ts" },
+  "dependencies": { "jose": "^6.2.12" }
+}
