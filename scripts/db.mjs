@@ -6,6 +6,7 @@ import { readdirSync, readFileSync, existsSync, rmSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
+import { testFiles } from './test-files.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const dataDir = process.env.TRIALOPS_PGDATA || join(root, '.pgdata');
@@ -54,7 +55,7 @@ try {
     if (r.status) process.exitCode = r.status;
   }
   if (cmd === 'test') {
-    const files = readdirSync(join(root, 'db/tests')).filter(f => f.endsWith('.test.mjs')).map(f => join(root, 'db/tests', f));
+    const files = testFiles(root);
     const r = spawnSync(process.execPath, ['--test', '--test-concurrency=1', '--test-reporter=spec', '--test-reporter-destination=stdout',
       '--test-reporter=junit', `--test-reporter-destination=${join(root, 'test-results.xml')}`, ...files],
       { stdio: 'inherit', env: { ...process.env, DATABASE_URL: connString() } });

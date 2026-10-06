@@ -133,6 +133,11 @@
   },
   {
    "id": "APP-ID-02",
+   "release": "v0",
+   "text": "Access token carries sub, email, org_id and TrialOps claims platform_ids, arm_scopes, roles, blinding"
+  },
+  {
+   "id": "APP-ID-02",
    "release": "foundations",
    "text": "TrialOps claims (platform/arm/site scopes, blinding) added to the Supabase token"
   },

@@ -67,7 +67,7 @@ const sigMp = await ins('signature', { signer_sub: 'demo|admin', signer_name: 'D
 const mp = await ins('master_protocol_version', { platform_id: plat, version_label: '1.0', status: 'approved', approved_signature_id: sigMp,
   usdm: { study: { name: 'PLAT-001 Master Protocol', phases: ['phase1', 'phase2'], sharedControl: true } }, created_at: day(T0, 5) });
 
-for (const [k, role] of Object.entries(person))
+for (const role of Object.values(person))
   if (role.role !== 'arm_sponsor_lead')        // sponsors are scoped to their arm only (IAM-03)
     await ins('role_assignment', { person_id: role.id, role: role.role, platform_id: plat });
 
@@ -121,13 +121,10 @@ for (let i = 0; i < 6; i++) {
 }
 
 // --- subjects: ~240, statuses consistent with time; randomization 1:1:1 + shared control
-const statuses = ['identified', 'prescreened', 'prescreen_failed', 'consented', 'screen_failed', 'randomized', 'on_treatment', 'completed', 'withdrawn'];
-let n = 0;
 const subjects = [];
 for (let i = 0; i < 6; i++) {
   const count = [57, 48, 44, 40, 35, 16][i];   // 240 subjects; site 106 underperforms
   for (let k = 0; k < count; k++) {
-    n++;
     const r = rnd();
     const status = r < 0.08 ? 'identified' : r < 0.15 ? 'prescreened' : r < 0.25 ? 'prescreen_failed' : r < 0.32 ? 'consented'
       : r < 0.40 ? 'screen_failed' : r < 0.55 ? 'randomized' : r < 0.85 ? 'on_treatment' : r < 0.95 ? 'completed' : 'withdrawn';

@@ -5,20 +5,33 @@
   "description": "TrialOps — open source clinical operations platform for adaptive platform trials (TA3)",
   "license": "AGPL-3.0-only",
   "type": "module",
-  "workspaces": ["packages/*"],
-  "engines": { "node": ">=22" },
+  "workspaces": [
+    "packages/*",
+    "services/*"
+  ],
+  "engines": {
+    "node": ">=22.18"
+  },
   "scripts": {
     "db:up": "node scripts/db.mjs up",
     "db:reset": "node scripts/db.mjs reset",
     "db:seed": "node scripts/db.mjs seed",
     "test": "node scripts/db.mjs test",
     "trace": "node scripts/trace.mjs",
-    "verify": "npm run test && npm run trace"
+    "verify": "npm run lint && npm run typecheck && npm run test && npm run trace",
+    "lint": "eslint .",
+    "typecheck": "npm run typecheck --workspaces --if-present"
   },
   "devDependencies": {
-    "embedded-postgres": "17.5.0-beta.15",
-    "pg": "^8.13.0",
+    "@eslint/js": "^9.39.5",
+    "@types/node": "^22.20.5",
     "ajv": "^8.17.1",
-    "ajv-formats": "^3.0.1"
+    "ajv-formats": "^3.0.1",
+    "embedded-postgres": "17.5.0-beta.15",
+    "eslint": "^9.39.5",
+    "globals": "^17.13.0",
+    "pg": "^8.13.0",
+    "typescript": "~5.9",
+    "typescript-eslint": "^8.71.1"
   }
 }

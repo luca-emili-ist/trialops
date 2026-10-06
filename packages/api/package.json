@@ -1,0 +1,10 @@
+{
+  "name": "@trialops/api",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "TrialOps Platform API (ARC-03)",
+  "license": "AGPL-3.0-only",
+  "exports": { ".": "./src/index.ts" },
+  "scripts": { "typecheck": "tsc --noEmit -p ." }
+}

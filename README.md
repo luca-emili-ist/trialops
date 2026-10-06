@@ -13,7 +13,12 @@ npm install
 npm run db:reset    # embedded PostgreSQL 17, applies db/migrations, loads demo seed "demo-plat-001"
 npm test            # tests on a real PostgreSQL, writes test-results.xml
 npm run trace       # docs/traceability.md: requirement -> test -> result
+npm run verify      # lint (incl. AI-01 provider boundary) + typecheck + test + trace: the quality gate
 ```
+
+TypeScript runs natively on Node ≥ 22.18 (type stripping): tests live in `db/tests/` and `<workspace>/test/`, all run by
+`node --test` and tagged with requirement IDs. Set `TRIALOPS_GATE=foundations,v0` to make the trace step fail on a
+release that is not fully covered yet.
 
 No Docker needed for development: `embedded-postgres` downloads a PostgreSQL binary. Data lives in `.pgdata/`
 (override with `TRIALOPS_PGDATA`, port with `TRIALOPS_PGPORT`, default 54329).
@@ -28,7 +33,9 @@ No Docker needed for development: `embedded-postgres` downloads a PostgreSQL bin
 | `packages/schemas/` | App manifest JSON Schema, event catalogue, reference manifest |
 | `docs/requirements.json` | Requirement register by release |
 | `docs/traceability.md` | Generated traceability matrix |
-| `scripts/` | DB runner, traceability generator |
+| `packages/api/` | Platform API (TypeScript, ARC-03) |
+| `services/ai-runtime/` | AI runtime: the only component allowed to call AI providers (AI-01, ARC-10) |
+| `scripts/` | DB runner, traceability generator, shared test-file discovery |
 
 ## What the foundations guarantee (all enforced in the database, not in the UI)
 

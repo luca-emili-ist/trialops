@@ -1,0 +1,10 @@
+{
+  "name": "@trialops/ai-runtime",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "TrialOps AI runtime: the only component allowed to call AI providers (AI-01)",
+  "license": "AGPL-3.0-only",
+  "exports": { ".": "./src/index.ts" },
+  "scripts": { "typecheck": "tsc --noEmit -p ." }
+}
