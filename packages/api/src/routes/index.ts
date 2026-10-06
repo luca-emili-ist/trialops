@@ -3,5 +3,6 @@ import { platformRoutes } from './platform.ts';
 import { armRoutes } from './arms.ts';
 import { protocolRoutes } from './protocol.ts';
 import { signatureRoutes } from './signatures.ts';
+import { siteRoutes } from './sites.ts';
 
-export const routes: RouteDef[] = [...platformRoutes, ...armRoutes, ...protocolRoutes, ...signatureRoutes];
+export const routes: RouteDef[] = [...platformRoutes, ...armRoutes, ...protocolRoutes, ...signatureRoutes, ...siteRoutes];
