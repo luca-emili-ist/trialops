@@ -3,6 +3,7 @@
 import type { Db } from './db.ts';
 import type { Claims } from './auth.ts';
 import type { Reauthenticator } from './lib/reauth.ts';
+import type { AiRuntime } from '@trialops/ai-runtime';
 
 export type JsonSchema = Record<string, unknown>;
 
@@ -16,26 +17,10 @@ export interface Ctx<B = unknown> {
   services: Services;
 }
 
-/** Collaborators injected into handlers (AI runtime client, clock...). Filled in by later steps. */
+/** Collaborators injected into handlers. */
 export interface Services {
-  ai?: AiClient;
+  ai?: AiRuntime;
   reauth?: Reauthenticator;
-}
-
-export interface AiTaskRequest {
-  task_type: string;
-  data_class: 'PUBLIC' | 'INTERNAL' | 'CONFIDENTIAL_SPONSOR' | 'CLINICAL_PSEUDONYMIZED' | 'STRICT_LOCAL';
-  input: Record<string, unknown>;
-  platform_id?: string;
-  arm_id?: string;
-  task_id?: string;
-}
-export interface AiTaskResult {
-  ai_request_id: string;
-  output: Record<string, unknown>;
-}
-export interface AiClient {
-  run(req: AiTaskRequest, caller: { db: Db; claims: Claims }): Promise<AiTaskResult>;
 }
 
 export interface RouteDef {

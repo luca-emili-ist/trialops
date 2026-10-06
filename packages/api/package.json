@@ -16,7 +16,9 @@
     "ajv-formats": "^3.0.1",
     "express": "^5.2.1",
     "jose": "^6.2.12",
-    "pg": "^8.23.1"
+    "pg": "^8.23.1",
+    "@trialops/ai-runtime": "0.1.0",
+    "@trialops/schemas": "0.1.0"
   },
   "devDependencies": {
     "@types/express": "^5.0.6",

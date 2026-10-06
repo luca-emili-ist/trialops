@@ -14,6 +14,11 @@ interface PgError { code?: string; message?: string }
 
 export function toHttp(e: unknown): HttpError {
   if (e instanceof HttpError) return e;
+  // typed errors of other TrialOps packages (e.g. AiRequestError) carry their own status and code
+  const typed = e as { status?: unknown; code?: unknown; message?: string };
+  if (typeof typed?.status === 'number' && typed.status < 500 && typeof typed.code === 'string') {
+    return new HttpError(typed.status, typed.code, typed.message ?? typed.code);
+  }
   const pg = e as PgError;
   switch (pg?.code) {
     case '42501': return new HttpError(403, 'forbidden', pg.message ?? 'forbidden');           // privilege / RLS

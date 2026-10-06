@@ -1,0 +1,111 @@
+// AI runtime (ARC-10): POST /api/ai/tasks. Resolves the task type, applies the data-class policy, calls the pinned
+// model through a provider, validates the structured output and writes one ledger row per call (AI-06).
+import { Ajv2020, type ValidateFunction } from 'ajv/dist/2020.js';
+import addFormats from 'ajv-formats';
+import Anthropic from '@anthropic-ai/sdk';
+import { REGISTRY, type TaskTypeDef } from './registry.ts';
+import { canonical, sha256 } from './canonical.ts';
+import { anthropicProvider } from './providers/anthropic.ts';
+import { replayProvider, recording } from './providers/replay.ts';
+import type { AiTaskRequest, AiTaskResult, LedgerDb, Outcome, Provider } from './types.ts';
+
+/** USD per million tokens (list price). Ledger cost is in EUR at TRIALOPS_USD_EUR. */
+const PRICE_USD_PER_MTOK: Record<string, { in: number; out: number }> = { 'claude-opus-5-5': { in: 4, out: 20 } };
+
+export class AiRequestError extends Error {
+  readonly status = 422;
+  readonly code: string;
+  constructor(code: string, message: string) { super(message); this.code = code; }
+}
+
+export interface AiRuntimeOptions {
+  provider?: Provider;
+  registry?: Record<string, TaskTypeDef>;
+  usdToEur?: number;
+  now?: () => number;
+}
+
+/** Provider from the environment: TRIALOPS_AI_MODE=live (Anthropic, needs ANTHROPIC_API_KEY) or replay (default). */
+export function providerFromEnv(env: NodeJS.ProcessEnv = process.env): Provider {
+  if (env.TRIALOPS_AI_MODE !== 'live') return replayProvider();
+  const live = anthropicProvider(new Anthropic());
+  return env.TRIALOPS_AI_RECORD === '1' ? recording(live) : live;
+}
+
+export function createAiRuntime(opts: AiRuntimeOptions = {}) {
+  const provider = opts.provider ?? providerFromEnv();
+  const registry = opts.registry ?? REGISTRY;
+  const usdToEur = opts.usdToEur ?? Number(process.env.TRIALOPS_USD_EUR || 0.86);
+  const now = opts.now ?? (() => performance.now());
+  const ajv = new Ajv2020({ allErrors: true, strict: false });
+  addFormats.default(ajv);
+  const validators = new Map<string, ValidateFunction>();
+  const validatorFor = (d: TaskTypeDef) => {
+    let v = validators.get(d.task_type);
+    if (!v) { v = ajv.compile(d.output_schema); validators.set(d.task_type, v); }
+    return v;
+  };
+
+  async function ledger(db: LedgerDb, req: AiTaskRequest, d: TaskTypeDef, row: {
+    model: string; input_sha256: string; output_sha256: string | null; input_tokens: number | null; output_tokens: number | null;
+    latency_ms: number | null; outcome: Outcome;
+  }): Promise<string> {
+    const price = PRICE_USD_PER_MTOK[row.model];
+    const cost = price && row.input_tokens !== null && row.output_tokens !== null
+      ? ((row.input_tokens * price.in + row.output_tokens * price.out) / 1e6) * usdToEur : 0;
+    const r = await db.query(`insert into core.ai_request(platform_id, arm_id, task_id, task_type, data_class, provider, model, model_version,
+        prompt_id, prompt_version, input_sha256, output_sha256, input_tokens, output_tokens, cost_eur, latency_ms, outcome)
+      values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17) returning id`,
+      [req.platform_id ?? null, req.arm_id ?? null, req.task_id ?? null, d.task_type, req.data_class, provider.name, d.model, row.model,
+       d.prompt_id, d.prompt_version, row.input_sha256, row.output_sha256, row.input_tokens, row.output_tokens,
+       Math.round(cost * 1e6) / 1e6, row.latency_ms, row.outcome]);
+    return String(r.rows[0]!.id);
+  }
+
+  return {
+    provider,
+    registry,
+    async run(req: AiTaskRequest, caller: { db: LedgerDb }): Promise<AiTaskResult> {
+      const d = registry[req.task_type];
+      if (!d) throw new AiRequestError('unknown_task_type', `task_type ${req.task_type} is not registered (AI-02)`);
+      if (!d.data_classes.includes(req.data_class)) {
+        throw new AiRequestError('data_class_not_allowed', `${req.task_type} is not approved for ${req.data_class} data`);
+      }
+      const prompt = d.render(req.input);
+      const input_sha256 = sha256(canonical({ task_type: d.task_type, prompt_id: d.prompt_id, prompt_version: d.prompt_version,
+        model: d.model, system: prompt.system, user: prompt.user }));
+      const base = { model: d.model, input_sha256, output_sha256: null, input_tokens: null, output_tokens: null, latency_ms: null };
+      const result = (outcome: Outcome, id: string, output: Record<string, unknown> | null, model: string, error?: string): AiTaskResult =>
+        ({ ai_request_id: id, outcome, output, provider: provider.name, model, ...(error ? { error } : {}) });
+
+      if (!provider.accepts.includes(req.data_class)) {
+        const id = await ledger(caller.db, req, d, { ...base, outcome: 'blocked' });
+        return result('blocked', id, null, d.model, `${req.data_class} data may not be sent to ${provider.name}`);
+      }
+      const t0 = now();
+      let r;
+      try {
+        r = await provider.call({ task_type: d.task_type, model: d.model, effort: d.effort, max_tokens: d.max_tokens, system: prompt.system,
+          user: prompt.user, output_schema: d.output_schema, input_sha256 });
+      } catch (e) {
+        const timeout = (e as { name?: string })?.name?.includes('Timeout');
+        const id = await ledger(caller.db, req, d, { ...base, latency_ms: Math.round(now() - t0), outcome: timeout ? 'timeout' : 'error' });
+        return result(timeout ? 'timeout' : 'error', id, null, d.model, (e as Error).message);
+      }
+      const usage = { model: r.model, input_tokens: r.input_tokens, output_tokens: r.output_tokens, latency_ms: Math.round(now() - t0) };
+      if (r.refusal) {
+        const id = await ledger(caller.db, req, d, { ...base, ...usage, outcome: 'blocked' });
+        return result('blocked', id, null, r.model, `provider declined (${r.refusal})`);
+      }
+      const output_sha256 = sha256(canonical(r.output));
+      const validate = validatorFor(d);
+      if (!validate(r.output)) {
+        const id = await ledger(caller.db, req, d, { ...base, ...usage, output_sha256, outcome: 'validation_failed' });
+        return result('validation_failed', id, null, r.model, ajv.errorsText(validate.errors));
+      }
+      const id = await ledger(caller.db, req, d, { ...base, ...usage, output_sha256, outcome: 'success' });
+      return result('success', id, r.output as Record<string, unknown>, r.model);
+    },
+  };
+}
+export type AiRuntime = ReturnType<typeof createAiRuntime>;

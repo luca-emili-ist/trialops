@@ -1,6 +1,6 @@
 # Traceability matrix
 
-Generated 2026-10-06T21:19:54.737Z by scripts/trace.mjs from test tags and test-results.xml.
+Generated 2026-10-06T21:24:26.712Z by scripts/trace.mjs from test tags and test-results.xml.
 
 | Requirement | Release | Description | Tests | Result |
 | --- | --- | --- | --- | --- |
@@ -12,13 +12,13 @@ Generated 2026-10-06T21:19:54.737Z by scripts/trace.mjs from test tags and test-
 | DM-03 | foundations | Change reason mandatory on GxP updates; no physical delete | db/tests/audit.test.mjs, db/tests/sites_registry.test.mjs (4) | PASS |
 | DM-05 | foundations | Deterministic synthetic demo seed; no real data | db/tests/tasks_apps_metrics.test.mjs (1) | PASS |
 | IAM-02 | foundations | RLS driven by JWT claims platform_ids / arm_scopes / site_scopes | db/tests/access.test.mjs, db/tests/claims.test.mjs, db/tests/sites_registry.test.mjs, packages/api/test/platform.test.ts, packages/api/test/sites.test.ts (9) | PASS |
-| IAM-03 | foundations | Sponsors see and write only their own arm | db/tests/access.test.mjs, packages/api/test/metrics.test.ts, packages/api/test/platform.test.ts, packages/api/test/protocol_arms.test.ts (5) | PASS |
+| IAM-03 | foundations | Sponsors see and write only their own arm | db/tests/access.test.mjs, packages/api/test/ai.test.ts, packages/api/test/metrics.test.ts, packages/api/test/platform.test.ts, packages/api/test/protocol_arms.test.ts (6) | PASS |
 | IAM-04 | foundations | Unblinded data only in sac_enclave for the unblinded role | db/tests/access.test.mjs, db/tests/claims.test.mjs (3) | PASS |
 | IAM-05 | foundations | Separation of duties: the author of a GxP document or change cannot approve it | packages/api/test/protocol_arms.test.ts (1) | PASS |
 | IAM-07 | foundations | Agents are never unblinded | db/tests/access.test.mjs, packages/api/test/platform.test.ts (2) | PASS |
-| AI-05 | foundations | GxP AI output is a proposal until a person signs | db/tests/tasks_apps_metrics.test.mjs, packages/api/test/protocol_arms.test.ts (3) | PASS |
-| AI-06 | foundations | AI ledger with model version and input hash | db/tests/tasks_apps_metrics.test.mjs (1) | PASS |
-| AI-11 | foundations | AI never sees unblinded data outside the SAC enclave | db/tests/access.test.mjs (1) | PASS |
+| AI-05 | foundations | GxP AI output is a proposal until a person signs | db/tests/tasks_apps_metrics.test.mjs, packages/api/test/ai.test.ts, packages/api/test/protocol_arms.test.ts (4) | PASS |
+| AI-06 | foundations | AI ledger with model version and input hash | db/tests/tasks_apps_metrics.test.mjs, packages/api/test/ai.test.ts, services/ai-runtime/test/runtime.test.ts (6) | PASS |
+| AI-11 | foundations | AI never sees unblinded data outside the SAC enclave | db/tests/access.test.mjs, services/ai-runtime/test/runtime.test.ts (2) | PASS |
 | APP-MF-01 | foundations | App manifest validated against published JSON Schema | db/tests/schemas.test.mjs (3) | PASS |
 | APP-MF-02 | foundations | App activation requires approval; scopes granted on approval | db/tests/tasks_apps_metrics.test.mjs (1) | PASS |
 | APP-MF-04 | foundations | Uninstall revokes scopes | db/tests/tasks_apps_metrics.test.mjs (1) | PASS |
@@ -33,7 +33,7 @@ Generated 2026-10-06T21:19:54.737Z by scripts/trace.mjs from test tags and test-
 | APP-ID-01 | v0 | OIDC SSO via identity broker | — (0) | NO TEST |
 | APP-ID-02 | v0 | Access token carries sub, email, org_id and TrialOps claims platform_ids, arm_scopes, roles, blinding | db/tests/claims.test.mjs, db/tests/sites_registry.test.mjs, packages/api/test/platform.test.ts (8) | PASS |
 | APP-ID-02 | foundations | TrialOps claims (platform/arm/site scopes, blinding) added to the Supabase token | db/tests/claims.test.mjs, db/tests/sites_registry.test.mjs, packages/api/test/platform.test.ts (8) | PASS |
-| AI-01 | v0 | All AI calls through POST /api/ai/tasks | services/ai-runtime/test/boundary.test.ts (3) | PASS |
+| AI-01 | v0 | All AI calls through POST /api/ai/tasks | packages/api/test/ai.test.ts, services/ai-runtime/test/boundary.test.ts, services/ai-runtime/test/runtime.test.ts (9) | PASS |
 | M01-01 | v0 | Structured Master Protocol / appendix editor | packages/api/test/protocol_arms.test.ts (2) | PASS |
 | M01-02 | v0 | New-arm wizard with AI-drafted appendix and task plan | — (0) | NO TEST |
 | M02-01 | v0 | Site registry | db/tests/sites_registry.test.mjs, packages/api/test/sites.test.ts (6) | PASS |

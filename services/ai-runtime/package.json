@@ -5,6 +5,15 @@
   "type": "module",
   "description": "TrialOps AI runtime: the only component allowed to call AI providers (AI-01)",
   "license": "AGPL-3.0-only",
-  "exports": { ".": "./src/index.ts" },
-  "scripts": { "typecheck": "tsc --noEmit -p ." }
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit -p ."
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.131.0",
+    "ajv": "^8.20.0",
+    "ajv-formats": "^3.0.1"
+  }
 }

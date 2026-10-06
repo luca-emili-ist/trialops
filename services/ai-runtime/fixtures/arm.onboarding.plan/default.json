@@ -1,0 +1,22 @@
+{
+  "tasks": [
+    { "key": "contract-addendum", "area": "contracts", "type": "contract.addendum.prepare", "title": "Prepare and negotiate the arm addendum with the sponsor", "assignee_role": "platform_ops_manager", "due_in_days": 5, "gxp_impact": false, "site_number": "", "depends_on": [] },
+    { "key": "irb-package", "area": "regulatory", "type": "irb.amendment.package", "title": "Assemble the central IRB amendment package for the new arm", "assignee_role": "regulatory_lead", "due_in_days": 4, "gxp_impact": true, "site_number": "", "depends_on": [] },
+    { "key": "ind-amendment", "area": "regulatory", "type": "ind.amendment.submit", "title": "Prepare the IND protocol amendment adding the arm appendix", "assignee_role": "regulatory_lead", "due_in_days": 7, "gxp_impact": true, "site_number": "", "depends_on": ["irb-package"] },
+    { "key": "ip-supply", "area": "supply", "type": "supply.ip.plan", "title": "Confirm investigational product supply and labelling plan with the sponsor", "assignee_role": "arm_sponsor_lead", "due_in_days": 10, "gxp_impact": false, "site_number": "", "depends_on": ["contract-addendum"] },
+    { "key": "ecrf-setup", "area": "data_management", "type": "edc.arm.setup", "title": "Add arm-specific eCRF fields (ECG, PK sampling) to the platform EDC", "assignee_role": "data_manager", "due_in_days": 10, "gxp_impact": false, "site_number": "", "depends_on": [] },
+    { "key": "site-101", "area": "sites", "type": "site.activation.start", "title": "Start activation of site 101 for the new arm", "assignee_role": "ctm", "due_in_days": 3, "gxp_impact": false, "site_number": "101", "depends_on": [] },
+    { "key": "site-102", "area": "sites", "type": "site.activation.start", "title": "Start activation of site 102 for the new arm", "assignee_role": "ctm", "due_in_days": 3, "gxp_impact": false, "site_number": "102", "depends_on": [] },
+    { "key": "site-103", "area": "sites", "type": "site.activation.start", "title": "Start activation of site 103 for the new arm", "assignee_role": "ctm", "due_in_days": 3, "gxp_impact": false, "site_number": "103", "depends_on": [] },
+    { "key": "training", "area": "training", "type": "training.arm.rollout", "title": "Roll out arm training (protocol appendix, ECG and PK procedures) to site staff", "assignee_role": "cra", "due_in_days": 12, "gxp_impact": false, "site_number": "", "depends_on": ["ecrf-setup"] }
+  ],
+  "checklist": [
+    { "area": "contracts", "item": "Arm addendum executed" },
+    { "area": "regulatory", "item": "Central IRB approval of the arm appendix" },
+    { "area": "regulatory", "item": "FDA may proceed on the IND amendment" },
+    { "area": "supply", "item": "IP release and depot shipment plan confirmed" },
+    { "area": "data_management", "item": "eCRF changes validated" },
+    { "area": "sites", "item": "At least three sites with green light" },
+    { "area": "training", "item": "Training records complete for activated sites" }
+  ]
+}
