@@ -6,5 +6,6 @@ import { signatureRoutes } from './signatures.ts';
 import { siteRoutes } from './sites.ts';
 import { metricRoutes } from './metrics.ts';
 import { aiRoutes } from './ai.ts';
+import { taskRoutes } from './tasks.ts';
 
-export const routes: RouteDef[] = [...platformRoutes, ...armRoutes, ...protocolRoutes, ...signatureRoutes, ...siteRoutes, ...metricRoutes, ...aiRoutes];
+export const routes: RouteDef[] = [...platformRoutes, ...armRoutes, ...protocolRoutes, ...signatureRoutes, ...siteRoutes, ...metricRoutes, ...aiRoutes, ...taskRoutes];
