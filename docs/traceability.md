@@ -1,6 +1,6 @@
 # Traceability matrix
 
-Generated 2026-10-06T21:18:07.625Z by scripts/trace.mjs from test tags and test-results.xml.
+Generated 2026-10-06T21:19:54.737Z by scripts/trace.mjs from test tags and test-results.xml.
 
 | Requirement | Release | Description | Tests | Result |
 | --- | --- | --- | --- | --- |
@@ -12,7 +12,7 @@ Generated 2026-10-06T21:18:07.625Z by scripts/trace.mjs from test tags and test-
 | DM-03 | foundations | Change reason mandatory on GxP updates; no physical delete | db/tests/audit.test.mjs, db/tests/sites_registry.test.mjs (4) | PASS |
 | DM-05 | foundations | Deterministic synthetic demo seed; no real data | db/tests/tasks_apps_metrics.test.mjs (1) | PASS |
 | IAM-02 | foundations | RLS driven by JWT claims platform_ids / arm_scopes / site_scopes | db/tests/access.test.mjs, db/tests/claims.test.mjs, db/tests/sites_registry.test.mjs, packages/api/test/platform.test.ts, packages/api/test/sites.test.ts (9) | PASS |
-| IAM-03 | foundations | Sponsors see and write only their own arm | db/tests/access.test.mjs, packages/api/test/platform.test.ts, packages/api/test/protocol_arms.test.ts (4) | PASS |
+| IAM-03 | foundations | Sponsors see and write only their own arm | db/tests/access.test.mjs, packages/api/test/metrics.test.ts, packages/api/test/platform.test.ts, packages/api/test/protocol_arms.test.ts (5) | PASS |
 | IAM-04 | foundations | Unblinded data only in sac_enclave for the unblinded role | db/tests/access.test.mjs, db/tests/claims.test.mjs (3) | PASS |
 | IAM-05 | foundations | Separation of duties: the author of a GxP document or change cannot approve it | packages/api/test/protocol_arms.test.ts (1) | PASS |
 | IAM-07 | foundations | Agents are never unblinded | db/tests/access.test.mjs, packages/api/test/platform.test.ts (2) | PASS |
@@ -28,8 +28,8 @@ Generated 2026-10-06T21:18:07.625Z by scripts/trace.mjs from test tags and test-
 | M01-04 | foundations | Arm lifecycle with allowed transitions and events | db/tests/protocol_arms.test.mjs, packages/api/test/protocol_arms.test.ts (5) | PASS |
 | M05-02 | foundations | Enrollment funnel per site (blinded) | db/tests/tasks_apps_metrics.test.mjs (1) | PASS |
 | M07-01 | foundations | SAE expedited reporting clock | db/tests/protocol_arms.test.mjs (1) | PASS |
-| M11-01 | foundations | SURPASS TA3 metric catalogue with targets | db/tests/tasks_apps_metrics.test.mjs (1) | PASS |
-| M11-02 | foundations | Arm onboarding metrics computed from records | db/tests/tasks_apps_metrics.test.mjs (1) | PASS |
+| M11-01 | foundations | SURPASS TA3 metric catalogue with targets | db/tests/tasks_apps_metrics.test.mjs, packages/api/test/metrics.test.ts (2) | PASS |
+| M11-02 | foundations | Arm onboarding metrics computed from records | db/tests/tasks_apps_metrics.test.mjs, packages/api/test/metrics.test.ts (4) | PASS |
 | APP-ID-01 | v0 | OIDC SSO via identity broker | — (0) | NO TEST |
 | APP-ID-02 | v0 | Access token carries sub, email, org_id and TrialOps claims platform_ids, arm_scopes, roles, blinding | db/tests/claims.test.mjs, db/tests/sites_registry.test.mjs, packages/api/test/platform.test.ts (8) | PASS |
 | APP-ID-02 | foundations | TrialOps claims (platform/arm/site scopes, blinding) added to the Supabase token | db/tests/claims.test.mjs, db/tests/sites_registry.test.mjs, packages/api/test/platform.test.ts (8) | PASS |
