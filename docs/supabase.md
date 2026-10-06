@@ -13,12 +13,13 @@ plain PostgREST both set, so a later move to Azure (PostgreSQL + PostgREST + Ent
    ```sql
    grant usage on schema core to supabase_auth_admin;
    grant execute on function core.custom_access_token_hook(jsonb) to supabase_auth_admin;
-   grant select on core.person, core.role_assignment to supabase_auth_admin;
+   grant select on core.person, core.role_assignment to supabase_auth_admin;   -- 0008 reads only these too
    ```
    then Authentication → Hooks → Custom Access Token → `core.custom_access_token_hook`.
 4. Link people to Supabase users: `core.person.idp_sub` = `auth.users.id`.
 
-The hook adds `person_id`, `platform_ids`, `arm_scopes`, `site_scopes` (`"*"` = all), `blinding` and `actor_type`.
+The hook (0007, extended in 0008) adds `person_id`, `org_id`, `email`, `platform_ids`, `arm_scopes`, `site_scopes`
+(`"*"` = all), `roles`, `blinding` and `actor_type` (APP-ID-02).
 Agents and apps get tokens from the server with `actor_type` = `agent` / `app`; they are never unblinded (IAM-07).
 
 ## To verify with the existing user component

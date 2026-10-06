@@ -184,6 +184,23 @@ await ins('app_installation', { app_id: 'ist.simulation-ta1', version: '1.4.0', 
   manifest: { app_id: 'ist.simulation-ta1', version: '1.4.0', scopes: ['platform:read', 'arm:read', 'enrollment.metrics:read', 'simulation.results:write'],
               task_types: ['simulation.rerun', 'simulation.scenario.review'] } });
 
+// --- site registry (M02-01): investigators, certifications, concurrent trials. Appended last so earlier UUIDs stay stable.
+const specialties = ['Neurology', 'Internal medicine', 'Clinical pharmacology', 'Neurology', 'Family medicine', 'Neurology'];
+for (let i = 0; i < 6; i++) {
+  await ins('site_investigator', { platform_id: plat, site_id: site[i], person_id: pis[i], full_name: `Dr. PI Site ${101 + i}`,
+    investigator_role: 'principal', specialty: specialties[i], gcp_training_valid_until: day('2026-10-06T00:00:00Z', int(-30, 700)).slice(0, 10) });
+  for (let k = 0; k < int(1, 3); k++)
+    await ins('site_investigator', { platform_id: plat, site_id: site[i], full_name: `Dr. Sub-I ${101 + i}-${k + 1}`, investigator_role: 'sub',
+      specialty: pick(specialties), gcp_training_valid_until: day('2026-10-06T00:00:00Z', int(-60, 700)).slice(0, 10) });
+  for (const kind of ['GCP inspection', 'CLIA lab', 'Pharmacy IP handling'])
+    if (kind !== 'CLIA lab' || i !== 4)
+      await ins('site_certification', { platform_id: plat, site_id: site[i], kind, issuer: kind === 'CLIA lab' ? 'CMS (simulated)' : 'Northfield QA',
+        valid_until: day('2026-10-06T00:00:00Z', int(60, 900)).slice(0, 10) });
+  for (let k = 0; k < [1, 2, 0, 1, 3, 2][i]; k++)
+    await ins('site_concurrent_trial', { platform_id: plat, site_id: site[i], title: `Synthetic concurrent study ${101 + i}-${k + 1}`,
+      registry_id: `NCT9${String(int(1000000, 9999999))}`, competes_for_population: i === 5 || rnd() < 0.3 });
+}
+
 await c.query('commit');
 const counts = await c.query(`select (select count(*) from core.subject) subjects, (select count(*) from core.site) sites,
   (select count(*) from core.arm) arms, (select count(*) from core.audit_event) audit_events, (select count(*) from core.event_outbox) events`);

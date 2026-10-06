@@ -1,6 +1,6 @@
 # Traceability matrix
 
-Generated 2026-10-06T20:57:36.921Z by scripts/trace.mjs from test tags and test-results.xml.
+Generated 2026-10-06T21:10:03.144Z by scripts/trace.mjs from test tags and test-results.xml.
 
 | Requirement | Release | Description | Tests | Result |
 | --- | --- | --- | --- | --- |
@@ -9,9 +9,9 @@ Generated 2026-10-06T20:57:36.921Z by scripts/trace.mjs from test tags and test-
 | CMP-04 | foundations | ALCOA+: who/when/old/new/reason captured on every GxP change | db/tests/audit.test.mjs (1) | PASS |
 | DM-01 | foundations | Every clinical entity carries platform_id (+ arm_id, site_id) | db/tests/protocol_arms.test.mjs (1) | PASS |
 | DM-02 | foundations | Approved controlled versions are immutable; approval needs signature | db/tests/protocol_arms.test.mjs (2) | PASS |
-| DM-03 | foundations | Change reason mandatory on GxP updates; no physical delete | db/tests/audit.test.mjs (3) | PASS |
+| DM-03 | foundations | Change reason mandatory on GxP updates; no physical delete | db/tests/audit.test.mjs, db/tests/sites_registry.test.mjs (4) | PASS |
 | DM-05 | foundations | Deterministic synthetic demo seed; no real data | db/tests/tasks_apps_metrics.test.mjs (1) | PASS |
-| IAM-02 | foundations | RLS driven by JWT claims platform_ids / arm_scopes / site_scopes | db/tests/access.test.mjs, db/tests/claims.test.mjs (4) | PASS |
+| IAM-02 | foundations | RLS driven by JWT claims platform_ids / arm_scopes / site_scopes | db/tests/access.test.mjs, db/tests/claims.test.mjs, db/tests/sites_registry.test.mjs (5) | PASS |
 | IAM-03 | foundations | Sponsors see and write only their own arm | db/tests/access.test.mjs (2) | PASS |
 | IAM-04 | foundations | Unblinded data only in sac_enclave for the unblinded role | db/tests/access.test.mjs, db/tests/claims.test.mjs (3) | PASS |
 | IAM-07 | foundations | Agents are never unblinded | db/tests/access.test.mjs (1) | PASS |
@@ -30,12 +30,12 @@ Generated 2026-10-06T20:57:36.921Z by scripts/trace.mjs from test tags and test-
 | M11-01 | foundations | SURPASS TA3 metric catalogue with targets | db/tests/tasks_apps_metrics.test.mjs (1) | PASS |
 | M11-02 | foundations | Arm onboarding metrics computed from records | db/tests/tasks_apps_metrics.test.mjs (1) | PASS |
 | APP-ID-01 | v0 | OIDC SSO via identity broker | — (0) | NO TEST |
-| APP-ID-02 | v0 | Access token carries sub, email, org_id and TrialOps claims platform_ids, arm_scopes, roles, blinding | db/tests/claims.test.mjs (4) | PASS |
-| APP-ID-02 | foundations | TrialOps claims (platform/arm/site scopes, blinding) added to the Supabase token | db/tests/claims.test.mjs (4) | PASS |
+| APP-ID-02 | v0 | Access token carries sub, email, org_id and TrialOps claims platform_ids, arm_scopes, roles, blinding | db/tests/claims.test.mjs, db/tests/sites_registry.test.mjs (7) | PASS |
+| APP-ID-02 | foundations | TrialOps claims (platform/arm/site scopes, blinding) added to the Supabase token | db/tests/claims.test.mjs, db/tests/sites_registry.test.mjs (7) | PASS |
 | AI-01 | v0 | All AI calls through POST /api/ai/tasks | services/ai-runtime/test/boundary.test.ts (3) | PASS |
 | M01-01 | v0 | Structured Master Protocol / appendix editor | — (0) | NO TEST |
 | M01-02 | v0 | New-arm wizard with AI-drafted appendix and task plan | — (0) | NO TEST |
-| M02-01 | v0 | Site registry | — (0) | NO TEST |
+| M02-01 | v0 | Site registry | db/tests/sites_registry.test.mjs (3) | PASS |
 | M02-03 | v0 | Per-arm site activation workflow | — (0) | NO TEST |
 | APP-TK-01 | v1 | Task model and inbox | — (0) | NO TEST |
 | APP-TK-03 | v1 | Apps claim and close tasks via API | — (0) | NO TEST |
