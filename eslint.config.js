@@ -31,6 +31,8 @@ export default tseslint.config(
     languageOptions: { ecmaVersion: 2023, sourceType: 'module', globals: globals.node },
     rules: { ...aiBoundary, '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }] },
   },
+  // tests read JSON bodies loosely
+  { files: ['**/test/**'], rules: { '@typescript-eslint/no-explicit-any': 'off' } },
   // the runtime itself, and its boundary tests that must spell the forbidden endpoints
   { files: ['services/ai-runtime/**'], rules: { 'no-restricted-imports': 'off', 'no-restricted-syntax': 'off' } },
 );

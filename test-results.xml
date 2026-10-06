@@ -1,58 +1,64 @@
 <?xml version="1.0" encoding="utf-8"?>
 <testsuites>
-	<testcase name="[IAM-02] a user without the platform claim sees no platform data" time="0.051300" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/access.test.mjs"/>
-	<testcase name="[IAM-03] a sponsor sees only its own arm, its contracts and its documents" time="0.004742" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/access.test.mjs"/>
-	<testcase name="[IAM-03] a sponsor cannot write into another arm" time="0.008905" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/access.test.mjs"/>
-	<testcase name="[IAM-04] blinded users never see arm allocation" time="0.004365" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/access.test.mjs"/>
-	<testcase name="[IAM-04] the SAC unblinded role can read allocation" time="0.001121" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/access.test.mjs"/>
-	<testcase name="[IAM-07][AI-11] an agent identity is never unblinded, even with the claim" time="0.004190" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/access.test.mjs"/>
-	<testcase name="[IAM-02] site staff see only their site" time="0.006792" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/access.test.mjs"/>
-	<testcase name="[CMP-01] audit trail hash chain verifies end to end" time="0.045480" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/audit.test.mjs"/>
-	<testcase name="[CMP-01] audit_event cannot be updated, deleted or truncated" time="0.004302" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/audit.test.mjs"/>
-	<testcase name="[CMP-01] tampering is detected by audit_verify" time="0.005645" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/audit.test.mjs"/>
-	<testcase name="[DM-03] update of a GxP record without a change reason is refused" time="0.002956" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/audit.test.mjs"/>
-	<testcase name="[DM-03][CMP-04] update with reason writes who, when, old, new and reason" time="0.005016" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/audit.test.mjs"/>
-	<testcase name="[DM-03] physical delete is refused; void is audited as VOID" time="0.004087" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/audit.test.mjs"/>
-	<testcase name="[CMP-02] signatures are immutable" time="0.001345" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/audit.test.mjs"/>
-	<testcase name="[APP-ID-02][IAM-02] sponsor token gets only its own arm" time="0.036064" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/claims.test.mjs"/>
-	<testcase name="[APP-ID-02][IAM-02] site PI token is restricted to its site" time="0.000562" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/claims.test.mjs"/>
-	<testcase name="[APP-ID-02][IAM-04] only SAC members receive an unblinded token" time="0.000808" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/claims.test.mjs"/>
-	<testcase name="[APP-ID-02] unknown users get no platform" time="0.000353" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/claims.test.mjs"/>
-	<testcase name="[DM-02] an approved Master Protocol version cannot be edited" time="0.032083" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/protocol_arms.test.mjs"/>
-	<testcase name="[DM-02][CMP-02] approval without an approval signature is refused" time="0.005139" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/protocol_arms.test.mjs"/>
-	<testcase name="[M01-04][APP-DT-04] new arm emits arm.created as a CloudEvent" time="0.004030" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/protocol_arms.test.mjs"/>
-	<testcase name="[M01-04] arm lifecycle rejects draft -> active and accepts draft -> approved -> active" time="0.002718" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/protocol_arms.test.mjs"/>
-	<testcase name="[M07-01] serious AE starts a 15-day expedited clock; fatal/life-threatening 7 days" time="0.006140" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/protocol_arms.test.mjs"/>
-	<testcase name="[DM-01] every clinical table carries platform_id" time="0.017714" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/protocol_arms.test.mjs"/>
-	<testcase name="[APP-MF-01] reference manifest of the IST TA1 app is valid" time="0.003769" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/schemas.test.mjs"/>
-	<testcase name="[APP-MF-01] L2/L3 apps must declare a validation package" time="0.000148" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/schemas.test.mjs"/>
-	<testcase name="[APP-MF-01] unknown fields and non-https endpoints are rejected" time="0.000090" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/schemas.test.mjs"/>
-	<testcase name="[APP-DT-04] every event in the catalogue is a dotted lowercase CloudEvents type" time="0.000523" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/schemas.test.mjs"/>
-	<testcase name="[APP-ID-02] token carries sub, email, org_id and the person roles" time="0.036666" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/sites_registry.test.mjs"/>
-	<testcase name="[APP-ID-02] an email already in the identity token is kept" time="0.000527" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/sites_registry.test.mjs"/>
-	<testcase name="[APP-ID-02] unknown users get no roles" time="0.000414" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/sites_registry.test.mjs"/>
-	<testcase name="[M02-01] every demo site has a principal investigator, certifications and capacity" time="0.003385" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/sites_registry.test.mjs"/>
-	<testcase name="[M02-01][IAM-02] a site PI sees only the registry of its own site" time="0.002146" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/sites_registry.test.mjs"/>
-	<testcase name="[M02-01][DM-03] registry changes are audited and need a reason" time="0.004162" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/sites_registry.test.mjs"/>
-	<testcase name="[APP-TK-02] invalid task transitions are refused and valid ones logged" time="0.043311" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/tasks_apps_metrics.test.mjs"/>
-	<testcase name="[APP-TK-04][AI-05] GxP task by an agent cannot skip human review" time="0.001971" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/tasks_apps_metrics.test.mjs"/>
-	<testcase name="[APP-TK-04][AI-05] an agent cannot close its own GxP task even after review" time="0.003249" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/tasks_apps_metrics.test.mjs"/>
-	<testcase name="[APP-TK-04] a person completes a reviewed GxP task with a signature" time="0.004357" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/tasks_apps_metrics.test.mjs"/>
-	<testcase name="[APP-MF-02][APP-MF-04] app scopes are granted on approval and revoked on uninstall" time="0.006825" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/tasks_apps_metrics.test.mjs"/>
-	<testcase name="[M11-01] the SURPASS TA3 metric catalogue is loaded with interim and final targets" time="0.001151" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/tasks_apps_metrics.test.mjs"/>
-	<testcase name="[M11-02] arm onboarding metrics are computed from records, later arms faster" time="0.005894" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/tasks_apps_metrics.test.mjs"/>
-	<testcase name="[M05-02] enrollment funnel is monotonic per site" time="0.000774" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/tasks_apps_metrics.test.mjs"/>
-	<testcase name="[AI-06] AI ledger requires model version and input hash" time="0.001355" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/tasks_apps_metrics.test.mjs"/>
-	<testcase name="[DM-05] demo data is synthetic and complete" time="0.001249" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/tasks_apps_metrics.test.mjs"/>
-	<testcase name="[AI-01] a module importing a provider SDK fails the lint gate" time="0.454914" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/services/ai-runtime/test/boundary.test.ts"/>
-	<testcase name="[AI-01] a module calling a provider endpoint directly fails the lint gate" time="0.002660" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/services/ai-runtime/test/boundary.test.ts"/>
-	<testcase name="[AI-01] the AI runtime is the only place allowed to reach a provider" time="0.002503" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/services/ai-runtime/test/boundary.test.ts"/>
-	<!-- tests 47 -->
+	<testcase name="[IAM-02] a user without the platform claim sees no platform data" time="0.073816" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/access.test.mjs"/>
+	<testcase name="[IAM-03] a sponsor sees only its own arm, its contracts and its documents" time="0.007533" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/access.test.mjs"/>
+	<testcase name="[IAM-03] a sponsor cannot write into another arm" time="0.017753" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/access.test.mjs"/>
+	<testcase name="[IAM-04] blinded users never see arm allocation" time="0.004895" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/access.test.mjs"/>
+	<testcase name="[IAM-04] the SAC unblinded role can read allocation" time="0.001663" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/access.test.mjs"/>
+	<testcase name="[IAM-07][AI-11] an agent identity is never unblinded, even with the claim" time="0.004084" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/access.test.mjs"/>
+	<testcase name="[IAM-02] site staff see only their site" time="0.007054" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/access.test.mjs"/>
+	<testcase name="[CMP-01] audit trail hash chain verifies end to end" time="0.054627" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/audit.test.mjs"/>
+	<testcase name="[CMP-01] audit_event cannot be updated, deleted or truncated" time="0.007007" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/audit.test.mjs"/>
+	<testcase name="[CMP-01] tampering is detected by audit_verify" time="0.005170" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/audit.test.mjs"/>
+	<testcase name="[DM-03] update of a GxP record without a change reason is refused" time="0.004202" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/audit.test.mjs"/>
+	<testcase name="[DM-03][CMP-04] update with reason writes who, when, old, new and reason" time="0.005712" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/audit.test.mjs"/>
+	<testcase name="[DM-03] physical delete is refused; void is audited as VOID" time="0.006379" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/audit.test.mjs"/>
+	<testcase name="[CMP-02] signatures are immutable" time="0.002540" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/audit.test.mjs"/>
+	<testcase name="[APP-ID-02][IAM-02] sponsor token gets only its own arm" time="0.043826" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/claims.test.mjs"/>
+	<testcase name="[APP-ID-02][IAM-02] site PI token is restricted to its site" time="0.000485" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/claims.test.mjs"/>
+	<testcase name="[APP-ID-02][IAM-04] only SAC members receive an unblinded token" time="0.000717" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/claims.test.mjs"/>
+	<testcase name="[APP-ID-02] unknown users get no platform" time="0.000420" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/claims.test.mjs"/>
+	<testcase name="[DM-02] an approved Master Protocol version cannot be edited" time="0.036534" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/protocol_arms.test.mjs"/>
+	<testcase name="[DM-02][CMP-02] approval without an approval signature is refused" time="0.004133" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/protocol_arms.test.mjs"/>
+	<testcase name="[M01-04][APP-DT-04] new arm emits arm.created as a CloudEvent" time="0.007158" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/protocol_arms.test.mjs"/>
+	<testcase name="[M01-04] arm lifecycle rejects draft -> active and accepts draft -> approved -> active" time="0.002654" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/protocol_arms.test.mjs"/>
+	<testcase name="[M07-01] serious AE starts a 15-day expedited clock; fatal/life-threatening 7 days" time="0.008012" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/protocol_arms.test.mjs"/>
+	<testcase name="[DM-01] every clinical table carries platform_id" time="0.051435" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/protocol_arms.test.mjs"/>
+	<testcase name="[APP-MF-01] reference manifest of the IST TA1 app is valid" time="0.003817" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/schemas.test.mjs"/>
+	<testcase name="[APP-MF-01] L2/L3 apps must declare a validation package" time="0.000168" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/schemas.test.mjs"/>
+	<testcase name="[APP-MF-01] unknown fields and non-https endpoints are rejected" time="0.000089" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/schemas.test.mjs"/>
+	<testcase name="[APP-DT-04] every event in the catalogue is a dotted lowercase CloudEvents type" time="0.001520" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/schemas.test.mjs"/>
+	<testcase name="[APP-ID-02] token carries sub, email, org_id and the person roles" time="0.039470" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/sites_registry.test.mjs"/>
+	<testcase name="[APP-ID-02] an email already in the identity token is kept" time="0.000355" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/sites_registry.test.mjs"/>
+	<testcase name="[APP-ID-02] unknown users get no roles" time="0.000424" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/sites_registry.test.mjs"/>
+	<testcase name="[M02-01] every demo site has a principal investigator, certifications and capacity" time="0.005040" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/sites_registry.test.mjs"/>
+	<testcase name="[M02-01][IAM-02] a site PI sees only the registry of its own site" time="0.001913" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/sites_registry.test.mjs"/>
+	<testcase name="[M02-01][DM-03] registry changes are audited and need a reason" time="0.004993" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/sites_registry.test.mjs"/>
+	<testcase name="[APP-TK-02] invalid task transitions are refused and valid ones logged" time="0.048730" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/tasks_apps_metrics.test.mjs"/>
+	<testcase name="[APP-TK-04][AI-05] GxP task by an agent cannot skip human review" time="0.001688" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/tasks_apps_metrics.test.mjs"/>
+	<testcase name="[APP-TK-04][AI-05] an agent cannot close its own GxP task even after review" time="0.006984" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/tasks_apps_metrics.test.mjs"/>
+	<testcase name="[APP-TK-04] a person completes a reviewed GxP task with a signature" time="0.005080" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/tasks_apps_metrics.test.mjs"/>
+	<testcase name="[APP-MF-02][APP-MF-04] app scopes are granted on approval and revoked on uninstall" time="0.009339" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/tasks_apps_metrics.test.mjs"/>
+	<testcase name="[M11-01] the SURPASS TA3 metric catalogue is loaded with interim and final targets" time="0.001870" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/tasks_apps_metrics.test.mjs"/>
+	<testcase name="[M11-02] arm onboarding metrics are computed from records, later arms faster" time="0.014390" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/tasks_apps_metrics.test.mjs"/>
+	<testcase name="[M05-02] enrollment funnel is monotonic per site" time="0.000891" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/tasks_apps_metrics.test.mjs"/>
+	<testcase name="[AI-06] AI ledger requires model version and input hash" time="0.001357" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/tasks_apps_metrics.test.mjs"/>
+	<testcase name="[DM-05] demo data is synthetic and complete" time="0.002406" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/db/tests/tasks_apps_metrics.test.mjs"/>
+	<testcase name="[IAM-02] requests without a valid bearer token are refused" time="0.074757" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/packages/api/test/platform.test.ts"/>
+	<testcase name="[APP-ID-02][IAM-02] /v1/me returns the perimeter and roles carried by the token" time="0.044036" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/packages/api/test/platform.test.ts"/>
+	<testcase name="[IAM-02] a user outside the platform sees no platform" time="0.013186" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/packages/api/test/platform.test.ts"/>
+	<testcase name="[IAM-03] the platform overview shows a sponsor only its own arm" time="0.035368" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/packages/api/test/platform.test.ts"/>
+	<testcase name="[IAM-07] an agent token is never unblinded, even if it claims so" time="0.001713" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/packages/api/test/platform.test.ts"/>
+	<testcase name="[APP-DT-01] the OpenAPI 3.1 document is generated from the route registry" time="0.001086" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/packages/api/test/platform.test.ts"/>
+	<testcase name="[AI-01] a module importing a provider SDK fails the lint gate" time="0.461667" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/services/ai-runtime/test/boundary.test.ts"/>
+	<testcase name="[AI-01] a module calling a provider endpoint directly fails the lint gate" time="0.002692" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/services/ai-runtime/test/boundary.test.ts"/>
+	<testcase name="[AI-01] the AI runtime is the only place allowed to reach a provider" time="0.002494" classname="test" file="/Users/lucaemili/Documents/trialops.nosync/services/ai-runtime/test/boundary.test.ts"/>
+	<!-- tests 53 -->
 	<!-- suites 0 -->
-	<!-- pass 47 -->
+	<!-- pass 53 -->
 	<!-- fail 0 -->
 	<!-- cancelled 0 -->
 	<!-- skipped 0 -->
 	<!-- todo 0 -->
-	<!-- duration_ms 1556.722042 -->
+	<!-- duration_ms 2496.655292 -->
 </testsuites>

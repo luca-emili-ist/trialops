@@ -1,6 +1,6 @@
 # Traceability matrix
 
-Generated 2026-10-06T21:10:03.144Z by scripts/trace.mjs from test tags and test-results.xml.
+Generated 2026-10-06T21:12:11.445Z by scripts/trace.mjs from test tags and test-results.xml.
 
 | Requirement | Release | Description | Tests | Result |
 | --- | --- | --- | --- | --- |
@@ -11,10 +11,10 @@ Generated 2026-10-06T21:10:03.144Z by scripts/trace.mjs from test tags and test-
 | DM-02 | foundations | Approved controlled versions are immutable; approval needs signature | db/tests/protocol_arms.test.mjs (2) | PASS |
 | DM-03 | foundations | Change reason mandatory on GxP updates; no physical delete | db/tests/audit.test.mjs, db/tests/sites_registry.test.mjs (4) | PASS |
 | DM-05 | foundations | Deterministic synthetic demo seed; no real data | db/tests/tasks_apps_metrics.test.mjs (1) | PASS |
-| IAM-02 | foundations | RLS driven by JWT claims platform_ids / arm_scopes / site_scopes | db/tests/access.test.mjs, db/tests/claims.test.mjs, db/tests/sites_registry.test.mjs (5) | PASS |
-| IAM-03 | foundations | Sponsors see and write only their own arm | db/tests/access.test.mjs (2) | PASS |
+| IAM-02 | foundations | RLS driven by JWT claims platform_ids / arm_scopes / site_scopes | db/tests/access.test.mjs, db/tests/claims.test.mjs, db/tests/sites_registry.test.mjs, packages/api/test/platform.test.ts (8) | PASS |
+| IAM-03 | foundations | Sponsors see and write only their own arm | db/tests/access.test.mjs, packages/api/test/platform.test.ts (3) | PASS |
 | IAM-04 | foundations | Unblinded data only in sac_enclave for the unblinded role | db/tests/access.test.mjs, db/tests/claims.test.mjs (3) | PASS |
-| IAM-07 | foundations | Agents are never unblinded | db/tests/access.test.mjs (1) | PASS |
+| IAM-07 | foundations | Agents are never unblinded | db/tests/access.test.mjs, packages/api/test/platform.test.ts (2) | PASS |
 | AI-05 | foundations | GxP AI output is a proposal until a person signs | db/tests/tasks_apps_metrics.test.mjs (2) | PASS |
 | AI-06 | foundations | AI ledger with model version and input hash | db/tests/tasks_apps_metrics.test.mjs (1) | PASS |
 | AI-11 | foundations | AI never sees unblinded data outside the SAC enclave | db/tests/access.test.mjs (1) | PASS |
@@ -30,8 +30,8 @@ Generated 2026-10-06T21:10:03.144Z by scripts/trace.mjs from test tags and test-
 | M11-01 | foundations | SURPASS TA3 metric catalogue with targets | db/tests/tasks_apps_metrics.test.mjs (1) | PASS |
 | M11-02 | foundations | Arm onboarding metrics computed from records | db/tests/tasks_apps_metrics.test.mjs (1) | PASS |
 | APP-ID-01 | v0 | OIDC SSO via identity broker | — (0) | NO TEST |
-| APP-ID-02 | v0 | Access token carries sub, email, org_id and TrialOps claims platform_ids, arm_scopes, roles, blinding | db/tests/claims.test.mjs, db/tests/sites_registry.test.mjs (7) | PASS |
-| APP-ID-02 | foundations | TrialOps claims (platform/arm/site scopes, blinding) added to the Supabase token | db/tests/claims.test.mjs, db/tests/sites_registry.test.mjs (7) | PASS |
+| APP-ID-02 | v0 | Access token carries sub, email, org_id and TrialOps claims platform_ids, arm_scopes, roles, blinding | db/tests/claims.test.mjs, db/tests/sites_registry.test.mjs, packages/api/test/platform.test.ts (8) | PASS |
+| APP-ID-02 | foundations | TrialOps claims (platform/arm/site scopes, blinding) added to the Supabase token | db/tests/claims.test.mjs, db/tests/sites_registry.test.mjs, packages/api/test/platform.test.ts (8) | PASS |
 | AI-01 | v0 | All AI calls through POST /api/ai/tasks | services/ai-runtime/test/boundary.test.ts (3) | PASS |
 | M01-01 | v0 | Structured Master Protocol / appendix editor | — (0) | NO TEST |
 | M01-02 | v0 | New-arm wizard with AI-drafted appendix and task plan | — (0) | NO TEST |
@@ -48,7 +48,7 @@ Generated 2026-10-06T21:10:03.144Z by scripts/trace.mjs from test tags and test-
 | M09-02 | v1 | AI-assisted TMF filing | — (0) | NO TEST |
 | FIN-03 | v1 | Shared-cost allocation keys | — (0) | NO TEST |
 | FIN-07 | v1 | Sponsor runway linked to enrollment forecast | — (0) | NO TEST |
-| APP-DT-01 | v2 | Versioned REST API in OpenAPI 3.1 | — (0) | NO TEST |
+| APP-DT-01 | v2 | Versioned REST API in OpenAPI 3.1 | packages/api/test/platform.test.ts (1) | PASS |
 | APP-AU-01 | v2 | Apps push audit events to the core | — (0) | NO TEST |
 | FIN-09 | v2 | Cost per arm vs CRO quotes | — (0) | NO TEST |
 | DEMO-01 | v2 | One-command demo reset | — (0) | NO TEST |

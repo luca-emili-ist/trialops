@@ -1,2 +1,7 @@
-// TrialOps Platform API (ARC-03). Routes are added from step 3 of the demo v0 plan.
+// TrialOps Platform API (ARC-03).
+export { createApp, type AppDeps } from './app.ts';
+export { createVerifier, type Claims, type Verifier } from './auth.ts';
+export { createPool, withClaims } from './db.ts';
+export { openapi } from './openapi.ts';
+export { routes } from './routes/index.ts';
 export const API_VERSION = 'v1';
