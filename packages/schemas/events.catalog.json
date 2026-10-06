@@ -1,0 +1,27 @@
+{
+  "$comment": "TrialOps domain event catalogue v1 (spec §4.4). All events are CloudEvents 1.0; 'emitted_by' = where the core emits it today.",
+  "events": [
+    { "type": "platform.protocol.version.approved", "subject": "master_protocol_version/{id}", "emitted_by": "planned" },
+    { "type": "arm.created", "subject": "arm/{id}", "emitted_by": "core.arm trigger" },
+    { "type": "arm.status.changed", "subject": "arm/{id}", "emitted_by": "core.arm trigger" },
+    { "type": "arm.stage.changed", "subject": "arm/{id}", "emitted_by": "core.arm trigger" },
+    { "type": "arm.closed", "subject": "arm/{id}", "emitted_by": "core.arm trigger" },
+    { "type": "site.activated", "subject": "site/{id}", "emitted_by": "core.site_arm_activation trigger" },
+    { "type": "subject.prescreened", "subject": "subject/{id}", "emitted_by": "core.subject trigger", "blinded": true },
+    { "type": "subject.consented", "subject": "subject/{id}", "emitted_by": "core.subject trigger", "blinded": true },
+    { "type": "subject.randomized", "subject": "subject/{id}", "emitted_by": "core.subject trigger", "blinded": true },
+    { "type": "visit.completed", "subject": "visit/{id}", "emitted_by": "planned" },
+    { "type": "ae.reported", "subject": "ae/{id}", "emitted_by": "core.adverse_event trigger" },
+    { "type": "sae.reported", "subject": "ae/{id}", "emitted_by": "core.adverse_event trigger" },
+    { "type": "deviation.detected", "subject": "deviation/{id}", "emitted_by": "planned" },
+    { "type": "document.filed", "subject": "document/{id}", "emitted_by": "planned" },
+    { "type": "submission.status.changed", "subject": "submission/{id}", "emitted_by": "core.submission trigger" },
+    { "type": "irb.approved", "subject": "submission/{id}", "emitted_by": "core.submission trigger" },
+    { "type": "contract.executed", "subject": "contract/{id}", "emitted_by": "core.contract trigger" },
+    { "type": "enrollment.snapshot.published", "subject": "platform/{id}", "emitted_by": "planned (weekly job)" },
+    { "type": "adaptation.decision.recorded", "subject": "decision_record/{id}", "emitted_by": "planned" },
+    { "type": "task.created", "subject": "task/{id}", "emitted_by": "core.task trigger" },
+    { "type": "task.completed", "subject": "task/{id}", "emitted_by": "core.task trigger" },
+    { "type": "cost.recorded", "subject": "cost_movement/{id}", "emitted_by": "planned (finance module)" }
+  ]
+}

@@ -1,0 +1,290 @@
+{
+ "source": "Specifiche di sviluppo \u2014 Piattaforma TA3 Clinical Operations, 2026-10-06",
+ "requirements": [
+  {
+   "id": "CMP-01",
+   "release": "foundations",
+   "text": "Append-only, hash-chained audit trail; tampering detectable"
+  },
+  {
+   "id": "CMP-02",
+   "release": "foundations",
+   "text": "Part 11 e-signatures: immutable, linked to signed version"
+  },
+  {
+   "id": "CMP-04",
+   "release": "foundations",
+   "text": "ALCOA+: who/when/old/new/reason captured on every GxP change"
+  },
+  {
+   "id": "DM-01",
+   "release": "foundations",
+   "text": "Every clinical entity carries platform_id (+ arm_id, site_id)"
+  },
+  {
+   "id": "DM-02",
+   "release": "foundations",
+   "text": "Approved controlled versions are immutable; approval needs signature"
+  },
+  {
+   "id": "DM-03",
+   "release": "foundations",
+   "text": "Change reason mandatory on GxP updates; no physical delete"
+  },
+  {
+   "id": "DM-05",
+   "release": "foundations",
+   "text": "Deterministic synthetic demo seed; no real data"
+  },
+  {
+   "id": "IAM-02",
+   "release": "foundations",
+   "text": "RLS driven by JWT claims platform_ids / arm_scopes / site_scopes"
+  },
+  {
+   "id": "IAM-03",
+   "release": "foundations",
+   "text": "Sponsors see and write only their own arm"
+  },
+  {
+   "id": "IAM-04",
+   "release": "foundations",
+   "text": "Unblinded data only in sac_enclave for the unblinded role"
+  },
+  {
+   "id": "IAM-07",
+   "release": "foundations",
+   "text": "Agents are never unblinded"
+  },
+  {
+   "id": "AI-05",
+   "release": "foundations",
+   "text": "GxP AI output is a proposal until a person signs"
+  },
+  {
+   "id": "AI-06",
+   "release": "foundations",
+   "text": "AI ledger with model version and input hash"
+  },
+  {
+   "id": "AI-11",
+   "release": "foundations",
+   "text": "AI never sees unblinded data outside the SAC enclave"
+  },
+  {
+   "id": "APP-MF-01",
+   "release": "foundations",
+   "text": "App manifest validated against published JSON Schema"
+  },
+  {
+   "id": "APP-MF-02",
+   "release": "foundations",
+   "text": "App activation requires approval; scopes granted on approval"
+  },
+  {
+   "id": "APP-MF-04",
+   "release": "foundations",
+   "text": "Uninstall revokes scopes"
+  },
+  {
+   "id": "APP-TK-02",
+   "release": "foundations",
+   "text": "Task state machine with logged transitions"
+  },
+  {
+   "id": "APP-TK-04",
+   "release": "foundations",
+   "text": "GxP tasks by agents/apps pass waiting_review + signature"
+  },
+  {
+   "id": "APP-DT-04",
+   "release": "foundations",
+   "text": "Domain events in CloudEvents 1.0 via outbox"
+  },
+  {
+   "id": "M01-04",
+   "release": "foundations",
+   "text": "Arm lifecycle with allowed transitions and events"
+  },
+  {
+   "id": "M05-02",
+   "release": "foundations",
+   "text": "Enrollment funnel per site (blinded)"
+  },
+  {
+   "id": "M07-01",
+   "release": "foundations",
+   "text": "SAE expedited reporting clock"
+  },
+  {
+   "id": "M11-01",
+   "release": "foundations",
+   "text": "SURPASS TA3 metric catalogue with targets"
+  },
+  {
+   "id": "M11-02",
+   "release": "foundations",
+   "text": "Arm onboarding metrics computed from records"
+  },
+  {
+   "id": "APP-ID-01",
+   "release": "v0",
+   "text": "OIDC SSO via identity broker"
+  },
+  {
+   "id": "APP-ID-02",
+   "release": "foundations",
+   "text": "TrialOps claims (platform/arm/site scopes, blinding) added to the Supabase token"
+  },
+  {
+   "id": "AI-01",
+   "release": "v0",
+   "text": "All AI calls through POST /api/ai/tasks"
+  },
+  {
+   "id": "M01-01",
+   "release": "v0",
+   "text": "Structured Master Protocol / appendix editor"
+  },
+  {
+   "id": "M01-02",
+   "release": "v0",
+   "text": "New-arm wizard with AI-drafted appendix and task plan"
+  },
+  {
+   "id": "M02-01",
+   "release": "v0",
+   "text": "Site registry"
+  },
+  {
+   "id": "M02-03",
+   "release": "v0",
+   "text": "Per-arm site activation workflow"
+  },
+  {
+   "id": "APP-TK-01",
+   "release": "v1",
+   "text": "Task model and inbox"
+  },
+  {
+   "id": "APP-TK-03",
+   "release": "v1",
+   "text": "Apps claim and close tasks via API"
+  },
+  {
+   "id": "AI-07",
+   "release": "v1",
+   "text": "Tool registry AUTO/CONFIRM/BLOCK"
+  },
+  {
+   "id": "AI-08",
+   "release": "v1",
+   "text": "Internal policy engine with signed decision records"
+  },
+  {
+   "id": "M03-01",
+   "release": "v1",
+   "text": "Arm addendum generation"
+  },
+  {
+   "id": "M04-02",
+   "release": "v1",
+   "text": "IRB package assembly"
+  },
+  {
+   "id": "M05-01",
+   "release": "v1",
+   "text": "AI-assisted pre-screening"
+  },
+  {
+   "id": "M08-02",
+   "release": "v1",
+   "text": "Agent-proposed deviations"
+  },
+  {
+   "id": "M09-02",
+   "release": "v1",
+   "text": "AI-assisted TMF filing"
+  },
+  {
+   "id": "FIN-03",
+   "release": "v1",
+   "text": "Shared-cost allocation keys"
+  },
+  {
+   "id": "FIN-07",
+   "release": "v1",
+   "text": "Sponsor runway linked to enrollment forecast"
+  },
+  {
+   "id": "APP-DT-01",
+   "release": "v2",
+   "text": "Versioned REST API in OpenAPI 3.1"
+  },
+  {
+   "id": "APP-AU-01",
+   "release": "v2",
+   "text": "Apps push audit events to the core"
+  },
+  {
+   "id": "FIN-09",
+   "release": "v2",
+   "text": "Cost per arm vs CRO quotes"
+  },
+  {
+   "id": "DEMO-01",
+   "release": "v2",
+   "text": "One-command demo reset"
+  },
+  {
+   "id": "EDC-01",
+   "release": "v1",
+   "text": "Versioned CRF library linked to protocol visits"
+  },
+  {
+   "id": "EDC-03",
+   "release": "v1",
+   "text": "Site data entry"
+  },
+  {
+   "id": "EDC-04",
+   "release": "v1",
+   "text": "Declarative edit checks"
+  },
+  {
+   "id": "EDC-05",
+   "release": "v1",
+   "text": "Query workflow"
+  },
+  {
+   "id": "EDC-11",
+   "release": "v1",
+   "text": "No arm data in blinded eCRF"
+  },
+  {
+   "id": "EDC-12",
+   "release": "v1",
+   "text": "visit.completed event and data-collection metric"
+  },
+  {
+   "id": "EDC-02",
+   "release": "v2",
+   "text": "eCRF versions per arm/stage"
+  },
+  {
+   "id": "EDC-06",
+   "release": "v2",
+   "text": "SDV and reviews"
+  },
+  {
+   "id": "EDC-07",
+   "release": "v2",
+   "text": "PI signature"
+  },
+  {
+   "id": "EDC-08",
+   "release": "v2",
+   "text": "Locks and data freeze"
+  }
+ ]
+}

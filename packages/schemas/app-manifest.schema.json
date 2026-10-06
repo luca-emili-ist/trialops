@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://trialops.dev/schemas/app-manifest/v1.json",
+  "title": "TrialOps vertical app manifest (APP-MF-01)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["app_id", "version", "publisher", "gxp_class", "hosting", "auth", "scopes", "domains", "data_residency"],
+  "properties": {
+    "app_id": { "type": "string", "pattern": "^[a-z0-9]+(\\.[a-z0-9-]+)+$" },
+    "version": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+(-[0-9A-Za-z.-]+)?$" },
+    "publisher": { "type": "string", "minLength": 2 },
+    "gxp_class": { "enum": ["L0", "L1", "L2", "L3"] },
+    "gamp_category": { "enum": [1, 3, 4, 5] },
+    "hosting": { "enum": ["hosted", "external"] },
+    "base_url": { "type": "string", "format": "uri", "pattern": "^https://" },
+    "auth": {
+      "type": "object", "additionalProperties": false, "required": ["oidc_redirect_uris"],
+      "properties": {
+        "oidc_redirect_uris": { "type": "array", "minItems": 1, "items": { "type": "string", "format": "uri", "pattern": "^https://" } },
+        "scim": { "type": "boolean", "default": false }
+      }
+    },
+    "scopes": { "type": "array", "minItems": 1, "uniqueItems": true,
+      "items": { "type": "string", "pattern": "^[a-z_.]+:(read|write)$" } },
+    "domains": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+    "roles": { "type": "array", "items": { "type": "string", "pattern": "^[a-z0-9_]+\\.[a-z0-9_]+$" } },
+    "events": {
+      "type": "object", "additionalProperties": false,
+      "properties": {
+        "subscribe": { "type": "array", "items": { "$ref": "#/$defs/eventType" } },
+        "publish": { "type": "array", "items": { "$ref": "#/$defs/eventType" } }
+      }
+    },
+    "task_types": { "type": "array", "items": { "type": "string", "pattern": "^[a-z0-9_]+(\\.[a-z0-9_]+)+$" } },
+    "ui_extensions": { "type": "array", "items": {
+      "type": "object", "additionalProperties": false, "required": ["slot", "title", "url"],
+      "properties": {
+        "slot": { "enum": ["platform.dashboard.card", "arm.detail.tab", "site.detail.tab", "subject.detail.tab", "task.inbox.action"] },
+        "title": { "type": "string" }, "url": { "type": "string" } } } },
+    "data_residency": { "type": "array", "minItems": 1, "items": { "enum": ["EU", "US"] } },
+    "validation_package_url": { "type": "string", "format": "uri" }
+  },
+  "allOf": [
+    { "if": { "properties": { "gxp_class": { "enum": ["L2", "L3"] } } },
+      "then": { "required": ["validation_package_url", "gamp_category"] } },
+    { "if": { "properties": { "hosting": { "const": "external" } } }, "then": { "required": ["base_url"] } }
+  ],
+  "$defs": { "eventType": { "type": "string", "pattern": "^[a-z_]+(\\.[a-z_]+)+$" } }
+}

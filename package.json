@@ -1,0 +1,24 @@
+{
+  "name": "trialops",
+  "version": "0.1.0",
+  "private": true,
+  "description": "TrialOps — open source clinical operations platform for adaptive platform trials (TA3)",
+  "license": "AGPL-3.0-only",
+  "type": "module",
+  "workspaces": ["packages/*"],
+  "engines": { "node": ">=22" },
+  "scripts": {
+    "db:up": "node scripts/db.mjs up",
+    "db:reset": "node scripts/db.mjs reset",
+    "db:seed": "node scripts/db.mjs seed",
+    "test": "node scripts/db.mjs test",
+    "trace": "node scripts/trace.mjs",
+    "verify": "npm run test && npm run trace"
+  },
+  "devDependencies": {
+    "embedded-postgres": "17.5.0-beta.15",
+    "pg": "^8.13.0",
+    "ajv": "^8.17.1",
+    "ajv-formats": "^3.0.1"
+  }
+}
