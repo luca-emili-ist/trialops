@@ -32,3 +32,7 @@ export async function withClaims<T>(pool: pg.Pool, claims: Claims, reason: strin
     client.release();
   }
 }
+
+/** A database row as returned by pg (columns are not statically typed). */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type Row = Record<string, any>;

@@ -1,0 +1,74 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://trialops.dev/schemas/protocol-sections.schema.json",
+  "title": "TrialOps structured protocol content (Master Protocol and arm appendix)",
+  "description": "Sections follow ICH M11 headings; objects mirror CDISC USDM (objectives, endpoints, population, schedule of activities, interventions). Stored in usdm jsonb of core.master_protocol_version / core.arm_appendix_version (M01-01).",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "synopsis": { "$ref": "#/$defs/synopsis" },
+    "objectives": { "$ref": "#/$defs/objectives" },
+    "endpoints": { "$ref": "#/$defs/endpoints" },
+    "population": { "$ref": "#/$defs/population" },
+    "interventions": { "$ref": "#/$defs/interventions" },
+    "schedule": { "$ref": "#/$defs/schedule" },
+    "transition_rules": { "$ref": "#/$defs/transition_rules" },
+    "study": { "type": "object", "description": "Legacy free-form study header (foundations seed)" },
+    "arm": { "type": "string", "description": "Legacy arm code (foundations seed)" }
+  },
+  "$defs": {
+    "id": { "type": "string", "pattern": "^[A-Za-z][A-Za-z0-9_.-]{0,39}$" },
+    "text": { "type": "string", "minLength": 1, "maxLength": 4000 },
+    "synopsis": {
+      "type": "object", "additionalProperties": false, "required": ["title"],
+      "x-ich-m11": "1 Protocol Summary",
+      "properties": {
+        "title": { "$ref": "#/$defs/text" },
+        "rationale": { "$ref": "#/$defs/text" },
+        "phase": { "enum": ["phase1", "phase1_2", "phase2", "phase2_3", "phase3"] }
+      }
+    },
+    "objectives": {
+      "type": "array", "x-ich-m11": "3 Trial Objectives and Associated Estimands",
+      "items": { "type": "object", "additionalProperties": false, "required": ["id", "level", "text"],
+        "properties": { "id": { "$ref": "#/$defs/id" }, "level": { "enum": ["primary", "secondary", "exploratory"] },
+          "text": { "$ref": "#/$defs/text" }, "endpoint_ids": { "type": "array", "items": { "$ref": "#/$defs/id" } } } }
+    },
+    "endpoints": {
+      "type": "array", "x-ich-m11": "3 Trial Objectives and Associated Estimands",
+      "items": { "type": "object", "additionalProperties": false, "required": ["id", "text", "type"],
+        "properties": { "id": { "$ref": "#/$defs/id" }, "text": { "$ref": "#/$defs/text" },
+          "type": { "enum": ["efficacy", "safety", "pharmacokinetic", "pharmacodynamic", "other"] }, "timeframe": { "type": "string" } } }
+    },
+    "population": {
+      "type": "object", "additionalProperties": false, "x-ich-m11": "5 Trial Population",
+      "properties": {
+        "description": { "$ref": "#/$defs/text" },
+        "inclusion": { "type": "array", "items": { "$ref": "#/$defs/criterion" } },
+        "exclusion": { "type": "array", "items": { "$ref": "#/$defs/criterion" } }
+      }
+    },
+    "criterion": { "type": "object", "additionalProperties": false, "required": ["id", "text"],
+      "properties": { "id": { "$ref": "#/$defs/id" }, "text": { "$ref": "#/$defs/text" } } },
+    "interventions": {
+      "type": "array", "x-ich-m11": "6 Trial Intervention and Concomitant Therapy",
+      "items": { "type": "object", "additionalProperties": false, "required": ["name", "type"],
+        "properties": { "name": { "type": "string", "minLength": 1 }, "type": { "enum": ["drug", "biologic", "placebo", "device", "other"] },
+          "dose": { "type": "string" }, "route": { "type": "string" }, "frequency": { "type": "string" } } }
+    },
+    "schedule": {
+      "type": "object", "additionalProperties": false, "x-ich-m11": "1.3 Schedule of Activities",
+      "properties": { "visits": { "type": "array", "items": { "type": "object", "additionalProperties": false, "required": ["id", "name", "day"],
+        "properties": { "id": { "$ref": "#/$defs/id" }, "name": { "type": "string", "minLength": 1 }, "day": { "type": "integer" },
+          "window_days": { "type": "integer", "minimum": 0 }, "activities": { "type": "array", "items": { "type": "string" } } } } } }
+    },
+    "transition_rules": {
+      "type": "array", "x-ich-m11": "4 Trial Design (adaptive rules)",
+      "items": { "type": "object", "additionalProperties": false, "required": ["id", "from_stage", "to_stage", "criterion"],
+        "properties": { "id": { "$ref": "#/$defs/id" },
+          "from_stage": { "enum": ["dose_finding", "expansion", "efficacy", "confirmatory"] },
+          "to_stage": { "enum": ["dose_finding", "expansion", "efficacy", "confirmatory", "graduated", "stopped"] },
+          "criterion": { "$ref": "#/$defs/text" } } }
+    }
+  }
+}

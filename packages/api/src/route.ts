@@ -2,6 +2,7 @@
 // (spec §3, "OpenAPI 3.1 generated from the code").
 import type { Db } from './db.ts';
 import type { Claims } from './auth.ts';
+import type { Reauthenticator } from './lib/reauth.ts';
 
 export type JsonSchema = Record<string, unknown>;
 
@@ -18,6 +19,7 @@ export interface Ctx<B = unknown> {
 /** Collaborators injected into handlers (AI runtime client, clock...). Filled in by later steps. */
 export interface Services {
   ai?: AiClient;
+  reauth?: Reauthenticator;
 }
 
 export interface AiTaskRequest {

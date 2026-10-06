@@ -1,7 +1,8 @@
 {
   "$comment": "TrialOps domain event catalogue v1 (spec §4.4). All events are CloudEvents 1.0; 'emitted_by' = where the core emits it today.",
   "events": [
-    { "type": "platform.protocol.version.approved", "subject": "master_protocol_version/{id}", "emitted_by": "planned" },
+    { "type": "platform.protocol.version.approved", "subject": "master_protocol_version/{id}", "emitted_by": "core.approval_controls trigger" },
+    { "type": "arm.appendix.version.approved", "subject": "arm_appendix_version/{id}", "emitted_by": "core.approval_controls trigger" },
     { "type": "arm.created", "subject": "arm/{id}", "emitted_by": "core.arm trigger" },
     { "type": "arm.status.changed", "subject": "arm/{id}", "emitted_by": "core.arm trigger" },
     { "type": "arm.stage.changed", "subject": "arm/{id}", "emitted_by": "core.arm trigger" },

@@ -1,1 +1,1 @@
-{ "name": "@trialops/schemas", "version": "0.1.0", "type": "module", "files": ["*.json", "examples"] }
+{"name": "@trialops/schemas", "version": "0.1.0", "type": "module", "files": ["*.json", "examples"], "exports": {"./*.json": "./*.json", "./examples/*": "./examples/*"}}

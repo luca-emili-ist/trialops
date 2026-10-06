@@ -1,13 +1,12 @@
 // Platform API (ARC-03). createApp is used by the local server, the Netlify function and the tests.
 import express, { type Request, type Response, type NextFunction } from 'express';
 import type pg from 'pg';
-import { Ajv2020 } from 'ajv/dist/2020.js';
-import addFormats from 'ajv-formats';
 import { bearer, type Verifier } from './auth.ts';
 import { withClaims } from './db.ts';
 import { HttpError, toHttp } from './errors.ts';
 import type { RouteDef, Services } from './route.ts';
 import { openapi } from './openapi.ts';
+import { ajv } from './lib/validate.ts';
 import { routes as allRoutes } from './routes/index.ts';
 
 export interface AppDeps {
@@ -21,8 +20,6 @@ export function createApp({ pool, verify, services = {}, routes = allRoutes }: A
   const app = express();
   app.disable('x-powered-by');
   app.use(express.json({ limit: '1mb' }));
-  const ajv = new Ajv2020({ allErrors: true, strict: false });
-  addFormats.default(ajv);
 
   app.get('/v1/openapi.json', (_req, res) => { res.json(openapi(routes)); });
 

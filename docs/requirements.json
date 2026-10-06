@@ -52,6 +52,11 @@
    "text": "Unblinded data only in sac_enclave for the unblinded role"
   },
   {
+   "id": "IAM-05",
+   "release": "foundations",
+   "text": "Separation of duties: the author of a GxP document or change cannot approve it"
+  },
+  {
    "id": "IAM-07",
    "release": "foundations",
    "text": "Agents are never unblinded"
