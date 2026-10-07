@@ -18,3 +18,25 @@ export async function api<T = any>(method: string, path: string, opts: { body?: 
   return data as T;
 }
 export const get = <T = any>(path: string) => api<T>('GET', path); // eslint-disable-line @typescript-eslint/no-explicit-any
+
+/** AI job (0014): AI tasks and agent runs are queued and run by a worker; the client polls until the job ends. */
+export interface AiJob<R = any> { id: string; kind: string; status: 'queued' | 'running' | 'completed' | 'failed'; result: R | null; error: string | null; // eslint-disable-line @typescript-eslint/no-explicit-any
+  ai_request_id: string | null; deadline_at: string }
+
+const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
+
+/** Starts a job (POST answering 202) and waits for its end; failed jobs reject with the recorded reason. */
+export async function runJob<R = any>(method: string, path: string, opts: { body?: unknown; onStatus?: (s: AiJob['status']) => void; // eslint-disable-line @typescript-eslint/no-explicit-any
+  intervalMs?: number } = {}): Promise<R> {
+  let job = await api<AiJob<R>>(method, path, { body: opts.body });
+  const limit = Date.parse(job.deadline_at) + 17 * 60_000;   // the server closes stuck jobs; this only guards the loop
+  let last: AiJob['status'] | null = null;
+  while (job.status === 'queued' || job.status === 'running') {
+    if (job.status !== last) { last = job.status; opts.onStatus?.(job.status); }
+    if (Date.now() > limit) throw new Error('The AI job did not finish in time');
+    await sleep(opts.intervalMs ?? 1500);
+    job = await get<AiJob<R>>(`/v1/ai/jobs/${job.id}`);
+  }
+  if (job.status === 'failed') throw new Error(job.error ?? 'The AI job failed');
+  return job.result as R;
+}

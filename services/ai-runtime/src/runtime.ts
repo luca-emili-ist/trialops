@@ -28,7 +28,8 @@ export interface AiRuntimeOptions {
 /** Provider from the environment: TRIALOPS_AI_MODE=live (Anthropic, needs ANTHROPIC_API_KEY) or replay (default). */
 export function providerFromEnv(env: NodeJS.ProcessEnv = process.env): Provider {
   if (env.TRIALOPS_AI_MODE !== 'live') return replayProvider();
-  const live = anthropicProvider(new Anthropic());
+  // One model call must end well inside the AI job limit (0014: 14 min, worker 15 min): bounded timeout and one retry.
+  const live = anthropicProvider(new Anthropic({ timeout: Number(env.TRIALOPS_AI_TIMEOUT_MS || 360_000), maxRetries: 1 }));
   return env.TRIALOPS_AI_RECORD === '1' ? recording(live) : live;
 }
 
@@ -62,15 +63,22 @@ export function createAiRuntime(opts: AiRuntimeOptions = {}) {
     return String(r.rows[0]!.id);
   }
 
+  /** Refuses unregistered task types and unapproved data classes before anything is queued or called (AI-01, AI-02). */
+  function check(req: Pick<AiTaskRequest, 'task_type' | 'data_class'>): TaskTypeDef {
+    const d = registry[req.task_type];
+    if (!d) throw new AiRequestError('unknown_task_type', `task_type ${req.task_type} is not registered (AI-02)`);
+    if (!d.data_classes.includes(req.data_class)) {
+      throw new AiRequestError('data_class_not_allowed', `${req.task_type} is not approved for ${req.data_class} data`);
+    }
+    return d;
+  }
+
   return {
     provider,
     registry,
+    check,
     async run(req: AiTaskRequest, caller: { db: LedgerDb }): Promise<AiTaskResult> {
-      const d = registry[req.task_type];
-      if (!d) throw new AiRequestError('unknown_task_type', `task_type ${req.task_type} is not registered (AI-02)`);
-      if (!d.data_classes.includes(req.data_class)) {
-        throw new AiRequestError('data_class_not_allowed', `${req.task_type} is not approved for ${req.data_class} data`);
-      }
+      const d = check(req);
       const prompt = d.render(req.input);
       const input_sha256 = sha256(canonical({ task_type: d.task_type, prompt_id: d.prompt_id, prompt_version: d.prompt_version,
         model: d.model, system: prompt.system, user: prompt.user }));

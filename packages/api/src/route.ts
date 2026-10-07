@@ -17,6 +17,10 @@ export interface Ctx<B = unknown> {
   reason: string | undefined;
   headers: Record<string, string | undefined>;
   services: Services;
+  /** Runs fn in a new transaction as the caller (own claims, RLS and audit apply). For routes with manualTx. */
+  tx<T>(fn: (db: Db) => Promise<T>): Promise<T>;
+  /** Runs fn after the request transaction committed and before the response is sent (e.g. dispatching a job). */
+  afterCommit(fn: () => Promise<void> | void): void;
 }
 
 /** Collaborators injected into handlers. */
@@ -27,6 +31,13 @@ export interface Services {
   /** Local development only (TRIALOPS_DEV_LOGIN=1): mints a token for a demo user, for the user switch (DEMO-02). */
   devLogin?: (sub: string) => Promise<string>;
   devUsers?: () => Promise<Record<string, unknown>[]>;
+  /** Starts the worker of an AI job (Netlify: the background function). Absent: the job runs in this process. */
+  jobs?: JobDispatcher;
+}
+
+/** Hands a queued AI job to a worker. Must return quickly: the worker answers 202 and runs the job on its own. */
+export interface JobDispatcher {
+  dispatch(jobId: string, request: { authorization?: string; cookie?: string }): Promise<void>;
 }
 
 export interface RawResponse { status: number; headers?: Record<string, string>; body: unknown }
@@ -46,6 +57,8 @@ export interface RouteDef {
   public?: boolean;
   /** The handler returns a RawResponse (own status/headers/body), e.g. OAuth error responses. */
   raw?: boolean;
+  /** No request transaction: the handler opens its own with ctx.tx (long work split into several commits). */
+  manualTx?: boolean;
   handler: (ctx: Ctx<never>) => Promise<unknown>;
 }
 

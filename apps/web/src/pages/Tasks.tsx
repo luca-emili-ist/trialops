@@ -1,7 +1,7 @@
 // TRO-030 Task inbox and TRO-031 Task detail: state history, agent run, review of agent proposals (AI-05, APP-TK-04).
 import { useState, type ReactNode } from 'react';
 import { PageHeader, Panel, DataTable, StatusPill, Button, Loading, ErrorNote, DefinitionList, SelectField, SignDialog, DiffList, EmptyState, useToast, type SectionDiff } from '@trialops/shell';
-import { api } from '../api.ts';
+import { api, runJob } from '../api.ts';
 import { useData, useSession } from '../session.tsx';
 import { go } from '../router.ts';
 import { fmtDate, fmtDateTime, human, tone } from '../format.ts';
@@ -47,7 +47,7 @@ export function TaskDetail({ id }: { id: string }) {
   return (
     <>
       <PageHeader crumbs={<a href="#/tasks">Tasks</a>} title={t.title}
-        actions={runnable ? <Button variant="primary" disabled={busy} onClick={() => { setBusy(true); api<{ outcome: string; error?: string }>('POST', `/v1/tasks/${id}/run-agent`)
+        actions={runnable ? <Button variant="primary" disabled={busy} onClick={() => { setBusy(true); runJob<{ outcome: string; error?: string }>('POST', `/v1/tasks/${id}/run-agent`)
           .then(r => toast(r.outcome === 'success' ? 'Agent finished' : `Agent: ${r.outcome} ${r.error ?? ''}`, r.outcome !== 'success'), e => toast((e as Error).message, true))
           .finally(() => { setBusy(false); task.reload(); }); }}>{busy ? 'Agent working…' : 'Run the agent'}</Button> : undefined} />
       <div className="grid-2">

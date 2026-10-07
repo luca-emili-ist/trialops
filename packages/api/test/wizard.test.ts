@@ -30,8 +30,10 @@ test('[M01-02] the wizard creates a draft arm, an empty appendix draft and one t
 });
 
 test('[M01-02][IAM-07] the Protocol author works under its own identity and leaves a proposal waiting for review', async () => {
-  const r = await api.call('POST', `/v1/tasks/${draftTask.id}/run-agent`, { as: 'demo|ops' });
-  assert.equal(r.status, 200, JSON.stringify(r.body));
+  const { accepted, job } = await api.job('POST', `/v1/tasks/${draftTask.id}/run-agent`, { as: 'demo|ops' });
+  assert.equal(accepted.status, 202, JSON.stringify(accepted.body));
+  assert.equal(job.status, 'completed', JSON.stringify(job));
+  const r = { body: job.result };
   assert.equal(r.body.outcome, 'success');
   const t = (await api.call('GET', `/v1/tasks/${draftTask.id}`, { as: 'demo|ops' })).body;
   assert.equal(t.state, 'waiting_review');
@@ -44,9 +46,9 @@ test('[M01-02][IAM-07] the Protocol author works under its own identity and leav
 });
 
 test('[M01-02] the Onboarding planner creates the operational tasks automatically', async () => {
-  const r = await api.call('POST', `/v1/tasks/${planTask.id}/run-agent`, { as: 'demo|ops' });
-  assert.equal(r.status, 200, JSON.stringify(r.body));
-  assert.equal(r.body.tasks_created, 9);
+  const { job } = await api.job('POST', `/v1/tasks/${planTask.id}/run-agent`, { as: 'demo|ops' });
+  assert.equal(job.status, 'completed', JSON.stringify(job));
+  assert.equal(job.result.tasks_created, 9);
   const tasks = (await api.call('GET', `/v1/platforms/${plat}/tasks?arm_id=${arm.id}`, { as: 'demo|ops' })).body.items;
   const areas = new Set(tasks.filter((t: any) => t.assignee_kind === 'role').map((t: any) => t.type.split('.')[0]));
   for (const a of ['contract', 'irb', 'ind', 'supply', 'edc', 'site', 'training']) assert.ok(areas.has(a), `missing ${a}`);
@@ -100,7 +102,7 @@ test('[M01-02][IAM-05] another person approves the appendix and the arm is ready
 
 test('[AI-05] edits and rejections are recorded and measured per task type', async () => {
   const e = (await wizard('ARM-E')).body;
-  await api.call('POST', `/v1/tasks/${e.agent_tasks[0].id}/run-agent`, { as: 'demo|ops' });
+  await api.job('POST', `/v1/tasks/${e.agent_tasks[0].id}/run-agent`, { as: 'demo|ops' });
   const proposal = (await api.call('GET', `/v1/tasks/${e.agent_tasks[0].id}`, { as: 'demo|ops' })).body.outputs.proposal.sections;
   const edited = { ...proposal, synopsis: { ...proposal.synopsis, phase: 'phase2_3' } };
   const er = await api.call('POST', `/v1/tasks/${e.agent_tasks[0].id}/review`, { as: 'demo|ops', reason: 'phase corrected',
@@ -108,7 +110,7 @@ test('[AI-05] edits and rejections are recorded and measured per task type', asy
   assert.equal(er.status, 200, JSON.stringify(er.body));
   assert.deepEqual(er.body.task.outputs.edits.map((x: any) => x.section), ['synopsis']);
   const f = (await wizard('ARM-F')).body;
-  await api.call('POST', `/v1/tasks/${f.agent_tasks[0].id}/run-agent`, { as: 'demo|ops' });
+  await api.job('POST', `/v1/tasks/${f.agent_tasks[0].id}/run-agent`, { as: 'demo|ops' });
   const rr = await api.call('POST', `/v1/tasks/${f.agent_tasks[0].id}/review`, { as: 'demo|ops', reason: 'not consistent with sponsor plan',
     body: { decision: 'reject', password: DEMO_PASSWORD } });
   assert.equal(rr.body.task.state, 'rejected');

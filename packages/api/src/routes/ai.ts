@@ -1,19 +1,23 @@
 // AI entry point (AI-01): POST /api/ai/tasks. Callers send an intent; the runtime picks the pinned model, applies the
-// data-class policy and records the call in the ledger (AI-06) inside the caller's transaction (RLS applies).
+// data-class policy and records the call in the ledger (AI-06) as the caller (RLS applies). The call runs as a job
+// (0014) so that a long model call never depends on the time limit of a synchronous HTTP function.
 import { route, uuid } from '../route.ts';
 import { HttpError } from '../errors.ts';
+import { enqueueJob } from './jobs.ts';
 import { DATA_CLASSES } from '@trialops/ai-runtime';
 import type { AiTaskRequest } from '@trialops/ai-runtime';
 
 export const aiRoutes = [
-  route<AiTaskRequest>({ method: 'post', path: '/api/ai/tasks', summary: 'Run an AI task through the AI runtime', tag: 'ai',
-    reqs: ['AI-01', 'AI-06'],
+  route<AiTaskRequest>({ method: 'post', path: '/api/ai/tasks', raw: true, tag: 'ai', reqs: ['AI-01', 'AI-06', 'AI-09'],
+    summary: 'Queue an AI task for the AI runtime: 202 with the job, poll GET /v1/ai/jobs/{id} for the outcome',
     body: { type: 'object', additionalProperties: false, required: ['task_type', 'data_class', 'input'],
       properties: { task_type: { type: 'string' }, data_class: { enum: DATA_CLASSES }, input: { type: 'object' },
         platform_id: uuid, arm_id: uuid, task_id: uuid } },
-    handler: async ({ db, body, services }) => {
-      if (!services.ai) throw new HttpError(501, 'ai_unavailable', 'AI runtime not configured');
-      return services.ai.run(body, { db });
+    handler: async ctx => {
+      if (!ctx.services.ai) throw new HttpError(501, 'ai_unavailable', 'AI runtime not configured');
+      ctx.services.ai.check(ctx.body);   // unknown task types and unapproved data classes are refused before queueing
+      return enqueueJob(ctx, { kind: 'ai_task', request: ctx.body, platform_id: ctx.body.platform_id, arm_id: ctx.body.arm_id,
+        task_id: ctx.body.task_id });
     } }),
 
   route({ method: 'get', path: '/v1/ai/task-types', summary: 'Registered AI task types with model, prompt version and risk', tag: 'ai',

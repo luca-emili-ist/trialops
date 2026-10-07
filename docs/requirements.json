@@ -300,6 +300,11 @@
    "id": "DEMO-04",
    "release": "v0",
    "text": "Visible 'synthetic data - demonstration environment' label and page code on every page"
+  },
+  {
+   "id": "AI-09",
+   "release": "v1",
+   "text": "Per-job limits (max_steps, max_tokens, max_cost, max_execution_time); an overrun stops the job and creates a task for a person"
   }
  ]
 }

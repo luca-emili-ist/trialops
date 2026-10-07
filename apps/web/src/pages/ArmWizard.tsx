@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { PageHeader, Panel, Button, TextField, SelectField, Field, Textarea, Steps, DataTable, DiffList, StatusPill, SignDialog,
   Loading, ErrorNote, DefinitionList, EmptyState, useToast, type SectionDiff } from '@trialops/shell';
-import { api } from '../api.ts';
+import { api, runJob } from '../api.ts';
 import { useData, useSession } from '../session.tsx';
 import { go } from '../router.ts';
 import { human, tone, fmtDateTime } from '../format.ts';
@@ -101,7 +101,7 @@ function Progress({ armId }: { armId: string }) {
     for (const t of [author, planner]) {
       if (!t || !['assigned', 'in_progress'].includes(t.state)) continue;
       try {
-        const r = await api<{ outcome: string; error?: string }>('POST', `/v1/tasks/${t.id}/run-agent`);
+        const r = await runJob<{ outcome: string; error?: string }>('POST', `/v1/tasks/${t.id}/run-agent`, { onStatus: () => tasks.reload() });
         if (r.outcome !== 'success') toast(`${t.assignee}: ${r.outcome}${r.error ? ` — ${r.error}` : ''}`, true);
       } catch (e) { toast((e as Error).message, true); }
     }

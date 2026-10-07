@@ -39,3 +39,15 @@ Agents and apps get tokens from the server with `actor_type` = `agent` / `app`; 
   Deploy: `netlify deploy --prod --build --filter @trialops/web` (the filter avoids the monorepo prompt).
   Server-only secrets: `DATABASE_URL`, `TRIALOPS_OIDC_PRIVATE_JWK`. AI runs in replay until `TRIALOPS_AI_MODE=live` and
   `ANTHROPIC_API_KEY` (IST key) are set.
+
+## AI jobs (0014, 2026-10-08)
+Agent runs and `POST /api/ai/tasks` no longer run inside the synchronous API function (10 s default, 26 s max): the API
+records a job in `core.ai_job` (status `queued`) and answers **202** with it; the background function
+`netlify/functions/ai-worker-background.mts` (up to 15 min) runs it as the person who asked (their bearer token is
+forwarded, plus the Team login cookie) and records `completed`/`failed`; the web app polls `GET /v1/ai/jobs/{id}`.
+The ledger `core.ai_request` is unchanged: one immutable row per model call, written by the runtime; the job points to
+it. Limits (AI-09): a job not started within `max_execution_s` (840 s) or a worker silent for 16 minutes is closed as
+failed; one model call times out after `TRIALOPS_AI_TIMEOUT_MS` (default 360000) with one retry. Locally (dev:api, tests)
+the job runs in the same process after the 202, the client polls the same way.
+- Migration `0014_ai_jobs.sql` must be applied to the Supabase project before deploying this code.
+- Worker URL: `${URL}/.netlify/functions/ai-worker-background` (Netlify sets `URL`); override with `TRIALOPS_WORKER_URL`.

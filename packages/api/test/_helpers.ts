@@ -31,6 +31,8 @@ export interface Api {
   admin: pg.Client;
   tokenFor(sub: string): Promise<string>;
   call(method: string, path: string, opts?: { token?: string; as?: string; body?: unknown; reason?: string }): Promise<{ status: number; body: any }>;
+  /** Starts an AI job (POST answering 202) and polls GET /v1/ai/jobs/{id} until it ends; returns the 202 and the final job. */
+  job(method: string, path: string, opts?: { token?: string; as?: string; body?: unknown }): Promise<{ accepted: { status: number; body: any }; job: any }>;
   close(): Promise<void>;
 }
 
@@ -79,8 +81,18 @@ export async function startApi(services: Services = {}): Promise<Api> {
     const text = await res.text();
     return { status: res.status, body: text ? JSON.parse(text) : null };
   };
+  const job: Api['job'] = async (method, path, opts = {}) => {
+    const token = opts.token ?? (opts.as ? await tokenFor(opts.as) : undefined);
+    const accepted = await call(method, path, { ...opts, token });
+    let j = accepted.body;
+    for (let i = 0; accepted.status === 202 && ['queued', 'running'].includes(j.status) && i < 400; i++) {
+      await new Promise(r => setTimeout(r, 25));
+      j = (await call('GET', `/v1/ai/jobs/${j.id}`, { token })).body;
+    }
+    return { accepted, job: j };
+  };
   return {
-    url, admin, tokenFor, call,
+    url, admin, tokenFor, call, job,
     close: async () => { await new Promise(r => server.close(r)); await pool.end(); await admin.end(); await clone.drop(); },
   };
 }

@@ -60,16 +60,25 @@ async function onboardingPlanner(db: Db, services: Services, task: Row): Promise
   return { outcome: r.outcome, ai_request_id: r.ai_request_id, tasks_created: created.length };
 }
 
-/** Runs the agent a task is assigned to, as that agent. */
-export async function runAgentTask(db: Db, services: Services, taskId: string): Promise<Row> {
+const RUNNERS = { [AGENTS.protocolAuthor]: protocolAuthor, [AGENTS.onboardingPlanner]: onboardingPlanner } as Record<string,
+  (db: Db, services: Services, task: Row) => Promise<Row>>;
+
+/** The task an agent can run now, or the reason why not (checked again by the worker before running). */
+export async function runnableAgentTask(db: Db, services: Services, taskId: string): Promise<{ task: Row; agentId: string }> {
   if (!services.ai) throw new HttpError(501, 'ai_unavailable', 'AI runtime not configured');
   const task = (await db.query('select * from core.task where id = $1', [taskId])).rows[0];
   if (!task) throw new HttpError(404, 'not_found', 'task not found');
   if (task.assignee_kind !== 'agent') throw new HttpError(409, 'not_an_agent_task', 'task is not assigned to an agent');
   if (!['assigned', 'in_progress'].includes(task.state)) throw new HttpError(409, 'task_not_runnable', `task is ${task.state}`);
   const agentId = String(task.assignee).replace(/^agent:/, '');
-  const run = agentId === AGENTS.protocolAuthor ? protocolAuthor : agentId === AGENTS.onboardingPlanner ? onboardingPlanner : null;
-  if (!run) throw new HttpError(422, 'unknown_agent', `no agent ${task.assignee}`);
+  if (!RUNNERS[agentId]) throw new HttpError(422, 'unknown_agent', `no agent ${task.assignee}`);
+  return { task, agentId };
+}
+
+/** Runs the agent a task is assigned to, as that agent. */
+export async function runAgentTask(db: Db, services: Services, taskId: string): Promise<Row> {
+  const { task, agentId } = await runnableAgentTask(db, services, taskId);
+  const run = RUNNERS[agentId]!;
   return asActor(db, agentClaims(agentId, task.platform_id, task.arm_id), async () => {
     if (task.state === 'assigned') await setState(db, task.id, 'in_progress', { claimed_by: `agent:${agentId}`, claimed_at: new Date().toISOString() });
     return { task_id: task.id, agent: `agent:${agentId}`, ...(await run(db, services, task)) };

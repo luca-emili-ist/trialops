@@ -8,7 +8,8 @@ import { sign } from '../lib/sign.ts';
 import { diffContent } from '../lib/diff.ts';
 import { createArm, newArmSchema, type NewArm } from './arms.ts';
 import { createDraft, getVersion, putSection, validateProtocolContent, PROTOCOL_KINDS, type ProtocolContent } from './protocol.ts';
-import { runAgentTask, AGENTS } from '../agents/index.ts';
+import { runnableAgentTask, AGENTS } from '../agents/index.ts';
+import { enqueueJob } from './jobs.ts';
 
 const OPEN = ['created', 'assigned', 'in_progress', 'waiting_review'];
 const TASK_COLS = `t.id, t.platform_id, t.arm_id, a.code arm_code, t.site_id, t.type, t.title, t.subject_ref, t.assignee_kind, t.assignee,
@@ -83,11 +84,13 @@ export const taskRoutes = [
         properties: { ref: { type: 'string', minLength: 1, maxLength: 60 }, title: { type: 'string' }, text: { type: 'string', maxLength: 50000 } } } } } },
     handler: async ({ db, claims, params, body }) => startWizard(db, claims, params.id!, body) }),
 
-  route({ method: 'post', path: '/v1/tasks/:id/run-agent', summary: 'Run the agent a task is assigned to', tag: 'tasks',
-    reqs: ['M01-02', 'AI-01', 'IAM-07'],
-    handler: async ({ db, claims, params, services }) => {
-      requireRole(claims, ['platform_admin', 'platform_ops_manager'], 'Running an agent');
-      return runAgentTask(db, services, params.id!);
+  route({ method: 'post', path: '/v1/tasks/:id/run-agent', raw: true, tag: 'tasks', reqs: ['M01-02', 'AI-01', 'IAM-07', 'AI-09'],
+    summary: 'Queue a run of the agent a task is assigned to: 202 with the job, poll GET /v1/ai/jobs/{id}',
+    handler: async ctx => {
+      requireRole(ctx.claims, ['platform_admin', 'platform_ops_manager'], 'Running an agent');
+      const { task } = await runnableAgentTask(ctx.db, ctx.services, ctx.params.id!);
+      return enqueueJob(ctx, { kind: 'agent_run', request: { task_id: task.id }, platform_id: task.platform_id, arm_id: task.arm_id,
+        task_id: task.id });
     } }),
 
   route({ method: 'get', path: '/v1/platforms/:id/tasks', summary: 'Task inbox (open by default; mine = my person or my roles)', tag: 'tasks',

@@ -11,10 +11,14 @@ before(async () => {
 });
 after(async () => api.close());
 
-test('[AI-01][AI-06] POST /api/ai/tasks runs a registered task and records it in the ledger', async () => {
-  const r = await api.call('POST', '/api/ai/tasks', { as: 'demo|ops',
+test('[AI-01][AI-06][AI-09] POST /api/ai/tasks queues a registered task as a job and records the call in the ledger', async () => {
+  const { accepted, job } = await api.job('POST', '/api/ai/tasks', { as: 'demo|ops',
     body: { task_type: 'arm.onboarding.plan', data_class: 'INTERNAL', input: { arm: 'ARM-B' }, platform_id: plat, arm_id: armB } });
-  assert.equal(r.status, 200, JSON.stringify(r.body));
+  assert.equal(accepted.status, 202, JSON.stringify(accepted.body));
+  assert.equal(accepted.body.status, 'queued');
+  assert.equal(job.status, 'completed', JSON.stringify(job));
+  const r = { body: job.result };
+  assert.equal(job.ai_request_id, r.body.ai_request_id);
   assert.equal(r.body.outcome, 'success');
   assert.ok(Array.isArray(r.body.output.tasks));
   const row = (await api.admin.query('select * from core.ai_request where id = $1', [r.body.ai_request_id])).rows[0];
@@ -27,11 +31,12 @@ test('[AI-01][AI-06] POST /api/ai/tasks runs a registered task and records it in
 });
 
 test('[AI-01] unknown task types and unapproved data classes are refused before any call', async () => {
-  const before = (await api.admin.query('select count(*)::int n from core.ai_request')).rows[0].n;
+  const before = (await api.admin.query('select (select count(*) from core.ai_request) + (select count(*) from core.ai_job) n')).rows[0].n;
   assert.equal((await api.call('POST', '/api/ai/tasks', { as: 'demo|ops', body: { task_type: 'free.chat', data_class: 'PUBLIC', input: {} } })).status, 422);
   assert.equal((await api.call('POST', '/api/ai/tasks', { as: 'demo|ops',
     body: { task_type: 'arm.onboarding.plan', data_class: 'CLINICAL_PSEUDONYMIZED', input: {} } })).status, 422);
-  assert.equal((await api.admin.query('select count(*)::int n from core.ai_request')).rows[0].n, before);
+  assert.equal((await api.admin.query('select (select count(*) from core.ai_request) + (select count(*) from core.ai_job) n')).rows[0].n, before,
+    'nothing queued, nothing called');
 });
 
 test('[AI-06][IAM-03] the ledger is visible within the perimeter only', async () => {

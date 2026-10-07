@@ -2,12 +2,15 @@
 import express, { type Request, type Response, type NextFunction } from 'express';
 import type pg from 'pg';
 import { bearer, type Verifier } from './auth.ts';
-import { withClaims, ANONYMOUS } from './db.ts';
+import { withClaims, ANONYMOUS, type Db } from './db.ts';
 import { HttpError, toHttp } from './errors.ts';
 import type { RawResponse, RouteDef, Services } from './route.ts';
 import { openapi } from './openapi.ts';
 import { ajv } from './lib/validate.ts';
 import { routes as allRoutes } from './routes/index.ts';
+
+/** ctx.db of a manualTx route: there is no request transaction, the handler must use ctx.tx. */
+const NO_TX = new Proxy({}, { get() { throw new Error('manualTx route: use ctx.tx() to open a transaction'); } }) as Db;
 
 export interface AppDeps {
   pool: pg.Pool;
@@ -33,15 +36,15 @@ export function createApp({ pool, verify, services = {}, routes = allRoutes }: A
         }
         const reason = req.header('x-change-reason')?.trim() || undefined;
         if (r.needsReason && !reason) throw new HttpError(400, 'reason_required', 'X-Change-Reason header required for this change (DM-03)');
+        const after: (() => Promise<void> | void)[] = [];
+        const claims = r.public ? ANONYMOUS : await verify(bearer(req.header('authorization')));
         const ctxBase = { params: req.params as Record<string, string>, query: req.query as Record<string, string | undefined>,
-          body: req.body as never, reason, services, headers: req.headers as Record<string, string | undefined> };
-        let out: unknown;
-        if (r.public) {
-          out = await withClaims(pool, ANONYMOUS, undefined, db => r.handler({ ...ctxBase, db, claims: ANONYMOUS }));
-        } else {
-          const claims = await verify(bearer(req.header('authorization')));
-          out = await withClaims(pool, claims, reason, db => r.handler({ ...ctxBase, db, claims }));
-        }
+          body: req.body as never, reason, services, headers: req.headers as Record<string, string | undefined>, claims,
+          tx: <T>(fn: (db: Db) => Promise<T>) => withClaims(pool, claims, r.public ? undefined : reason, fn),
+          afterCommit: (fn: () => Promise<void> | void) => { after.push(fn); } };
+        const out: unknown = r.manualTx ? await r.handler({ ...ctxBase, db: NO_TX })
+          : await ctxBase.tx(db => r.handler({ ...ctxBase, db }));
+        for (const fn of after) await fn();
         if (out === undefined) throw new HttpError(404, 'not_found', 'not found');
         if (r.raw) { const { status, headers, body } = out as RawResponse; res.status(status).set(headers ?? {}).json(body); return; }
         res.status(r.status ?? 200).json(out);

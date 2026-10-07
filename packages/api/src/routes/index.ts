@@ -9,5 +9,6 @@ import { aiRoutes } from './ai.ts';
 import { taskRoutes } from './tasks.ts';
 import { appRoutes } from './apps.ts';
 import { devRoutes } from './dev.ts';
+import { jobRoutes } from './jobs.ts';
 
-export const routes: RouteDef[] = [...platformRoutes, ...armRoutes, ...protocolRoutes, ...signatureRoutes, ...siteRoutes, ...metricRoutes, ...aiRoutes, ...taskRoutes, ...appRoutes, ...devRoutes];
+export const routes: RouteDef[] = [...platformRoutes, ...armRoutes, ...protocolRoutes, ...signatureRoutes, ...siteRoutes, ...metricRoutes, ...aiRoutes, ...jobRoutes, ...taskRoutes, ...appRoutes, ...devRoutes];

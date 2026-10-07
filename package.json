@@ -22,7 +22,7 @@
     "trace": "node scripts/trace.mjs",
     "verify": "npm run lint && npm run typecheck && npm run build && npm run test && npm run trace",
     "lint": "eslint .",
-    "typecheck": "npm run typecheck --workspaces --if-present",
+    "typecheck": "npm run typecheck --workspaces --if-present && tsc -p netlify",
     "dev:api": "TRIALOPS_DEV_LOGIN=1 node scripts/dev.mjs",
     "dev:web": "npm run dev -w @trialops/web",
     "build": "npm run build --workspaces --if-present"
