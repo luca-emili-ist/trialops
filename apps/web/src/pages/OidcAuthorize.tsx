@@ -1,6 +1,6 @@
 // TRO-041 Single sign-on hand-off: the signed-in user is sent here by an installed app; TrialOps issues a code and
 // returns the user to the app without a new login (APP-ID-01).
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { PageHeader, Panel, ErrorNote, Loading, DefinitionList } from '@trialops/shell';
 import { api } from '../api.ts';
 import { useSession } from '../session.tsx';
@@ -9,7 +9,10 @@ export function OidcAuthorize() {
   const s = useSession();
   const q = new URLSearchParams(window.location.search);
   const [error, setError] = useState<string | null>(null);
+  const asked = useRef(false);   // one code per hand-off, even when React runs the effect twice (StrictMode in development)
   useEffect(() => {
+    if (asked.current) return;
+    asked.current = true;
     if (q.get('response_type') !== 'code') { setError('Unsupported request: response_type must be code.'); return; }
     api<{ redirect_to: string }>('POST', '/v1/oidc/authorize', { body: {
       client_id: q.get('client_id'), platform_id: q.get('platform_id') ?? s.platform?.id, redirect_uri: q.get('redirect_uri'),

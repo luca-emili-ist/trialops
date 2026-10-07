@@ -1,6 +1,6 @@
 # Traceability matrix
 
-Generated 2026-10-07T23:23:06.778Z by scripts/trace.mjs from test tags and test-results.xml.
+Generated 2026-10-07T23:29:35.736Z by scripts/trace.mjs from test tags and test-results.xml.
 
 | Requirement | Release | Description | Tests | Result |
 | --- | --- | --- | --- | --- |

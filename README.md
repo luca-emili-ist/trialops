@@ -28,6 +28,15 @@ npm run dev:web     # web app on http://localhost:5173 (proxies the API)
 ```
 
 AI calls are live only with `TRIALOPS_AI_MODE=live` and `ANTHROPIC_API_KEY` set on the server (never in the browser).
+They run as jobs (202 + polling, migration 0014; on Netlify in the background function `ai-worker-background`).
+
+End-to-end scenario of demo v0 (Playwright, not part of `verify`): a fresh seeded database on :54349, API on :8797,
+web on :5183 and the TA1 test app on :5184, so it runs next to `dev:api`/`dev:web`. Screenshots go to `e2e/screens/`.
+
+```bash
+npm run e2e:install # once: Playwright's Chromium
+npm run e2e         # sign in -> dashboard -> new-arm wizard with the agents -> app install + SSO of the TA1 test app
+```
 
 No Docker needed for development: `embedded-postgres` downloads a PostgreSQL binary. Data lives in `.pgdata/`
 (override with `TRIALOPS_PGDATA`, port with `TRIALOPS_PGPORT`, default 54329).

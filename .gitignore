@@ -6,3 +6,6 @@ dist/
 .netlify/
 **/.netlify/
 supabase/.temp/
+e2e/report/
+e2e/results/
+e2e/screens/

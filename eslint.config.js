@@ -23,7 +23,7 @@ const aiBoundary = {
 };
 
 export default tseslint.config(
-  { ignores: ['**/node_modules/**', '**/dist/**', '.pgdata/**', 'docs/**'] },
+  { ignores: ['**/node_modules/**', '**/dist/**', '.pgdata*/**', 'docs/**', 'e2e/report/**', 'e2e/results/**'] },
   js.configs.recommended,
   ...tseslint.configs.recommended,
   {
