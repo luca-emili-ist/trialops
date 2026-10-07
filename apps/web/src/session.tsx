@@ -35,15 +35,19 @@ export function SessionProvider({ children }: { children: ReactNode }) {
   const [platform, setPlatform] = useState<Platform | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const load = useCallback(async (token: string | null) => {
+  /** Loads the identity behind a token; returns the error message when the API refuses or is unreachable. */
+  const load = useCallback(async (token: string | null): Promise<string | null> => {
     setToken(token);
-    if (!token) { setMe(null); setPlatform(null); setLoading(false); return; }
+    if (!token) { setMe(null); setPlatform(null); setLoading(false); return null; }
     try {
       const m = await get<Me>('/v1/me');
       const ps = await get<{ items: Platform[] }>('/v1/platforms');
-      setMe(m); setPlatform(ps.items[0] ?? null);
-    } catch { setToken(null); store.set(null); setMe(null); setPlatform(null); }
-    setLoading(false);
+      setMe(m); setPlatform(ps.items[0] ?? null); setLoading(false);
+      return null;
+    } catch (e) {
+      setToken(null); store.set(null); setMe(null); setPlatform(null); setLoading(false);
+      return `Signed in, but TrialOps could not load your profile: ${(e as Error).message}`;
+    }
   }, []);
 
   useEffect(() => {
@@ -63,11 +67,13 @@ export function SessionProvider({ children }: { children: ReactNode }) {
       if (supabase) {
         const { data, error } = await supabase.auth.signInWithPassword({ email: emailOrSub, password: password ?? '' });
         if (error) { setLoading(false); throw new Error(error.message); }
-        await load(data.session?.access_token ?? null);
+        const problem = await load(data.session?.access_token ?? null);
+        if (problem) { await supabase.auth.signOut(); throw new Error(problem); }
       } else {
         const r = await api<{ access_token: string }>('POST', '/v1/dev/login', { body: { sub: emailOrSub } });
         store.set(r.access_token);
-        await load(r.access_token);
+        const problem = await load(r.access_token);
+        if (problem) throw new Error(problem);
       }
     },
     async signOut() { if (supabase) await supabase.auth.signOut(); store.set(null); await load(null); },
