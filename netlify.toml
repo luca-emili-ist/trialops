@@ -1,0 +1,18 @@
+# TrialOps on Netlify (IST team, Team login on). Web app = static build; Platform API = Netlify Function (netlify/functions/api.mts).
+[build]
+  command = "npm run build -w @trialops/web"
+  publish = "apps/web/dist"
+
+[build.environment]
+  NODE_VERSION = "24"
+
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Robots-Tag = "noindex"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"

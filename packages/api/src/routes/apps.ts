@@ -1,7 +1,6 @@
 // App catalogue, installation with scope approval (APP-MF-01/02/04), app roles (APP-ID-04) and OIDC SSO (APP-ID-01/02).
-import { readdirSync, readFileSync } from 'node:fs';
-import { join, dirname } from 'node:path';
-import { createRequire } from 'node:module';
+import simulationTa1 from '@trialops/schemas/catalogue/ist.simulation-ta1.manifest.json' with { type: 'json' };
+import ta1TestApp from '@trialops/schemas/catalogue/ist.ta1-test-app.manifest.json' with { type: 'json' };
 import manifestSchema from '@trialops/schemas/app-manifest.schema.json' with { type: 'json' };
 import { route, uuid, type RawResponse } from '../route.ts';
 import type { Db, Row } from '../db.ts';
@@ -11,12 +10,11 @@ import { ajv } from '../lib/validate.ts';
 import { discovery, newCode, s256, sha256hex, signToken, verifyAccessToken, type Oidc } from '../lib/oidc.ts';
 
 const validateManifest = ajv.compile(manifestSchema);
-const catalogueDir = join(dirname(createRequire(import.meta.url).resolve('@trialops/schemas/app-manifest.schema.json')), 'catalogue');
 const ADMIN = ['platform_admin'] as const;
 
+/** Published manifests (packages/schemas/catalogue), bundled with the code. */
 export function catalogue(): Row[] {
-  return readdirSync(catalogueDir).filter(f => f.endsWith('.manifest.json')).sort()
-    .map(f => JSON.parse(readFileSync(join(catalogueDir, f), 'utf8')));
+  return [simulationTa1, ta1TestApp].map(m => structuredClone(m) as Row).sort((a, b) => a.app_id.localeCompare(b.app_id));
 }
 
 async function getInstallation(db: Db, id: string): Promise<Row | undefined> {

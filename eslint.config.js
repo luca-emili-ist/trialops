@@ -27,7 +27,7 @@ export default tseslint.config(
   js.configs.recommended,
   ...tseslint.configs.recommended,
   {
-    files: ['**/*.{js,mjs,ts,tsx}'],
+    files: ['**/*.{js,mjs,ts,mts,tsx}'],
     languageOptions: { ecmaVersion: 2023, sourceType: 'module', globals: globals.node },
     rules: { ...aiBoundary, '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_', varsIgnorePattern: '^_', ignoreRestSiblings: true }] },
   },

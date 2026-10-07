@@ -21,7 +21,7 @@ export function Login() {
       <main className="shell-content" id="main">
         <header className="page-header"><div><div className="crumbs">InSilicoTrials</div><h1>Sign in to TrialOps</h1>
           <p>Clinical operations platform for adaptive platform trials.</p></div></header>
-        {s.mode === 'dev' ? <DevUsers /> : <PasswordForm />}
+        {s.mode === 'dev' ? <DevUsers /> : <><PasswordForm /><DemoAccounts /></>}
       </main>
       <PageFooter pageCode={PAGE_CODES.login} />
     </div>
@@ -54,6 +54,21 @@ function DevUsers() {
           { key: 'roles', label: 'Role', render: u => u.roles.replace(/_/g, ' ') || '—' },
           { key: 'go', label: '', render: u => <Button variant="secondary" onClick={e => { e.stopPropagation(); void s.signIn(u.sub).then(back); }}>Sign in</Button> },
         ]} />}
+    </Panel>
+  );
+}
+
+const DEMO_ACCOUNTS: [string, string][] = [
+  ['Platform admin', 'admin'], ['Platform operations manager', 'ops'], ['Regulatory lead', 'reg'], ['Clinical trial manager', 'ctm'],
+  ['CRA', 'cra'], ['Sponsor of ARM-A (Arden Therapeutics)', 'arden'], ['Site PI, site 101', 'pi101'], ['QA / auditor', 'qa'],
+  ['SAC member (unblinded)', 'sac'], ['Data manager', 'dm'], ['Safety physician', 'safety'], ['Finance controller', 'fin'],
+];
+/** Synthetic demo accounts (DEMO-02): one per role, to show what each role can see. The password is shared out of band. */
+function DemoAccounts() {
+  return (
+    <Panel title="Demonstration accounts" meta="Synthetic people of the demo platform. Ask the platform owner for the demonstration password.">
+      <DataTable rows={DEMO_ACCOUNTS.map(([role, k]) => ({ role, email: `${k}@demo.trialops.example` }))} rowKey={r => r.email}
+        columns={[{ key: 'role', label: 'Role' }, { key: 'email', label: 'Email', render: r => <span className="t-mono">{r.email}</span> }]} />
     </Panel>
   );
 }

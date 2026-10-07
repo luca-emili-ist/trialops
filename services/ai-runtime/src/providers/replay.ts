@@ -4,6 +4,11 @@ import { readFileSync, existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { DATA_CLASSES, type Provider, type ProviderCall, type ProviderResult } from '../types.ts';
+import appendixDraft from '../../fixtures/protocol.appendix.draft/default.json' with { type: 'json' };
+import onboardingPlan from '../../fixtures/arm.onboarding.plan/default.json' with { type: 'json' };
+
+/** Demo answers bundled with the code, so replay also works where the fixtures folder is not on disk (serverless). */
+const DEFAULTS: Record<string, unknown> = { 'protocol.appendix.draft': appendixDraft, 'arm.onboarding.plan': onboardingPlan };
 
 export const FIXTURES = join(dirname(fileURLToPath(import.meta.url)), '../../fixtures');
 
@@ -13,9 +18,9 @@ export function replayProvider(dir = FIXTURES): Provider {
     accepts: DATA_CLASSES,                 // nothing leaves the perimeter
     async call(c: ProviderCall): Promise<ProviderResult> {
       const exact = join(dir, c.task_type, `${c.input_sha256}.json`);
-      const file = existsSync(exact) ? exact : join(dir, c.task_type, 'default.json');
-      if (!existsSync(file)) throw new Error(`no recorded response for ${c.task_type}`);
-      return { output: JSON.parse(readFileSync(file, 'utf8')), model: c.model, input_tokens: 0, output_tokens: 0 };
+      const output = existsSync(exact) ? JSON.parse(readFileSync(exact, 'utf8')) : structuredClone(DEFAULTS[c.task_type]);
+      if (output === undefined) throw new Error(`no recorded response for ${c.task_type}`);
+      return { output, model: c.model, input_tokens: 0, output_tokens: 0 };
     },
   };
 }

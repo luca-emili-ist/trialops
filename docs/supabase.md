@@ -26,3 +26,16 @@ Agents and apps get tokens from the server with `actor_type` = `agent` / `app`; 
 - that it uses Supabase Auth users (so `auth.users.id` is the stable subject);
 - whether it already uses a custom access token hook (Supabase allows one: the two must be merged into one function);
 - how its module flags (`user_has_module`) map to TrialOps roles.
+
+## Deployed demo (2026-10-07)
+- Supabase project `dbhmlvqrwkurxgeeidko` (IST org, eu-central-1, micro). DB password in the Keychain
+  ("Supabase DB TrialOps (InSilicoTrials, eu-central-1)"). Migrations and seed with `scripts/db-remote.mjs` through the
+  **transaction pooler** (`aws-1-eu-central-1.pooler.supabase.com:6543`; port 5432 is filtered on the office network).
+- Auth: claims hook enabled (`pg-functions://postgres/core/custom_access_token_hook`), self-signup off, min password 10,
+  JWT signed with ES256 (the API verifies with `TRIALOPS_JWKS_URL`).
+- Users: synthetic demo users linked with `scripts/supabase-users.mjs demo` (shared password in the Keychain item
+  "TrialOps demo users (InSilicoTrials, synthetic)"); the admin account with `scripts/create-admin.sh` (unified login).
+- Netlify site `trialops` (IST team, Team login on): web app static, API as the function `netlify/functions/api.mts`.
+  Deploy: `netlify deploy --prod --build --filter @trialops/web` (the filter avoids the monorepo prompt).
+  Server-only secrets: `DATABASE_URL`, `TRIALOPS_OIDC_PRIVATE_JWK`. AI runs in replay until `TRIALOPS_AI_MODE=live` and
+  `ANTHROPIC_API_KEY` (IST key) are set.
