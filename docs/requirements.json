@@ -295,6 +295,11 @@
    "id": "EDC-08",
    "release": "v2",
    "text": "Locks and data freeze"
+  },
+  {
+   "id": "DEMO-04",
+   "release": "v0",
+   "text": "Visible 'synthetic data - demonstration environment' label and page code on every page"
   }
  ]
 }

@@ -41,4 +41,13 @@ export const platformRoutes = [
         where platform_id = $1 and state not in ('completed','rejected','cancelled','expired')`, [params.id])).rows[0];
       return { ...p, arms, sites, enrollment, open_tasks: tasks.open };
     } }),
+
+  route({ method: 'get', path: '/v1/platforms/:id/people', summary: 'People with an active role on the platform', tag: 'identity',
+    reqs: ['IAM-02'],
+    handler: async ({ db, params }) => ({
+      items: (await db.query(`select p.id, p.full_name, p.email, o.name org, string_agg(distinct r.role, ', ' order by r.role) roles
+        from core.person p join core.organization o on o.id = p.org_id
+        join core.role_assignment r on r.person_id = p.id and r.status = 'active' and r.platform_id = $1
+        where p.status = 'active' group by p.id, o.name order by p.full_name`, [params.id])).rows,
+    }) }),
 ];

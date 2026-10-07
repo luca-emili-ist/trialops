@@ -1,0 +1,22 @@
+{
+  "name": "@trialops/shell",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "TrialOps web shell and design system (direction C, sober regulatory): tokens, base components, app shell",
+  "license": "AGPL-3.0-only",
+  "exports": {
+    ".": "./src/index.ts",
+    "./tokens.css": "./src/tokens.css",
+    "./shell.css": "./src/shell.css"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit -p ."
+  },
+  "peerDependencies": {
+    "react": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.3.0"
+  }
+}

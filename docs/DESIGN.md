@@ -1,0 +1,36 @@
+# Visual design (TrialOps web)
+
+**Direction C — sober regulatory**, chosen by Luca Emili on 2026-10-07 among three mockups
+(A Grant OS continuity, B dense tool, C sober regulatory): https://claude.ai/artifact/6vEDSczbLeYYwkoVcLZirK
+
+The language of controlled documents: serif headings (Source Serif 4), Source Sans 3 for the interface, a night-blue
+navigation bar, hairlines instead of shadowed cards, **green only for actions that sign or approve**, status always as a
+pill with a label (never colour alone), signatures and versions shown beside the content, 40px table rows.
+
+## References and what we take
+
+| Reference | Why | What we take | What we avoid |
+| --- | --- | --- | --- |
+| Veeva Vault Clinical | eTMF/CTMS leader, language sponsors know | document status always visible, signature and version next to content | deep menus, long form screens |
+| Medidata (Rave/CTMS) | the reference for study managers | per-site and per-arm tables with thresholds, filters above the table | density without hierarchy |
+| Linear | dense tool people use all day | short rows, states as chips, no shadows | start-up look in a regulated context |
+| Datadog | metrics against thresholds, drill-down | value bar with target marks, click through to the event | saturated palette, too many widgets |
+| Stripe Dashboard | trustworthy numbers | key figures with unit and comparison, tabular digits | decorative charts |
+
+## Where it lives
+
+- Tokens: `packages/shell/src/tokens.css` (colour, type, space, radius, row heights). No value outside this file.
+- Components: `packages/shell/src/` — `Button`, `TextField`/`SelectField`/`Field`, `DataTable` (sticky, sortable),
+  `Panel`, `PageHeader`, `KeyFigures`, `StatusPill`, `MetricBar`, `Steps`, `DiffList`, `DefinitionList`, `EmptyState`,
+  `Modal`, `SignDialog` (Part 11: meaning + reason + password), `ReasonDialog` (DM-03), `ToastProvider`, `AppShell`,
+  `PageFooter` (copyright + page code).
+- Catalogue: `#/ui` (page `TRO-099`) shows every component in its states.
+
+## Rules for whoever writes pages (Claude, Forge, Local Dev)
+
+1. Use only the components of `@trialops/shell`. If one is missing, stop and report it in "Open points"; do not invent it.
+2. No hex colours, `rgb()` or inline colour/font styles in `apps/web/src` (enforced by `apps/web/test/pages.test.ts`).
+3. Every route has a page code in `apps/web/src/pageCodes.ts` (`TRO-xxx`, never reused; tested for uniqueness/coverage).
+4. Every GxP change asks for a reason (`ReasonDialog`); every approval or acceptance of an AI proposal is a signature
+   (`SignDialog`) with re-authentication. Sign actions use the `sign` button variant, nothing else does.
+5. Before a deploy that touches the UI, check every route at 1440px and 375px (no horizontal page scroll).

@@ -1,6 +1,6 @@
 # Traceability matrix
 
-Generated 2026-10-06T21:32:45.475Z by scripts/trace.mjs from test tags and test-results.xml.
+Generated 2026-10-07T10:11:45.552Z by scripts/trace.mjs from test tags and test-results.xml.
 
 | Requirement | Release | Description | Tests | Result |
 | --- | --- | --- | --- | --- |
@@ -11,7 +11,7 @@ Generated 2026-10-06T21:32:45.475Z by scripts/trace.mjs from test tags and test-
 | DM-02 | foundations | Approved controlled versions are immutable; approval needs signature | db/tests/protocol_arms.test.mjs, packages/api/test/protocol_arms.test.ts (4) | PASS |
 | DM-03 | foundations | Change reason mandatory on GxP updates; no physical delete | db/tests/audit.test.mjs, db/tests/sites_registry.test.mjs (4) | PASS |
 | DM-05 | foundations | Deterministic synthetic demo seed; no real data | db/tests/tasks_apps_metrics.test.mjs (1) | PASS |
-| IAM-02 | foundations | RLS driven by JWT claims platform_ids / arm_scopes / site_scopes | db/tests/access.test.mjs, db/tests/claims.test.mjs, db/tests/sites_registry.test.mjs, packages/api/test/apps_sso.test.ts, packages/api/test/platform.test.ts, packages/api/test/sites.test.ts (10) | PASS |
+| IAM-02 | foundations | RLS driven by JWT claims platform_ids / arm_scopes / site_scopes | db/tests/access.test.mjs, db/tests/claims.test.mjs, db/tests/sites_registry.test.mjs, packages/api/test/apps_sso.test.ts, packages/api/test/platform.test.ts, packages/api/test/sites.test.ts (11) | PASS |
 | IAM-03 | foundations | Sponsors see and write only their own arm | db/tests/access.test.mjs, packages/api/test/ai.test.ts, packages/api/test/metrics.test.ts, packages/api/test/platform.test.ts, packages/api/test/protocol_arms.test.ts (6) | PASS |
 | IAM-04 | foundations | Unblinded data only in sac_enclave for the unblinded role | db/tests/access.test.mjs, db/tests/claims.test.mjs (3) | PASS |
 | IAM-05 | foundations | Separation of duties: the author of a GxP document or change cannot approve it | packages/api/test/protocol_arms.test.ts, packages/api/test/wizard.test.ts (2) | PASS |
@@ -63,3 +63,4 @@ Generated 2026-10-06T21:32:45.475Z by scripts/trace.mjs from test tags and test-
 | EDC-06 | v2 | SDV and reviews | — (0) | NO TEST |
 | EDC-07 | v2 | PI signature | — (0) | NO TEST |
 | EDC-08 | v2 | Locks and data freeze | — (0) | NO TEST |
+| DEMO-04 | v0 | Visible 'synthetic data - demonstration environment' label and page code on every page | apps/web/test/pages.test.ts (3) | PASS |

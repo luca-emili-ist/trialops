@@ -3,8 +3,8 @@
 Open source clinical operations platform for adaptive, seamless platform trials (ARPA-H SURPASS, Technical Area 3).
 Working name. License: AGPL-3.0-only (see LICENSE). Runs on Supabase or plain PostgreSQL + PostgREST (docs/supabase.md).
 
-**Status:** release *Foundations* — data model, audit trail, access control, task engine, app contract schemas,
-synthetic demo data. No UI or HTTP API yet (next: demo v0).
+**Status:** release *demo v0* in progress — Platform API, AI runtime (replay by default), new-arm wizard with agents,
+OIDC single sign-on for apps and the web app run locally; not deployed yet.
 
 ## Quick start
 
@@ -20,6 +20,15 @@ TypeScript runs natively on Node ≥ 22.18 (type stripping): tests live in `db/t
 `node --test` and tagged with requirement IDs. Set `TRIALOPS_GATE=foundations,v0` to make the trace step fail on a
 release that is not fully covered yet.
 
+Run it locally (synthetic data, AI answers replayed, demo user switch, signing password `demo-password`):
+
+```bash
+npm run dev:api     # embedded PostgreSQL + API on :8787
+npm run dev:web     # web app on http://localhost:5173 (proxies the API)
+```
+
+AI calls are live only with `TRIALOPS_AI_MODE=live` and `ANTHROPIC_API_KEY` set on the server (never in the browser).
+
 No Docker needed for development: `embedded-postgres` downloads a PostgreSQL binary. Data lives in `.pgdata/`
 (override with `TRIALOPS_PGDATA`, port with `TRIALOPS_PGPORT`, default 54329).
 
@@ -34,6 +43,9 @@ No Docker needed for development: `embedded-postgres` downloads a PostgreSQL bin
 | `docs/requirements.json` | Requirement register by release |
 | `docs/traceability.md` | Generated traceability matrix |
 | `packages/api/` | Platform API (TypeScript, ARC-03) |
+| `packages/shell/` | Web shell and design system (tokens, components) — see docs/DESIGN.md |
+| `apps/web/` | Web app (React + Vite): dashboard, arms & protocol, new-arm wizard, sites, tasks, apps, AI ledger |
+| `examples/ta1-test-app/` | Minimal app that signs in with TrialOps (OIDC + PKCE) |
 | `services/ai-runtime/` | AI runtime: the only component allowed to call AI providers (AI-01, ARC-10) |
 | `scripts/` | DB runner, traceability generator, shared test-file discovery |
 

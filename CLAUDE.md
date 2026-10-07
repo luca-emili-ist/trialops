@@ -19,7 +19,11 @@ If `docs/SPEC.md` is missing, stop and ask for it.
 8. **Secrets** live only server-side (Key Vault / env), never in the frontend or the repo.
 
 ## Quality gate (same as Forge)
-`npm install && npm run db:reset && npm run verify` — all tests green, traceability with 0 missing for the release.
+`npm install && npm run db:reset && npm run verify` — lint (incl. the AI-01 provider boundary), typecheck, build, all
+tests green, traceability with 0 missing for the release (`TRIALOPS_GATE=foundations,v0` at release time).
+
+## UI
+Design direction C, chosen by Luca: follow `docs/DESIGN.md`. Pages use only `@trialops/shell` components and tokens.
 
 ## Decisions (2026-10-06)
 New monorepo · Supabase for now (no Azure dependency) · existing IST user-management component (Supabase Auth) with

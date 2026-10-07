@@ -24,6 +24,9 @@ export interface Services {
   ai?: AiRuntime;
   reauth?: Reauthenticator;
   oidc?: Oidc;
+  /** Local development only (TRIALOPS_DEV_LOGIN=1): mints a token for a demo user, for the user switch (DEMO-02). */
+  devLogin?: (sub: string) => Promise<string>;
+  devUsers?: () => Promise<Record<string, unknown>[]>;
 }
 
 export interface RawResponse { status: number; headers?: Record<string, string>; body: unknown }

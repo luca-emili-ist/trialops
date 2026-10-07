@@ -7,6 +7,7 @@ import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
 import { testFiles } from './test-files.mjs';
+import { createConnection } from 'node:net';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const dataDir = process.env.TRIALOPS_PGDATA || join(root, '.pgdata');
@@ -15,7 +16,19 @@ const cmd = process.argv[2] || 'up';
 
 const server = new EmbeddedPostgres({ databaseDir: dataDir, user: 'postgres', password: 'postgres', port, persistent: true, onLog: () => {} });
 
+/** A running instance (e.g. npm run dev:api) owns the data directory: refuse instead of silently running no tests. */
+const portInUse = () => new Promise(resolve => {
+  const s = createConnection({ port, host: '127.0.0.1' });
+  s.once('connect', () => { s.destroy(); resolve(true); });
+  s.once('error', () => resolve(false));
+});
+
 async function start() {
+  if (await portInUse()) {
+    console.error(`PostgreSQL is already running on port ${port} (is "npm run dev:api" running?). Stop it, or use another ` +
+      'TRIALOPS_PGPORT and TRIALOPS_PGDATA for this command.');
+    process.exit(1);
+  }
   if (cmd === 'reset' && existsSync(dataDir)) rmSync(dataDir, { recursive: true, force: true });
   if (!existsSync(join(dataDir, 'PG_VERSION'))) await server.initialise();
   await server.start();

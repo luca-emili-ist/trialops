@@ -2,12 +2,13 @@
   "name": "trialops",
   "version": "0.1.0",
   "private": true,
-  "description": "TrialOps \u2014 open source clinical operations platform for adaptive platform trials (TA3)",
+  "description": "TrialOps — open source clinical operations platform for adaptive platform trials (TA3)",
   "license": "AGPL-3.0-only",
   "type": "module",
   "workspaces": [
     "packages/*",
     "services/*",
+    "apps/*",
     "examples/*"
   ],
   "engines": {
@@ -19,9 +20,12 @@
     "db:seed": "node scripts/db.mjs seed",
     "test": "node scripts/db.mjs test",
     "trace": "node scripts/trace.mjs",
-    "verify": "npm run lint && npm run typecheck && npm run test && npm run trace",
+    "verify": "npm run lint && npm run typecheck && npm run build && npm run test && npm run trace",
     "lint": "eslint .",
-    "typecheck": "npm run typecheck --workspaces --if-present"
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "dev:api": "TRIALOPS_DEV_LOGIN=1 node scripts/dev.mjs",
+    "dev:web": "npm run dev -w @trialops/web",
+    "build": "npm run build --workspaces --if-present"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.5",
@@ -31,6 +35,7 @@
     "embedded-postgres": "17.5.0-beta.15",
     "eslint": "^9.39.5",
     "globals": "^17.13.0",
+    "jose": "^6.2.12",
     "pg": "^8.13.0",
     "typescript": "~5.9",
     "typescript-eslint": "^8.71.1"
