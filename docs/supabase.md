@@ -51,3 +51,58 @@ failed; one model call times out after `TRIALOPS_AI_TIMEOUT_MS` (default 360000)
 the job runs in the same process after the 202, the client polls the same way.
 - Migration `0014_ai_jobs.sql` must be applied to the Supabase project before deploying this code.
 - Worker URL: `${URL}/.netlify/functions/ai-worker-background` (Netlify sets `URL`); override with `TRIALOPS_WORKER_URL`.
+
+## Access controls: MFA, lockout, idle timeout (0018, IAM-01 and CMP-03, 2026-10-10)
+How it works:
+- **Sign-in through the API.** The web app no longer calls `signInWithPassword`: it posts email + password to
+  `POST /v1/auth/login`, the API checks the lock, makes the Supabase password grant server-side and returns the tokens,
+  which the web app installs with `supabase.auth.setSession`. Failed attempts are recorded in `core.auth_event`; 5 within
+  15 minutes lock the account for 30 minutes (`core.account_lock`), and so do failed signature re-authentications and
+  wrong authenticator codes. While locked the API answers 423 without calling Supabase and refuses every token of that
+  subject/email. Unlock: `POST /v1/admin/accounts/unlock` (platform admin, `X-Change-Reason`, audited); open locks:
+  `GET /v1/admin/accounts/locks`.
+- **MFA (TOTP).** After the password the token is `aal1`; the API refuses it (403 `mfa_required`) for every person with a
+  role, except `GET /v1/me` and the sign-in routes. The web app then asks the code of the user's authenticator
+  (screen TRO-091) or enrols a first one (TRO-092: QR code + setup key) with `supabase.auth.mfa.enroll`; the code is
+  verified through `POST /v1/auth/mfa/verify` (Supabase challenge + verify with the user's token, failures counted) and
+  the returned `aal2` session is installed. Signing asks password + code and records `reauth_mfa`; a person without a
+  verified factor cannot sign while MFA is required.
+- **Idle timeout.** Per Supabase `session_id`: `core.user_session.last_seen_at` is refreshed at most once a minute; after
+  `TRIALOPS_IDLE_MINUTES` (default 15) without requests the API ends the session for good (401 `session_idle`,
+  `session_idle_timeout` in `core.auth_event`). The browser has the same timer (warning 60 s before, keep-alive on user
+  activity) and tells the API when it signs out (`POST /v1/auth/session/end`).
+- Every row of `core.auth_event` and every lock/unlock and session start/end is in the hash-chained audit trail.
+  Passwords and codes are never stored; emails are stored lowercased.
+
+API environment (Netlify site, server-side):
+
+| Variable | Default | Meaning |
+| --- | --- | --- |
+| `TRIALOPS_MFA` | `required` | `off` disables the MFA check (never in a GxP production environment) |
+| `TRIALOPS_MFA_EXEMPT_EMAIL_DOMAINS` | empty | **Demo deviation only**: comma list of email domains accepted at `aal1` (e.g. `demo.trialops.example` for the synthetic demo accounts); `/v1/me` reports `mfa.exempt: true`. Never allowed in a GxP production environment, where it must stay empty |
+| `TRIALOPS_LOCKOUT_MAX` | `5` | failures that lock an account (the database never accepts fewer than 3) |
+| `TRIALOPS_LOCKOUT_WINDOW_MIN` | `15` | window in minutes in which the failures are counted |
+| `TRIALOPS_LOCKOUT_MINUTES` | `30` | duration of a lock |
+| `TRIALOPS_IDLE_MINUTES` | `15` | inactivity after which a session ends |
+| `SUPABASE_URL`, `SUPABASE_ANON_KEY` (or `VITE_SUPABASE_PUBLISHABLE_KEY`) | — | already set: password grant and MFA calls |
+
+Supabase settings to make **before deploying this code** (documentation only: nothing has been changed on the project):
+1. Apply `db/migrations/0018_access_controls.sql` (it creates the role `auth_service` and grants it to the migration
+   user; the API takes it with `SET LOCAL ROLE auth_service`). Check afterwards, as the API user:
+   `begin; set local role auth_service; select core.access_check('x', null, null, 15); rollback;` must answer `ok`.
+2. Authentication → Multi-Factor → **TOTP: enabled** (enroll and verify). Leave phone MFA off.
+3. Authentication → Sessions (recommended): inactivity timeout 15 minutes (same as `TRIALOPS_IDLE_MINUTES`), time-box
+   12 hours; access token (JWT) expiry 900 s or less, so a token outlives its session as little as possible (the API
+   already refuses tokens of ended sessions).
+4. Authentication → Rate limits: the password grant and the MFA verify now come from the Netlify function, so all users
+   share its addresses: raise the per-IP sign-in and MFA limits accordingly (the lockout in TrialOps is the per-account
+   control).
+5. API settings → exposed schemas: the web app does not use PostgREST. **Remove `core` from the exposed schemas** (step 2
+   of the setup above was written for a PostgREST client that does not exist): otherwise an `aal1` token could read
+   through RLS directly, bypassing the MFA and idle checks of the API.
+6. Known limit: someone holding the publishable key can call the Supabase password grant directly, outside the TrialOps
+   counter (Supabase's own rate limits apply). The resulting token is still `aal1` and refused by the API, and a locked
+   account stays locked in TrialOps. Supabase's "password verification attempt" hook (paid plans) can close this.
+7. The synthetic demo accounts have no authenticator: on the demo site either enrol one per account or set
+   `TRIALOPS_MFA_EXEMPT_EMAIL_DOMAINS=demo.trialops.example` (documented deviation, demo only). The admin account
+   (unified login) is not exempt: it enrols an authenticator at the first sign-in.

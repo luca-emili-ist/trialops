@@ -1,6 +1,6 @@
 # Traceability matrix
 
-Generated 2026-10-10T09:02:11.991Z by scripts/trace.mjs from test tags and test-results.xml.
+Generated 2026-10-10T09:54:56.665Z by scripts/trace.mjs from test tags and test-results.xml.
 
 | Requirement | Release | Description | Tests | Result |
 | --- | --- | --- | --- | --- |
@@ -65,8 +65,8 @@ Generated 2026-10-10T09:02:11.991Z by scripts/trace.mjs from test tags and test-
 | EDC-08 | v2 | Locks and data freeze | — (0) | NO TEST |
 | DEMO-04 | v0 | Visible 'synthetic data - demonstration environment' label and page code on every page | apps/web/test/pages.test.ts (3) | PASS |
 | AI-09 | v1 | Per-job limits (max_steps, max_tokens, max_cost, max_execution_time); an overrun stops the job and creates a task for a person | packages/api/test/ai.test.ts, packages/api/test/jobs.test.ts (7) | PASS |
-| IAM-01 | gxp-p0 | MFA mandatory for every role with GxP impact (TOTP or passkey); signing with MFA step-up | — (0) | NO TEST |
-| CMP-03 | gxp-p0 | Session idle timeout and account lockout after repeated failed logins or signing attempts, both recorded in the audit trail | — (0) | NO TEST |
+| IAM-01 | gxp-p0 | MFA mandatory for every role with GxP impact (TOTP or passkey); signing with MFA step-up | apps/web/test/pages.test.ts, db/tests/access_controls.test.mjs, packages/api/test/access_controls.test.ts (10) | PASS |
+| CMP-03 | gxp-p0 | Session idle timeout and account lockout after repeated failed logins or signing attempts, both recorded in the audit trail | apps/web/test/pages.test.ts, db/tests/access_controls.test.mjs, packages/api/test/access_controls.test.ts (14) | PASS |
 | CMP-10 | gxp-p0 | Audit trail review for QA/inspector roles: filter by record, user and period; readable PDF/CSV export; reviews recorded and signed | apps/web/test/pages.test.ts, db/tests/audit_review.test.mjs, packages/api/test/audit_review.test.ts (14) | PASS |
 | CMP-11 | gxp-p0 | Signature manifestation (printed name, UTC date/time, meaning, reason) on screen, print and export; reason stored on the signature record | apps/web/test/pages.test.ts, db/tests/audit_review.test.mjs, packages/api/test/audit_review.test.ts, packages/shell/test/manifest.test.ts (7) | PASS |
 | CMP-15 | gxp-p0 | Every table in the core schema is audited (attach_std) or listed in a justified exception list; checked by a test | db/tests/compliance.test.mjs (2) | PASS |

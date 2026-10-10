@@ -3,14 +3,14 @@ import { route, uuid } from '../route.ts';
 import { sign, SIGNABLE_TABLES, MANIFEST_COLS, type Meaning } from '../lib/sign.ts';
 
 export const signatureRoutes = [
-  route<{ target_table: string; target_id: string; meaning: Meaning; password?: string }>({
+  route<{ target_table: string; target_id: string; meaning: Meaning; password?: string; totp?: string }>({
     method: 'post', path: '/v1/signatures', status: 201, needsReason: true, tag: 'signatures',
     summary: 'Sign a record (re-authentication required; the X-Change-Reason is stored on the signature)', reqs: ['CMP-02', 'CMP-11'],
     body: { type: 'object', required: ['target_table', 'target_id', 'meaning'], additionalProperties: false,
       properties: { target_table: { enum: SIGNABLE_TABLES }, target_id: uuid,
-        meaning: { enum: ['author', 'review', 'approval', 'verification', 'responsibility'] }, password: { type: 'string' } } },
+        meaning: { enum: ['author', 'review', 'approval', 'verification', 'responsibility'] }, password: { type: 'string' }, totp: { type: 'string', maxLength: 16 } } },
     handler: async ({ db, claims, body, services }) => sign(db, claims, services.reauth, {
-      target_table: body.target_table, target_id: body.target_id, meaning: body.meaning, credential: { password: body.password },
+      target_table: body.target_table, target_id: body.target_id, meaning: body.meaning, credential: { password: body.password, totp: body.totp },
       requested_by_app: claims.actor_type === 'app' ? claims.app_id : undefined,
     }),
   }),

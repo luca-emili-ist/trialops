@@ -23,29 +23,49 @@ export function Modal({ title, onClose, children, actions }: { title: string; on
   );
 }
 
-/** Electronic signature: states what is signed and its meaning, asks for the password again and the reason. */
-export function SignDialog({ title, meaning, what, confirmLabel, onSign, onClose, reasonDefault = '' }: {
+/** Whether the signer has an authenticator (IAM-01): the application sets it from its session; SignDialog then asks for the
+ * one-time code with the password (MFA step-up). */
+export const SignMfaContext = createContext(false);
+
+/** Electronic signature: states what is signed and its meaning, asks for the password again (and the authenticator code
+ * when the signer has MFA) and the reason. */
+export function SignDialog({ title, meaning, what, confirmLabel, onSign, onClose, reasonDefault = '', mfa }: {
   title: string; meaning: string; what: ReactNode; confirmLabel: string; reasonDefault?: string;
-  onSign: (password: string, reason: string) => Promise<void>; onClose: () => void;
+  onSign: (password: string, reason: string, totp?: string) => Promise<void>; onClose: () => void;
+  /** Ask for the authenticator code; default from SignMfaContext. */
+  mfa?: boolean;
 }) {
+  const fromSession = useContext(SignMfaContext);
   const [password, setPassword] = useState('');
+  const [totp, setTotp] = useState('');
   const [reason, setReason] = useState(reasonDefault);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  // the server asks for the code when the signer has an authenticator the session did not know about
+  const [askCode, setAskCode] = useState(false);
+  const withCode = (mfa ?? fromSession) || askCode;
+  const ready = !!password && !!reason.trim() && (!withCode || /^\d{6}$/.test(totp));
   const submit = async () => {
     setBusy(true); setError(null);
-    try { await onSign(password, reason); } catch (e) { setError((e as Error).message); setBusy(false); }
+    try { await onSign(password, reason, withCode ? totp : undefined); } catch (e) {
+      if ((e as { code?: string }).code === 'mfa_code_required') setAskCode(true);
+      setError((e as Error).message); setBusy(false);
+    }
   };
+  const onEnter = (e: { key: string }) => { if (e.key === 'Enter' && ready) void submit(); };
   return (
     <Modal title={title} onClose={onClose} actions={<>
       <Button onClick={onClose}>Cancel</Button>
-      <Button variant="sign" disabled={!password || !reason.trim() || busy} onClick={submit}>{busy ? 'Signing…' : confirmLabel}</Button>
+      <Button variant="sign" disabled={!ready || busy} onClick={submit}>{busy ? 'Signing…' : confirmLabel}</Button>
     </>}>
       <div className="sign-meaning"><strong>Meaning of this signature: {meaning}</strong><span>{what}</span></div>
       <TextField label="Reason" value={reason} onChange={e => setReason(e.target.value)} hint="Recorded in the audit trail" />
       <TextField label="Password" type="password" autoComplete="current-password" value={password}
-        onChange={e => setPassword(e.target.value)} hint="Re-enter your password to sign" error={error ?? undefined}
-        onKeyDown={e => { if (e.key === 'Enter' && password && reason.trim()) void submit(); }} />
+        onChange={e => setPassword(e.target.value)} hint="Re-enter your password to sign" error={withCode ? undefined : error ?? undefined}
+        onKeyDown={onEnter} />
+      {withCode ? <TextField label="Authenticator code" inputMode="numeric" autoComplete="one-time-code" maxLength={6} value={totp}
+        onChange={e => setTotp(e.target.value.replace(/\D/g, ''))} hint="6-digit code from your authenticator app" error={error ?? undefined}
+        onKeyDown={onEnter} /> : null}
     </Modal>
   );
 }

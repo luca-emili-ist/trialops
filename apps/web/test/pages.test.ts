@@ -67,3 +67,36 @@ test('[CMP-09] AI proposals and accepted AI content are labelled AI-generated wh
   assert.match(page('ArmWizard.tsx'), /title="AI-generated appendix proposal/);
   assert.match(page('Tasks.tsx'), /'AI-generated proposal'/);
 });
+
+test('[IAM-01] the sign-in asks for the authenticator code or its enrolment before the app loads; signatures ask for the code', () => {
+  assert.equal(PAGE_CODES.loginMfa, 'TRO-091');
+  assert.equal(PAGE_CODES.loginMfaEnrol, 'TRO-092');
+  assert.equal(PAGE_CODES.login.slice(0, 6), PAGE_CODES.loginMfa.slice(0, 6), 'same decade as the sign-in');
+  const login = page('Login.tsx');
+  assert.match(login, /step\?\.kind === 'challenge' \? PAGE_CODES\.loginMfa : step\?\.kind === 'enrol' \? PAGE_CODES\.loginMfaEnrol : PAGE_CODES\.login/);
+  assert.match(login, /<PageFooter pageCode=\{code\} \/>/);
+  assert.match(login, /<img src=\{qr\}/, 'QR code of the enrolment');
+  assert.match(login, /Setup key/, 'secret as text when the QR code cannot be scanned');
+  const session = readFileSync(join(src, 'session.tsx'), 'utf8');
+  assert.match(session, /'\/v1\/auth\/login'/, 'password sign-in through the API (lockout)');
+  assert.match(session, /'\/v1\/auth\/mfa\/verify'/);
+  assert.match(session, /supabase\.auth\.setSession/);
+  assert.match(session, /m\.mfa\?\.required && !m\.mfa\.satisfied && !m\.mfa\.exempt/, 'the app loads only after the MFA step');
+  assert.match(session, /supabase\.auth\.mfa\.enroll\(\{ factorType: 'totp'/);
+  assert.match(session, /<SignMfaContext\.Provider value=\{!!me\?\.mfa\?\.enrolled\}>/);
+  const overlays = readFileSync(join(src, '../../../packages/shell/src/ui/overlays.tsx'), 'utf8');
+  assert.match(overlays, /label="Authenticator code"/);
+  for (const f of ['ProtocolEditor.tsx', 'Tasks.tsx', 'AuditTrail.tsx', 'ArmWizard.tsx']) assert.match(page(f), /onSign=\{(async )?\(password, reason, totp\) =>/, f);
+});
+
+test('[CMP-03] idle timer with a warning 60 s before the limit; the API ending the session signs out with the reason', () => {
+  const session = readFileSync(join(src, 'session.tsx'), 'utf8');
+  assert.match(session, /const limit = minutes \* 60_000;/);
+  assert.match(session, /setWarning\(idle >= limit - 60_000\)/);
+  assert.match(session, /title="Your session is about to end"/);
+  assert.match(session, /Your session ended after \$\{minutes\} minutes of inactivity/);
+  assert.match(session, /\/v1\/auth\/session\/end', \{ body: \{ reason: 'idle_timeout' \} \}/, 'the server records the timeout');
+  assert.match(session, /setSessionEndHandler\(e => \{ void endLocally\(e\.message\); \}\)/);
+  assert.match(readFileSync(join(src, 'api.ts'), 'utf8'), /const SESSION_END_CODES = \['session_idle', 'session_ended', 'account_locked'\];/);
+  assert.match(page('Login.tsx'), /<Panel title="Session ended">/);
+});

@@ -1,12 +1,15 @@
 // Platform-level reads: health, current user, platforms and the platform overview behind the dashboard.
 import { route } from '../route.ts';
+import { mfaStatus } from '../lib/access-policy.ts';
 
 export const platformRoutes = [
   route({ method: 'get', path: '/v1/health', summary: 'Liveness', tag: 'system', reqs: [], public: true,
     handler: async () => ({ status: 'ok' }) }),
 
-  route({ method: 'get', path: '/v1/me', summary: 'Current identity and perimeter from the token', tag: 'identity', reqs: ['APP-ID-02', 'IAM-02'],
-    handler: async ({ db, claims }) => {
+  // Reachable before the MFA step (aal1), so that the sign-in can show what is still needed (IAM-01).
+  route({ method: 'get', path: '/v1/me', summary: 'Current identity and perimeter from the token, MFA status and session policy', tag: 'identity',
+    reqs: ['APP-ID-02', 'IAM-02'], allowBelowMfa: true,
+    handler: async ({ db, claims, access }) => {
       const person = claims.person_id
         ? (await db.query('select id, full_name, email, org_id from core.person where id = $1', [claims.person_id])).rows[0] ?? null
         : null;
@@ -14,6 +17,7 @@ export const platformRoutes = [
         sub: claims.sub, email: claims.email ?? null, org_id: claims.org_id ?? null, actor_type: claims.actor_type ?? 'user',
         roles: claims.roles ?? [], platform_ids: claims.platform_ids ?? [], arm_scopes: claims.arm_scopes ?? [],
         site_scopes: claims.site_scopes ?? [], blinding: claims.blinding ?? 'blinded', person,
+        mfa: mfaStatus(claims, access), session: { idle_timeout_minutes: access.idleMinutes },
       };
     } }),
 

@@ -1,6 +1,6 @@
 # Compliance matrix
 
-Generated 2026-10-10T09:02:11.995Z by scripts/trace.mjs from docs/compliance/crosswalk.json and docs/requirements.json.
+Generated 2026-10-10T09:54:56.671Z by scripts/trace.mjs from docs/compliance/crosswalk.json and docs/requirements.json.
 Technical clauses are covered by requirements and their tests; procedural clauses are covered by SOPs of the quality system.
 
 ## P11 — US 21 CFR Part 11 — Electronic records; electronic signatures
@@ -10,7 +10,7 @@ Technical clauses are covered by requirements and their tests; procedural clause
 | P11-10a | §11.10(a) | Validation for accuracy, reliability, consistent intended performance, ability to discern invalid or altered records | technical | VAL-01 (v1: NO TEST), VAL-02 (v1: NO TEST), VAL-05 (gxp-p0: PASS) | partial |
 | P11-10b | §11.10(b) | Accurate and complete copies in human readable and electronic form for inspection | technical | CMP-10 (gxp-p0: PASS), CMP-14 (v1: NO TEST) | partial |
 | P11-10c | §11.10(c) | Protection of records for accurate and ready retrieval throughout the retention period | technical | NFR-04 (gxp-p0: PASS) | covered |
-| P11-10d | §11.10(d) | Limiting system access to authorized individuals | technical | IAM-02 (foundations: PASS), APP-MF-04 (foundations: PASS), APP-ID-01 (v0: PASS), IAM-01 (gxp-p0: NO TEST), CMP-03 (gxp-p0: NO TEST), IAM-06 (v2: NO TEST), APP-ID-03 (v2: NO TEST) | partial |
+| P11-10d | §11.10(d) | Limiting system access to authorized individuals | technical | IAM-02 (foundations: PASS), APP-MF-04 (foundations: PASS), APP-ID-01 (v0: PASS), IAM-01 (gxp-p0: PASS), CMP-03 (gxp-p0: PASS), IAM-06 (v2: NO TEST), APP-ID-03 (v2: NO TEST) | partial |
 | P11-10e | §11.10(e) | Secure, computer-generated, time-stamped audit trail; changes do not obscure previous values | technical | CMP-01 (foundations: PASS), CMP-04 (foundations: PASS), DM-03 (foundations: PASS), AI-06 (foundations: PASS), APP-TK-02 (foundations: PASS), AI-08 (v1: NO TEST), APP-AU-01 (v2: NO TEST), EDC-05 (v1: NO TEST), CMP-10 (gxp-p0: PASS), CMP-15 (gxp-p0: PASS), CMP-12 (v1: NO TEST) | partial |
 | P11-10f | §11.10(f) | Operational system checks to enforce permitted sequencing of steps | technical | DM-02 (foundations: PASS), IAM-05 (foundations: PASS), AI-05 (foundations: PASS), APP-TK-02 (foundations: PASS), APP-TK-04 (foundations: PASS), M01-04 (foundations: PASS), M07-01 (foundations: PASS), M01-01 (v0: PASS), M02-03 (v0: PASS), EDC-04 (v1: NO TEST), EDC-08 (v2: NO TEST) | partial |
 | P11-10g | §11.10(g) | Authority checks: only authorized individuals can use, sign, alter or access records | technical | IAM-02 (foundations: PASS), IAM-03 (foundations: PASS), IAM-04 (foundations: PASS), IAM-05 (foundations: PASS), APP-MF-02 (foundations: PASS), APP-ID-02 (v0: PASS), APP-ID-02 (foundations: PASS), APP-TK-03 (v1: NO TEST), AI-07 (v1: NO TEST) | partial |
@@ -24,8 +24,8 @@ Technical clauses are covered by requirements and their tests; procedural clause
 | P11-100a | §11.100(a) | Each e-signature unique to one individual, never reused or reassigned | technical | CMP-02 (foundations: PASS) | covered |
 | P11-100b | §11.100(b) | Identity verified before establishing an e-signature | procedural | — | SOP |
 | P11-100c | §11.100(c) | Certification to FDA that e-signatures are legally binding equivalent of handwritten | procedural | — | SOP |
-| P11-200a | §11.200(a) | Two distinct identification components; series of signings in one session; use only by genuine owner | technical | IAM-01 (gxp-p0: NO TEST) | planned |
-| P11-300 | §11.300 | Controls for identification codes/passwords: uniqueness, periodic revision, loss management, safeguards against unauthorized use | technical | APP-ID-01 (v0: PASS), IAM-01 (gxp-p0: NO TEST), CMP-03 (gxp-p0: NO TEST) | partial |
+| P11-200a | §11.200(a) | Two distinct identification components; series of signings in one session; use only by genuine owner | technical | IAM-01 (gxp-p0: PASS) | covered |
+| P11-300 | §11.300 | Controls for identification codes/passwords: uniqueness, periodic revision, loss management, safeguards against unauthorized use | technical | APP-ID-01 (v0: PASS), IAM-01 (gxp-p0: PASS), CMP-03 (gxp-p0: PASS) | covered |
 
 ## FDA-ESQA — US FDA guidance — Electronic Systems, Electronic Records, and Electronic Signatures in Clinical Investigations: Q&A (Oct 2024)
 
@@ -49,7 +49,7 @@ Technical clauses are covered by requirements and their tests; procedural clause
 | A11-9 | §9 | Audit trails: record of GMP-relevant changes and deletions with reason; available, convertible, regularly reviewed | technical | CMP-01 (foundations: PASS), CMP-04 (foundations: PASS), DM-03 (foundations: PASS), APP-AU-01 (v2: NO TEST), CMP-10 (gxp-p0: PASS), CMP-15 (gxp-p0: PASS), CMP-12 (v1: NO TEST) | partial |
 | A11-10 | §10 | Change and configuration management | procedural | VAL-02 (v1: NO TEST) | SOP |
 | A11-11 | §11 | Periodic evaluation | procedural | — | SOP |
-| A11-12 | §12 | Security: physical and logical access controls, creation/change/cancellation of access authorizations recorded | technical | IAM-02 (foundations: PASS), IAM-03 (foundations: PASS), IAM-05 (foundations: PASS), APP-MF-02 (foundations: PASS), APP-MF-04 (foundations: PASS), APP-ID-01 (v0: PASS), APP-ID-02 (v0: PASS), APP-ID-02 (foundations: PASS), IAM-01 (gxp-p0: NO TEST), CMP-03 (gxp-p0: NO TEST), IAM-06 (v2: NO TEST) | partial |
+| A11-12 | §12 | Security: physical and logical access controls, creation/change/cancellation of access authorizations recorded | technical | IAM-02 (foundations: PASS), IAM-03 (foundations: PASS), IAM-05 (foundations: PASS), APP-MF-02 (foundations: PASS), APP-MF-04 (foundations: PASS), APP-ID-01 (v0: PASS), APP-ID-02 (v0: PASS), APP-ID-02 (foundations: PASS), IAM-01 (gxp-p0: PASS), CMP-03 (gxp-p0: PASS), IAM-06 (v2: NO TEST) | partial |
 | A11-13 | §13 | Incident management | procedural | — | SOP |
 | A11-14 | §14 | Electronic signature: same impact as handwritten, permanently linked, time and date | technical | CMP-02 (foundations: PASS), DM-02 (foundations: PASS), CMP-11 (gxp-p0: PASS) | covered |
 | A11-16 | §16 | Business continuity | procedural | — | SOP |
@@ -69,8 +69,8 @@ Technical clauses are covered by requirements and their tests; procedural clause
 | EMA-CS-ARCHIVE | archiving | Archiving for the retention period with readability | technical | NFR-04 (gxp-p0: PASS) | covered |
 | EMA-CS-MIGRATION | migration | Validated data migration preserving audit trail and signatures | technical | VAL-03 (v1: NO TEST) | planned |
 | EMA-CS-VALID | Annex 2 Computerised system validation | Risk-based validation, requirements, traceability, test evidence, change control | technical | VAL-01 (v1: NO TEST), VAL-02 (v1: NO TEST), VAL-05 (gxp-p0: PASS) | partial |
-| EMA-CS-USERMGMT | Annex 3 User management | Unique accounts, role-based access, periodic access review, timely revocation, MFA where appropriate | technical | IAM-02 (foundations: PASS), APP-ID-01 (v0: PASS), IAM-01 (gxp-p0: NO TEST), IAM-06 (v2: NO TEST), APP-ID-03 (v2: NO TEST) | partial |
-| EMA-CS-SECURITY | Annex 4 Security | Security: encryption, vulnerability management, penetration testing, session timeout, lockout | technical | IAM-01 (gxp-p0: NO TEST), CMP-03 (gxp-p0: NO TEST), NFR-05 (v1: NO TEST) | planned |
+| EMA-CS-USERMGMT | Annex 3 User management | Unique accounts, role-based access, periodic access review, timely revocation, MFA where appropriate | technical | IAM-02 (foundations: PASS), APP-ID-01 (v0: PASS), IAM-01 (gxp-p0: PASS), IAM-06 (v2: NO TEST), APP-ID-03 (v2: NO TEST) | partial |
+| EMA-CS-SECURITY | Annex 4 Security | Security: encryption, vulnerability management, penetration testing, session timeout, lockout | technical | IAM-01 (gxp-p0: PASS), CMP-03 (gxp-p0: PASS), NFR-05 (v1: NO TEST) | partial |
 | EMA-CS-IRT | Annex 5 IRT | Randomisation and IRT: protected allocation, emergency unblinding logged | technical | IAM-04 (foundations: PASS), CMP-13 (v1: NO TEST) | partial |
 | EMA-CS-ECONSENT | Annex 5 eConsent | eConsent: identity, approved version, copy to the subject | technical | — | GAP — no requirement |
 | EMA-CS-CLOUD | Annex 1 Agreements / cloud | Agreements with service providers; data location; exit | procedural | — | SOP |
@@ -131,7 +131,7 @@ Technical clauses are covered by requirements and their tests; procedural clause
 
 | Clause | Ref | Title | Control | Requirements (release: result) | Status |
 | --- | --- | --- | --- | --- | --- |
-| HIPAA-312 | 45 CFR 164.312 | Technical safeguards: access control, audit controls, integrity, authentication, transmission security | technical | CMP-01 (foundations: PASS), IAM-02 (foundations: PASS), AI-01 (v0: PASS), IAM-01 (gxp-p0: NO TEST), CMP-03 (gxp-p0: NO TEST), CMP-13 (v1: NO TEST), CMP-08 (v1: NO TEST), NFR-05 (v1: NO TEST), NFR-06 (v1: NO TEST) | partial |
+| HIPAA-312 | 45 CFR 164.312 | Technical safeguards: access control, audit controls, integrity, authentication, transmission security | technical | CMP-01 (foundations: PASS), IAM-02 (foundations: PASS), AI-01 (v0: PASS), IAM-01 (gxp-p0: PASS), CMP-03 (gxp-p0: PASS), CMP-13 (v1: NO TEST), CMP-08 (v1: NO TEST), NFR-05 (v1: NO TEST), NFR-06 (v1: NO TEST) | partial |
 | HIPAA-BAA | 45 CFR 164.504(e) | Business associate agreements with service providers handling PHI | procedural | — | SOP |
 
 ## APPI — JP Act on the Protection of Personal Information (Act 57/2003, rev. 2022)

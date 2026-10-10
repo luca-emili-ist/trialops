@@ -1,7 +1,7 @@
 import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import { createAiRuntime, replayProvider } from '@trialops/ai-runtime';
-import { startApi, sign, platformId, DEMO_PASSWORD, type Api } from './_helpers.ts';
+import { startApi, sign, platformId, SIGN, type Api } from './_helpers.ts';
 
 let api: Api; let plat: string; let merid: string;
 let arm: any; let draftTask: any; let planTask: any;
@@ -71,7 +71,7 @@ test('[AI-05] the reviewer sees the diff and the cited sources before deciding',
 test('[AI-05][APP-TK-04] an agent cannot accept its own proposal', async () => {
   const agent = await sign({ sub: 'agent:protocol-author', actor_type: 'agent', email: 'a@x', roles: ['platform_ops_manager'],
     platform_ids: [plat], arm_scopes: '*', site_scopes: '*' });
-  const r = await api.call('POST', `/v1/tasks/${draftTask.id}/review`, { token: agent, reason: 'self', body: { decision: 'accept', password: DEMO_PASSWORD } });
+  const r = await api.call('POST', `/v1/tasks/${draftTask.id}/review`, { token: agent, reason: 'self', body: { decision: 'accept', ...SIGN } });
   assert.equal(r.status, 403);
 });
 
@@ -79,7 +79,7 @@ test('[AI-05][CMP-02] a person accepts with a signature: the appendix gets the c
   const bad = await api.call('POST', `/v1/tasks/${draftTask.id}/review`, { as: 'demo|ops', reason: 'reviewed', body: { decision: 'accept', password: 'x' } });
   assert.equal(bad.status, 401);
   const r = await api.call('POST', `/v1/tasks/${draftTask.id}/review`, { as: 'demo|ops', reason: 'proposal reviewed against sponsor brief',
-    body: { decision: 'accept', password: DEMO_PASSWORD } });
+    body: { decision: 'accept', ...SIGN } });
   assert.equal(r.status, 200, JSON.stringify(r.body));
   assert.equal(r.body.task.state, 'completed');
   assert.equal(r.body.signature.target_hash.length, 64);
@@ -92,7 +92,7 @@ test('[AI-05][CMP-02] a person accepts with a signature: the appendix gets the c
 
 test('[M01-02][IAM-05] another person approves the appendix and the arm is ready within one working day', async () => {
   const appendixId = draftTask.inputs.appendix_version_id;
-  const r = await api.call('POST', `/v1/appendix-versions/${appendixId}/approve`, { as: 'demo|reg', reason: 'appendix approved', body: { password: DEMO_PASSWORD } });
+  const r = await api.call('POST', `/v1/appendix-versions/${appendixId}/approve`, { as: 'demo|reg', reason: 'appendix approved', body: { ...SIGN } });
   assert.equal(r.status, 200, JSON.stringify(r.body));
   const a = await api.call('POST', `/v1/arms/${arm.id}/status`, { as: 'demo|ops', reason: 'appendix approved', body: { to: 'approved' } });
   assert.equal(a.body.status, 'approved');
@@ -106,13 +106,13 @@ test('[AI-05] edits and rejections are recorded and measured per task type', asy
   const proposal = (await api.call('GET', `/v1/tasks/${e.agent_tasks[0].id}`, { as: 'demo|ops' })).body.outputs.proposal.sections;
   const edited = { ...proposal, synopsis: { ...proposal.synopsis, phase: 'phase2_3' } };
   const er = await api.call('POST', `/v1/tasks/${e.agent_tasks[0].id}/review`, { as: 'demo|ops', reason: 'phase corrected',
-    body: { decision: 'edit', sections: edited, password: DEMO_PASSWORD } });
+    body: { decision: 'edit', sections: edited, ...SIGN } });
   assert.equal(er.status, 200, JSON.stringify(er.body));
   assert.deepEqual(er.body.task.outputs.edits.map((x: any) => x.section), ['synopsis']);
   const f = (await wizard('ARM-F')).body;
   await api.job('POST', `/v1/tasks/${f.agent_tasks[0].id}/run-agent`, { as: 'demo|ops' });
   const rr = await api.call('POST', `/v1/tasks/${f.agent_tasks[0].id}/review`, { as: 'demo|ops', reason: 'not consistent with sponsor plan',
-    body: { decision: 'reject', password: DEMO_PASSWORD } });
+    body: { decision: 'reject', ...SIGN } });
   assert.equal(rr.body.task.state, 'rejected');
   assert.equal(rr.body.appendix_version.status, 'draft');
   const stats = (await api.call('GET', `/v1/platforms/${plat}/ai-review-stats`, { as: 'demo|qa' })).body.items

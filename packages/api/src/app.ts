@@ -8,6 +8,7 @@ import type { RawResponse, RouteDef, Services } from './route.ts';
 import { openapi } from './openapi.ts';
 import { ajv } from './lib/validate.ts';
 import { routes as allRoutes } from './routes/index.ts';
+import { accessConfigFromEnv, authTx, enforceAccessPolicy, policyReauth, SYSTEM_AUTH, type Deferred } from './lib/access-policy.ts';
 
 /** ctx.db of a manualTx route: there is no request transaction, the handler must use ctx.tx. */
 const NO_TX = new Proxy({}, { get() { throw new Error('manualTx route: use ctx.tx() to open a transaction'); } }) as Db;
@@ -21,6 +22,17 @@ export interface AppDeps {
 
 export function createApp({ pool, verify, services = {}, routes = allRoutes }: AppDeps): express.Express {
   const app = express();
+  // The services seen by the routes: the given ones (read live, e.g. an OIDC provider set after start-up), the access policy
+  // (IAM-01, CMP-03) and the signature re-authentication wrapped by that policy (MFA step-up, failures counted).
+  const access = services.access ?? accessConfigFromEnv();
+  let wrapped: { inner: unknown; outer: Services['reauth'] } = { inner: undefined, outer: undefined };
+  const svc: Services = Object.create(services, {
+    access: { value: access, enumerable: true },
+    reauth: { enumerable: true, get: () => {
+      if (wrapped.inner !== services.reauth) wrapped = { inner: services.reauth, outer: services.reauth && policyReauth(services.reauth, pool, access) };
+      return wrapped.outer;
+    } },
+  });
   app.disable('x-powered-by');
   app.use(express.json({ limit: '1mb' }));
   app.use(express.urlencoded({ extended: false, limit: '64kb' }));   // OAuth token endpoint (form-encoded)
@@ -38,9 +50,12 @@ export function createApp({ pool, verify, services = {}, routes = allRoutes }: A
         if (r.needsReason && !reason) throw new HttpError(400, 'reason_required', 'X-Change-Reason header required for this change (DM-03)');
         const after: (() => Promise<void> | void)[] = [];
         const claims = r.public ? ANONYMOUS : await verify(bearer(req.header('authorization')));
+        // IAM-01, CMP-03: lockout, idle timeout and MFA for every authenticated route (lib/access-policy.ts)
+        if (!r.public) await enforceAccessPolicy(pool, claims, access, !!r.allowBelowMfa);
         const ctxBase = { params: req.params as Record<string, string>, query: req.query as Record<string, string | undefined>,
-          body: req.body as never, reason, services, headers: req.headers as Record<string, string | undefined>, claims,
+          body: req.body as never, reason, services: svc, headers: req.headers as Record<string, string | undefined>, claims, access,
           tx: <T>(fn: (db: Db) => Promise<T>) => withClaims(pool, claims, r.public ? undefined : reason, fn),
+          authTx: <T>(fn: (db: Db) => Promise<T>) => authTx(pool, r.public ? SYSTEM_AUTH : claims, fn),
           afterCommit: (fn: () => Promise<void> | void) => { after.push(fn); } };
         const out: unknown = r.manualTx ? await r.handler({ ...ctxBase, db: NO_TX })
           : await ctxBase.tx(db => r.handler({ ...ctxBase, db }));
@@ -53,7 +68,12 @@ export function createApp({ pool, verify, services = {}, routes = allRoutes }: A
           return;
         }
         res.status(r.status ?? 200).json(out);
-      } catch (e) { next(e); }
+      } catch (e) {
+        // e.g. a failed signature re-authentication, counted for the lockout once the request transaction rolled back
+        const later = (e as Deferred | undefined)?.afterRollback;
+        if (later) { try { next((await later()) ?? e); } catch (x) { next(x); } return; }
+        next(e);
+      }
     });
   }
 

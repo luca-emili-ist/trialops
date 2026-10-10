@@ -37,8 +37,7 @@ If `docs/SPEC.md` is missing, stop and ask for it.
 ## Quality gate (same as Forge)
 `npm install && npm run db:reset && npm run verify` — lint (incl. the AI-01 provider boundary), typecheck, build, all
 tests green, traceability with 0 missing for the release (`TRIALOPS_GATE=foundations,v0` at release time), 0 errors
-in the compliance fields. The P0 GCP controls are release `gxp-p0` (gate it with `TRIALOPS_GATE=foundations,v0,gxp-p0`
-once done).
+in the compliance fields. The P0 GCP controls are release `gxp-p0`, done on 2026-10-10: the gate is `TRIALOPS_GATE=foundations,v0,gxp-p0`.
 
 ## UI
 Design direction C, chosen by Luca: follow `docs/DESIGN.md`. Pages use only `@trialops/shell` components and tokens.

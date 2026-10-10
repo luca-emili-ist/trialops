@@ -2,7 +2,7 @@
 import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import { createAiRuntime, replayProvider } from '@trialops/ai-runtime';
-import { startApi, platformId, DEMO_PASSWORD, type Api } from './_helpers.ts';
+import { startApi, platformId, SIGN, type Api } from './_helpers.ts';
 
 let api: Api; let plat: string; let siteId: string; let oldCapacity: number;
 before(async () => {
@@ -55,7 +55,7 @@ test('[CMP-10] other roles get 403 on the audit trail and on reviews', async () 
     assert.equal(res.status, 403, who);
   }
   const r = await api.call('POST', '/v1/audit-reviews', { as: 'demo|cra', reason: 'x',
-    body: { platform_id: plat, from_seq: 1, to_seq: 2, conclusion: 'x', password: DEMO_PASSWORD } });
+    body: { platform_id: plat, from_seq: 1, to_seq: 2, conclusion: 'x', ...SIGN } });
   assert.equal(r.status, 403);
 });
 
@@ -79,17 +79,17 @@ test('[CMP-10] the CSV export is readable: UTC time, actor, table, record, actio
 test('[CMP-10][CMP-11] a review is recorded only with a review signature: name, meaning, UTC time and reason are kept', async () => {
   const latest = (await api.call('GET', '/v1/audit-events?limit=1', { as: 'demo|qa' })).body.items[0].seq;
   const body = { platform_id: plat, filters: { table: 'site' }, from_seq: 1, to_seq: latest, conclusion: 'Site changes reviewed; no anomalies.' };
-  assert.equal((await api.call('POST', '/v1/audit-reviews', { as: 'demo|qa', body: { ...body, password: DEMO_PASSWORD } })).status, 400, 'reason required');
+  assert.equal((await api.call('POST', '/v1/audit-reviews', { as: 'demo|qa', body: { ...body, ...SIGN } })).status, 400, 'reason required');
   const bad = await api.call('POST', '/v1/audit-reviews', { as: 'demo|qa', reason: 'periodic review', body: { ...body, password: 'wrong' } });
   assert.equal(bad.status, 401);
   assert.equal((await api.admin.query('select count(*)::int n from core.audit_review')).rows[0].n, 0, 'nothing kept without a signature');
-  const r = await api.call('POST', '/v1/audit-reviews', { as: 'demo|qa', reason: 'Monthly audit trail review', body: { ...body, password: DEMO_PASSWORD } });
+  const r = await api.call('POST', '/v1/audit-reviews', { as: 'demo|qa', reason: 'Monthly audit trail review', body: { ...body, ...SIGN } });
   assert.equal(r.status, 201, JSON.stringify(r.body));
   assert.equal(r.body.status, 'completed');
   assert.ok(r.body.row_count >= 7, `row_count ${r.body.row_count}`);
   const sig = r.body.signature;
   assert.deepEqual([sig.signer_name, sig.meaning, sig.reason, sig.auth_method, sig.target_table],
-    ['Olivia Grant', 'review', 'Monthly audit trail review', 'reauth_password', 'audit_review']);
+    ['Olivia Grant', 'review', 'Monthly audit trail review', 'reauth_mfa', 'audit_review']);
   assert.match(sig.signed_at, ISO_UTC);
   const list = await api.call('GET', `/v1/audit-reviews?platform_id=${plat}`, { as: 'demo|admin' });
   assert.equal(list.status, 200);
@@ -113,10 +113,10 @@ test('[CMP-11] signatures carry their manifestation everywhere they are listed; 
   const armDetail = await api.call('GET', `/v1/arms/${arm}`, { as: 'demo|reg' });
   assert.equal(armDetail.body.appendix_versions[0].approved_signature.signer_name, 'Dana Whitfield');
   const task = (await api.admin.query("select id from core.task where platform_id = $1 limit 1", [plat])).rows[0].id;
-  const noReason = await api.call('POST', '/v1/signatures', { as: 'demo|reg', body: { target_table: 'task', target_id: task, meaning: 'review', password: DEMO_PASSWORD } });
+  const noReason = await api.call('POST', '/v1/signatures', { as: 'demo|reg', body: { target_table: 'task', target_id: task, meaning: 'review', ...SIGN } });
   assert.equal(noReason.status, 400);
   const s = await api.call('POST', '/v1/signatures', { as: 'demo|reg', reason: 'Checked the outputs',
-    body: { target_table: 'task', target_id: task, meaning: 'review', password: DEMO_PASSWORD } });
+    body: { target_table: 'task', target_id: task, meaning: 'review', ...SIGN } });
   assert.equal(s.status, 201, JSON.stringify(s.body));
   assert.deepEqual([s.body.signer_name, s.body.meaning, s.body.reason], ['Elena Rossi', 'review', 'Checked the outputs']);
   const listed = await api.call('GET', `/v1/signatures?target_id=${task}`, { as: 'demo|reg' });
@@ -137,7 +137,7 @@ test('[CMP-09][CMP-11] accepted AI content keeps its provenance marker; the prop
   assert.equal(diff.body.ai_generated.ai_request_id, job.result.ai_request_id);
   assert.ok(diff.body.ai_generated.model);
   const r = await api.call('POST', `/v1/tasks/${draftTask.id}/review`, { as: 'demo|ops', reason: 'Proposal checked against the sponsor documents',
-    body: { decision: 'accept', password: DEMO_PASSWORD } });
+    body: { decision: 'accept', ...SIGN } });
   assert.equal(r.status, 200, JSON.stringify(r.body));
   const prov = r.body.appendix_version.ai_provenance;
   assert.deepEqual([prov.ai_request_id, prov.agent, prov.reviewed_by, prov.reviewed_by_sub, prov.decision, prov.review_signature_id],

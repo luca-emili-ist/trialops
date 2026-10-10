@@ -97,8 +97,8 @@ function ProposalReview({ task, onDone }: { task: Task; onDone: () => void }) {
       {sign ? <SignDialog title={sign === 'reject' ? 'Reject the proposal' : 'Accept the proposal'} meaning="review"
         what={sign === 'reject' ? 'The proposal is rejected; the appendix draft stays unchanged.' : 'The sections are written into the appendix draft, which goes to review.'}
         confirmLabel={sign === 'reject' ? 'Sign and reject' : 'Sign and accept'} onClose={() => setSign(null)}
-        onSign={async (password, reason) => {
-          await api('POST', `/v1/tasks/${task.id}/review`, { reason, body: { decision: sign, password, ...(sign === 'edit' ? { sections: clean(edited) } : {}) } });
+        onSign={async (password, reason, totp) => {
+          await api('POST', `/v1/tasks/${task.id}/review`, { reason, body: { decision: sign, password, totp, ...(sign === 'edit' ? { sections: clean(edited) } : {}) } });
           setSign(null); toast('Decision signed'); onDone();
         }} /> : null}
     </>

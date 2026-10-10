@@ -7,6 +7,11 @@ export class ApiError extends Error {
   constructor(status: number, code: string, message: string) { super(message); this.status = status; this.code = code; }
 }
 
+/** Called when the API ends the session (CMP-03): idle timeout, signed out elsewhere, or account locked. */
+const SESSION_END_CODES = ['session_idle', 'session_ended', 'account_locked'];
+let onSessionEnd: ((e: ApiError) => void) | null = null;
+export const setSessionEndHandler = (fn: ((e: ApiError) => void) | null) => { onSessionEnd = fn; };
+
 export async function api<T = any>(method: string, path: string, opts: { body?: unknown; reason?: string } = {}): Promise<T> { // eslint-disable-line @typescript-eslint/no-explicit-any
   const headers: Record<string, string> = { 'content-type': 'application/json' };
   if (token) headers.authorization = `Bearer ${token}`;
@@ -14,7 +19,11 @@ export async function api<T = any>(method: string, path: string, opts: { body?: 
   const res = await fetch(path, { method, headers, body: opts.body === undefined ? undefined : JSON.stringify(opts.body) });
   const text = await res.text();
   const data = text ? JSON.parse(text) : null;
-  if (!res.ok) throw new ApiError(res.status, data?.error?.code ?? 'error', data?.error?.message ?? `Request failed (${res.status})`);
+  if (!res.ok) {
+    const e = new ApiError(res.status, data?.error?.code ?? 'error', data?.error?.message ?? `Request failed (${res.status})`);
+    if (token && SESSION_END_CODES.includes(e.code)) onSessionEnd?.(e);
+    throw e;
+  }
   return data as T;
 }
 export const get = <T = any>(path: string) => api<T>('GET', path); // eslint-disable-line @typescript-eslint/no-explicit-any

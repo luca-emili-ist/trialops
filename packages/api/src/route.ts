@@ -5,6 +5,8 @@ import type { Claims } from './auth.ts';
 import type { Reauthenticator } from './lib/reauth.ts';
 import type { AiRuntime } from '@trialops/ai-runtime';
 import type { Oidc } from './lib/oidc.ts';
+import type { AuthProvider } from './lib/auth-provider.ts';
+import type { AccessConfig } from './lib/access-policy.ts';
 
 export type JsonSchema = Record<string, unknown>;
 
@@ -21,12 +23,21 @@ export interface Ctx<B = unknown> {
   tx<T>(fn: (db: Db) => Promise<T>): Promise<T>;
   /** Runs fn after the request transaction committed and before the response is sent (e.g. dispatching a job). */
   afterCommit(fn: () => Promise<void> | void): void;
+  /** Access policy in force (MFA, lockout, idle timeout: IAM-01, CMP-03). */
+  access: AccessConfig;
+  /** Runs fn in its own transaction as the role auth_service (sign-in bookkeeping of 0018); actor = the caller, or
+   * system:auth on public routes. */
+  authTx<T>(fn: (db: Db) => Promise<T>): Promise<T>;
 }
 
 /** Collaborators injected into handlers. */
 export interface Services {
   ai?: AiRuntime;
   reauth?: Reauthenticator;
+  /** Identity provider called by the server: sign-in, MFA verification (Supabase Auth; tests: localAuth). */
+  auth?: AuthProvider;
+  /** Access policy; default from the environment (accessConfigFromEnv). */
+  access?: AccessConfig;
   oidc?: Oidc;
   /** Local development only (TRIALOPS_DEV_LOGIN=1): mints a token for a demo user, for the user switch (DEMO-02). */
   devLogin?: (sub: string) => Promise<string>;
@@ -59,6 +70,8 @@ export interface RouteDef {
   raw?: boolean;
   /** No request transaction: the handler opens its own with ctx.tx (long work split into several commits). */
   manualTx?: boolean;
+  /** Reachable by a person whose token is not yet MFA-satisfied (aal1): the routes of the sign-in itself (IAM-01). */
+  allowBelowMfa?: boolean;
   handler: (ctx: Ctx<never>) => Promise<unknown>;
 }
 

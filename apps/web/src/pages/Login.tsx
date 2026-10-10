@@ -1,6 +1,8 @@
-// TRO-090 Sign in. Deployed: Supabase Auth (email + password). Local development: demo user switch (DEMO-02).
+// TRO-090 Sign in. Deployed: email + password through the Platform API (lockout, CMP-03), then the authenticator:
+// TRO-091 code of the authenticator app, TRO-092 enrolment of a first authenticator (IAM-01, MFA mandatory).
+// Local development: demo user switch (DEMO-02).
 import { useState } from 'react';
-import { Button, TextField, Panel, PageFooter, DataTable, Loading, ErrorNote } from '@trialops/shell';
+import { Button, TextField, Panel, PageFooter, DataTable, Loading, ErrorNote, DefinitionList } from '@trialops/shell';
 import { useData, useSession } from '../session.tsx';
 import { go } from '../router.ts';
 import { PAGE_CODES } from '../pageCodes.ts';
@@ -15,16 +17,69 @@ function back() {
 
 export function Login() {
   const s = useSession();
+  const step = s.mfaStep;
+  const code = step?.kind === 'challenge' ? PAGE_CODES.loginMfa : step?.kind === 'enrol' ? PAGE_CODES.loginMfaEnrol : PAGE_CODES.login;
   return (
     <div className="shell-main">
       <div className="shell-banner">Synthetic data — demonstration environment</div>
       <main className="shell-content" id="main">
         <header className="page-header"><div><div className="crumbs">InSilicoTrials</div><h1>Sign in to TrialOps</h1>
           <p>Clinical operations platform for adaptive platform trials.</p></div></header>
-        {s.mode === 'dev' ? <DevUsers /> : <><PasswordForm /><DemoAccounts /></>}
+        {s.notice && !step ? <Panel title="Session ended"><p role="status">{s.notice}</p></Panel> : null}
+        {step?.kind === 'challenge' ? <TotpChallenge /> : step?.kind === 'enrol' ? <TotpEnrol qr={step.qr} secret={step.secret} />
+          : s.mode === 'dev' ? <DevUsers /> : <><PasswordForm /><DemoAccounts /></>}
       </main>
-      <PageFooter pageCode={PAGE_CODES.login} />
+      <PageFooter pageCode={code} />
     </div>
+  );
+}
+
+/** Six-digit code form shared by the challenge and the enrolment. */
+function CodeForm({ label, hint, submitLabel }: { label: string; hint: string; submitLabel: string }) {
+  const s = useSession();
+  const [code, setCode] = useState('');
+  const [error, setError] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+  return (
+    <form className="stack" onSubmit={e => {
+      e.preventDefault(); setError(null); setBusy(true);
+      s.verifyMfa(code).then(back, err => { setError((err as Error).message); setBusy(false); setCode(''); });
+    }}>
+      <TextField label={label} inputMode="numeric" autoComplete="one-time-code" maxLength={6} value={code} autoFocus
+        onChange={e => setCode(e.target.value.replace(/\D/g, ''))} hint={hint} error={error ?? undefined} />
+      <div className="row">
+        <Button variant="primary" type="submit" disabled={!/^\d{6}$/.test(code) || busy}>{busy ? 'Checking…' : submitLabel}</Button>
+        <Button variant="ghost" type="button" onClick={() => { void s.signOut(); }}>Use another account</Button>
+      </div>
+    </form>
+  );
+}
+
+/** TRO-091: the second factor of the sign-in (IAM-01). */
+function TotpChallenge() {
+  return (
+    <Panel title="Authenticator code" meta="Multi-factor authentication is required for every role with GxP impact.">
+      <CodeForm label="Code from your authenticator app" hint="6 digits; the code changes every 30 seconds" submitLabel="Verify and continue" />
+    </Panel>
+  );
+}
+
+/** TRO-092: enrolment of a first authenticator (TOTP), mandatory before the platform opens (IAM-01). */
+function TotpEnrol({ qr, secret }: { qr: string; secret: string }) {
+  return (
+    <Panel title="Set up your authenticator" meta="TrialOps requires multi-factor authentication. Use an authenticator app (for example
+      Microsoft Authenticator, Google Authenticator or 1Password) on a device you keep with you.">
+      <div className="stack">
+        <ol className="stack">
+          <li>Scan this QR code with the authenticator app.</li>
+          <li>If you cannot scan it, add the account by hand with the setup key below.</li>
+          <li>Enter the 6-digit code the app shows to finish.</li>
+        </ol>
+        <img src={qr} width={180} height={180} alt="QR code to add TrialOps to your authenticator app" />
+        <DefinitionList items={[['Setup key', <span className="t-mono" key="k">{secret}</span>], ['Account', 'TrialOps']]} />
+        <CodeForm label="Code from your authenticator app" hint="Proves that the app is set up; the authenticator is then active" submitLabel="Activate and continue" />
+      </div>
+    </Panel>
   );
 }
 

@@ -65,7 +65,7 @@ export function UiCatalogue() {
           <Button onClick={() => setDialog('reason')}>Open reason dialog</Button><Button onClick={() => toast('Saved')}>Show toast</Button>
           <Button onClick={() => toast('Could not save: version is approved', true)}>Show error toast</Button></div>
       </Panel>
-      {dialog === 'sign' ? <SignDialog title="Approve Arm appendix v1.0" meaning="approval" what="The version becomes frozen." confirmLabel="Sign and approve"
+      {dialog === 'sign' ? <SignDialog title="Approve Arm appendix v1.0" meaning="approval" mfa what="The version becomes frozen." confirmLabel="Sign and approve"
         onClose={() => setDialog(null)} onSign={async () => { setDialog(null); toast('Signed (catalogue only)'); }} /> : null}
       {dialog === 'reason' ? <ReasonDialog title="Save section" confirmLabel="Save" onClose={() => setDialog(null)} onConfirm={async () => { setDialog(null); toast('Saved'); }} /> : null}
     </AppShell>

@@ -13,8 +13,12 @@ export interface Claims extends JWTPayload {
   site_scopes?: string[] | '*';
   roles?: string[];
   blinding?: 'blinded' | 'unblinded';
-  actor_type?: 'user' | 'agent' | 'app' | 'anon';
+  actor_type?: 'user' | 'agent' | 'app' | 'anon' | 'system';
   app_id?: string;
+  /** Supabase Auth: authenticator assurance level (aal2 = second factor verified, IAM-01) and session id (CMP-03). */
+  aal?: string;
+  amr?: { method: string; timestamp?: number }[];
+  session_id?: string;
 }
 
 export type Verifier = (token: string) => Promise<Claims>;

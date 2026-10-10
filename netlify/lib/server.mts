@@ -4,7 +4,8 @@
 import type { AddressInfo } from 'node:net';
 import { createApp, createPool, createVerifier, type JobDispatcher } from '../../packages/api/src/index.ts';
 import { createOidc } from '../../packages/api/src/lib/oidc.ts';
-import { supabaseReauth } from '../../packages/api/src/lib/reauth.ts';
+import { providerReauth } from '../../packages/api/src/lib/reauth.ts';
+import { supabaseAuth } from '../../packages/api/src/lib/auth-provider.ts';
 import { createAiRuntime } from '../../services/ai-runtime/src/index.ts';
 
 const env = process.env;
@@ -26,13 +27,17 @@ export function backgroundDispatcher(workerUrl = env.TRIALOPS_WORKER_URL
 
 async function start(): Promise<string> {
   const issuer = (env.TRIALOPS_ISSUER ?? env.URL ?? '').replace(/\/$/, '');
+  // Sign-in, MFA verification and signature re-authentication against Supabase Auth (IAM-01, CMP-03). Access policy from
+  // TRIALOPS_MFA, TRIALOPS_MFA_EXEMPT_EMAIL_DOMAINS, TRIALOPS_LOCKOUT_*, TRIALOPS_IDLE_MINUTES (lib/access-policy.ts).
+  const auth = supabaseAuth(env.SUPABASE_URL!, env.SUPABASE_ANON_KEY ?? env.VITE_SUPABASE_PUBLISHABLE_KEY!);
   const app = createApp({
     pool: createPool(env.DATABASE_URL),
     verify: createVerifier(env),
     services: {
       ai: createAiRuntime(),
       jobs: backgroundDispatcher(),
-      reauth: supabaseReauth(env.SUPABASE_URL!, env.SUPABASE_ANON_KEY ?? env.VITE_SUPABASE_PUBLISHABLE_KEY!),
+      auth,
+      reauth: providerReauth(auth),
       oidc: await createOidc({ issuer, authorizeUrl: `${issuer}/#/oidc/authorize`, privateJwk: env.TRIALOPS_OIDC_PRIVATE_JWK }),
     },
   });

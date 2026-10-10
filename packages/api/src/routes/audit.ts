@@ -85,7 +85,7 @@ async function withSignatures(db: Db, rows: Row[]): Promise<Row[]> {
     signature: r.signature_id ? m.get(r.signature_id) ?? null : null }));
 }
 
-interface ReviewBody { platform_id: string; filters?: Record<string, unknown>; from_seq: number; to_seq: number; conclusion: string; password?: string }
+interface ReviewBody { platform_id: string; filters?: Record<string, unknown>; from_seq: number; to_seq: number; conclusion: string; password?: string; totp?: string }
 
 /** Records a review and signs it (meaning 'review') in one transaction: without a valid signature nothing is kept. */
 async function recordReview(db: Db, claims: Claims, reauth: Reauthenticator | undefined, body: ReviewBody): Promise<Row> {
@@ -95,7 +95,7 @@ async function recordReview(db: Db, claims: Claims, reauth: Reauthenticator | un
   const created = (await db.query(`insert into core.audit_review(platform_id, filters, reviewed_from_seq, reviewed_to_seq, conclusion)
     values ($1, $2, $3, $4, $5) returning id`, [body.platform_id, JSON.stringify(filters), body.from_seq, body.to_seq, body.conclusion.trim()])).rows[0];
   const signature = await sign(db, claims, reauth, { target_table: 'audit_review', target_id: created.id, meaning: 'review',
-    credential: { password: body.password } });
+    credential: { password: body.password, totp: body.totp } });
   const done = (await db.query(`update core.audit_review set status = 'completed', signature_id = $2 where id = $1 returning ${REVIEW_COLS}`,
     [created.id, signature.id])).rows;
   return (await withSignatures(db, done))[0]!;
@@ -134,7 +134,7 @@ export const auditRoutes = [
     summary: 'Record an audit trail review over a seq range with its conclusion, signed by the reviewer (meaning review)',
     body: { type: 'object', additionalProperties: false, required: ['platform_id', 'from_seq', 'to_seq', 'conclusion'], properties: {
       platform_id: uuid, from_seq: { type: 'integer', minimum: 1 }, to_seq: { type: 'integer', minimum: 1 },
-      conclusion: { type: 'string', minLength: 1, maxLength: 4000 }, password: { type: 'string' },
+      conclusion: { type: 'string', minLength: 1, maxLength: 4000 }, password: { type: 'string' }, totp: { type: 'string', maxLength: 16 },
       filters: { type: 'object', additionalProperties: false, properties: { table: { type: 'string' }, record_id: { type: 'string' },
         actor: { type: 'string' }, from: { type: 'string' }, to: { type: 'string' } } } } },
     handler: async ({ db, claims, body, services }) => recordReview(db, claims, services.reauth, body) }),

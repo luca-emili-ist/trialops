@@ -64,7 +64,7 @@ export function ProtocolEditor({ kind, id }: { kind: 'master' | 'appendix'; id: 
       {dialog === 'approve' ? <SignDialog title={`Approve ${title} v${ver.version_label}`} meaning="approval"
         what="You approve this version as the controlled content. It becomes frozen and supersedes the previous approved version. Authors of the version cannot approve it."
         confirmLabel="Sign and approve" reasonDefault="Content reviewed and approved" onClose={() => setDialog(null)}
-        onSign={(password, reason) => run(() => api('POST', `${base}/${id}/approve`, { reason, body: { password } }), 'Approved and signed')} /> : null}
+        onSign={(password, reason, totp) => run(() => api('POST', `${base}/${id}/approve`, { reason, body: { password, totp } }), 'Approved and signed')} /> : null}
       {dialog === 'new' ? <Modal title="Start a new version" onClose={() => setDialog(null)} actions={<>
           <Button onClick={() => setDialog(null)}>Cancel</Button>
           <Button variant="primary" disabled={!label} onClick={() => {

@@ -11,5 +11,6 @@ import { appRoutes } from './apps.ts';
 import { devRoutes } from './dev.ts';
 import { jobRoutes } from './jobs.ts';
 import { auditRoutes } from './audit.ts';
+import { authRoutes } from './auth.ts';
 
-export const routes: RouteDef[] = [...platformRoutes, ...armRoutes, ...protocolRoutes, ...signatureRoutes, ...siteRoutes, ...metricRoutes, ...aiRoutes, ...jobRoutes, ...taskRoutes, ...appRoutes, ...auditRoutes, ...devRoutes];
+export const routes: RouteDef[] = [...platformRoutes, ...armRoutes, ...protocolRoutes, ...signatureRoutes, ...siteRoutes, ...metricRoutes, ...aiRoutes, ...jobRoutes, ...taskRoutes, ...appRoutes, ...auditRoutes, ...authRoutes, ...devRoutes];

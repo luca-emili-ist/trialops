@@ -1,5 +1,6 @@
 // Demo user switch for local development (DEMO-02). Off unless the server is started with a devLogin service, which
-// scripts/dev.mjs does only with TRIALOPS_DEV_LOGIN=1; deployed environments sign in through Supabase Auth.
+// scripts/dev.mjs does only with TRIALOPS_DEV_LOGIN=1; deployed environments sign in through Supabase Auth. The token stands
+// for a completed sign-in with MFA (aal2) and carries its own session_id, so the access policy (IAM-01, CMP-03) applies.
 import { route } from '../route.ts';
 import { HttpError } from '../errors.ts';
 

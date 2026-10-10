@@ -138,9 +138,9 @@ Fonte: inventario del codice al commit `45bc4e2` e `docs/SPEC.md` §9–§11. Le
 | Nessuna cancellazione fisica | ✅ | Trigger `no_delete`, nessun grant DELETE |
 | Sigillo crittografico dei blocchi (Ed25519) | 🟡 | Previsto da CMP-01, ma esiste solo come commento: nessun codice firma i blocchi |
 | Protezione dagli amministratori del database | 🟡 | I trigger possono essere rimossi dall'owner o da un superuser: serve separare i privilegi e registrare i DDL |
-| Copertura completa | 🟡 | `subject_status_history`, `task_event`, `app_scope_grant`, `event_outbox` sono protette solo dai grant, senza trigger di audit |
+| Copertura completa | ✅ | CMP-15 (0015): ogni tabella auditata o eccezione motivata verificata da test |
 | Ora UTC sincronizzata e documentata | 🟡 | `clock_timestamp()` del server DB; manca una dichiarazione documentata su NTP e fuso orario |
-| **Revisione dell'audit trail** (EMA 2023, FDA Q&A 2024) | ❌ | Nessuna API e nessuna pagina per consultare, filtrare o esportare l'audit trail |
+| **Revisione dell'audit trail** (EMA 2023, FDA Q&A 2024) | ✅ | CMP-10 (0019): pagina TRO-051, filtri, export CSV e stampa, revisioni firmate con significato *review*; solo QA/admin, mai righe dell'enclave SAC |
 | Log degli accessi in lettura ai dati sensibili (enclave SAC, dati non in cieco) | ❌ | Non presente |
 | Audit dalle app (`POST /v1/audit-events`, APP-AU-01) | ❌ | Requisito senza test |
 
@@ -152,11 +152,11 @@ Fonte: inventario del codice al commit `45bc4e2` e `docs/SPEC.md` §9–§11. Le
 | Significato della firma (autore, revisione, approvazione…) | ✅ | `core.signature.meaning` |
 | Legame indissolubile firma ↔ record | ✅ | `target_hash` calcolato dal server, `approval_controls()`, `freeze_approved()` |
 | Separazione dei compiti (chi scrive non approva) | ✅ | Migration 0009 |
-| **Manifestazione della firma** (nome, data e ora, significato su schermo, stampa ed export, §11.50) | ❌ | La UI mostra solo un ID breve |
-| Motivo salvato sulla firma | 🟡 | Il motivo c'è solo nella riga di audit |
+| **Manifestazione della firma** (nome, data e ora, significato su schermo, stampa ed export, §11.50) | ✅ | CMP-11 (0017): `SignatureManifest` ovunque compaia una firma |
+| Motivo salvato sulla firma | ✅ | `core.signature.reason` (0017), obbligatorio su `POST /v1/signatures` |
 | Firme in serie nella stessa sessione (§11.200(a)(1)) | ❌ | Non gestite |
 | Verifica dell'identità prima di abilitare la firma, lettera di certificazione a FDA (§11.100) | ❌ | Sono procedure, non codice: vanno nelle SOP e nell'onboarding utenti |
-| `reauth_mfa` | 🟡 | Il valore esiste nello schema, ma nessun codice lo produce |
+| `reauth_mfa` | ✅ | Prodotto dalla firma quando il firmatario ha un autenticatore TOTP (IAM-01) |
 
 ### 3.3 Controllo accessi — §11.10(d)(g), §11.300, Annex 11 §12, EMA 2023 Annex 3
 
@@ -165,8 +165,8 @@ Fonte: inventario del codice al commit `45bc4e2` e `docs/SPEC.md` §9–§11. Le
 | Account univoci, ruoli con perimetro piattaforma/braccio/sito, RLS guidata dai claim | ✅ | `core.role_assignment`, hook 0008, RLS |
 | Agenti e app sempre "in cieco" | ✅ | `auth.ts` |
 | Signup disabilitato, password di almeno 10 caratteri | ✅ | `docs/supabase.md` |
-| **MFA** | ❌ | IAM-01 e CMP-03 non sono in `requirements.json` |
-| **Timeout di sessione, blocco dopo tentativi falliti** | ❌ | Non presenti |
+| **MFA** | ✅ | IAM-01 (2026-10-10): TOTP Supabase obbligatorio per ogni persona con un ruolo (token `aal2`, policy in `lib/access-policy.ts`); firma con password + codice (`reauth_mfa`); esenzione solo demo documentata in `docs/supabase.md` |
+| **Timeout di sessione, blocco dopo tentativi falliti** | ✅ | CMP-03 (0018): timeout di inattività lato server per `session_id` (15 min) e nel browser; blocco dopo 5 errori in 15 min (login, codice, ri-autenticazione di firma), sblocco solo da admin con motivo; tutto in `core.auth_event` e nell'audit trail |
 | Revisione periodica degli accessi (IAM-06), provisioning SCIM, SSO aziendale | ❌ | Non presenti |
 | RLS su `person` e `role_assignment` | ❌ | Assente |
 
@@ -179,7 +179,7 @@ Fonte: inventario del codice al commit `45bc4e2` e `docs/SPEC.md` §9–§11. Le
 | Concorrenza ottimistica (`If-Match`), idempotenza (APP-DT-02) | ❌ | `row_version` viene solo mostrato |
 | Provenienza del dato (`source_app`, `transformation_id`, APP-DT-05) | ❌ | Non presente |
 | Blocco dei dati, data freeze (EDC-08) | ❌ | Non presente |
-| **Backup, PITR, test di restore, retention di 25 anni, archivio** | ❌ | Solo nella spec (NFR-04) |
+| **Backup, PITR, test di restore, retention di 25 anni, archivio** | 🟡 | NFR-04: retention per piattaforma (0016), test di restore con evidenza (`BACKUP_RESTORE.md`), backup giornalieri Supabase; PITR e archivio WORM rimandati al primo trial reale (decisione 2026-10-10) |
 | **Copie certificate ed export leggibile** dell'intero record con audit e firme | ❌ | Non presente |
 | Archivio documenti immutabile (WORM) | ❌ | Non c'è ancora un archivio file |
 | Accesso indipendente dello sperimentatore ai dati del proprio sito (EMA 2023 §4.6) | ❌ | Da progettare insieme all'EDC (M06b) |
@@ -211,7 +211,7 @@ Fonte: inventario del codice al commit `45bc4e2` e `docs/SPEC.md` §9–§11. Le
 | Parametri fissi (AI-04), tool registry AUTO/CONFIRM/BLOCK (AI-07), Agent Decision Record scritto (AI-08), limiti per job (AI-09) | 🟡/❌ | La tabella dell'Agent Decision Record esiste, ma nessuno la scrive; AI-09 è coperto solo in parte |
 | **Piano e report di credibilità per task type** (FDA, 7 passi) | ❌ | Non presente |
 | Monitoraggio di deriva e prestazioni (AI-10) | ❌ | Non presente |
-| Marcatura persistente "generato da AI" sul contenuto accettato (AI Act art. 50, ricostruibilità) | 🟡 | Il legame esiste solo tramite `task.outputs.ai_request_id` |
+| Marcatura persistente "generato da AI" sul contenuto accettato (AI Act art. 50, ricostruibilità) | ✅ | CMP-09 (0017): `ai_provenance` immutabile sulla versione dell'appendice, badge `AiProvenance` |
 | Fornitore AI: DPA, BAA, zero retention, regione | ❌ | La chiave attuale è quella del sito Grant OS; nessuna qualifica documentata |
 
 ### 3.7 Funzioni cliniche con requisiti regolatori specifici
@@ -349,7 +349,12 @@ Da aggiungere alle "Non-negotiable rules":
 | 3 | Hosting della prima release GxP | Supabase per ora | Qualifica di Supabase (e Netlify) come fornitori; PITR e backup su Supabase |
 | 4 | QA indipendente | In stand-by | Le release restano "validation-ready" ma non approvate da QA finché non si nomina |
 | 5 | Giappone | Nel perimetro da subito | Regione dati JP (NFR-06), giapponese per pagine di sito e soggetto (NFR-07), APPI |
-| 6 | Assessment esterno | Sì | Shortlist dei fornitori e documenti richiesti preparati da Claude; contatto a cura di Luca |
+| 6 | Assessment esterno | Sì | Shortlist in `ASSESSMENT_VENDORS.md`; contatto a cura di Luca |
+| 7 | PITR Supabase | Rimandato al primo trial reale | Oggi backup giornalieri (RPO 24 h) |
+| 8 | Archivio WORM 25 anni | Da decidere più avanti | Requisiti in `BACKUP_RESTORE.md` §3.3 |
+| 9 | Progetto dati Giappone | Più avanti; prima codice multi-regione e localizzazione | NFR-06/NFR-07 (v1) |
+
+**Stato al 2026-10-10:** release `gxp-p0` 8/8 nei test (IAM-01, CMP-03, CMP-09, CMP-10, CMP-11, CMP-15, NFR-04, VAL-05).
 
 ## Fonti principali
 

@@ -168,8 +168,8 @@ function Review({ task, onDone }: { task: Task; onDone: () => void }) {
         what={sign === 'accept' ? 'The proposed sections are written into the appendix draft, which goes to review. Approval needs another person.' : 'The proposal is rejected and the appendix draft stays unchanged.'}
         confirmLabel={sign === 'accept' ? 'Sign and accept' : 'Sign and reject'}
         reasonDefault={sign === 'accept' ? 'Proposal checked against the sponsor documents' : ''} onClose={() => setSign(null)}
-        onSign={async (password, reason) => {
-          await api('POST', `/v1/tasks/${task.id}/review`, { reason, body: { decision: sign, password } });
+        onSign={async (password, reason, totp) => {
+          await api('POST', `/v1/tasks/${task.id}/review`, { reason, body: { decision: sign, password, totp } });
           setSign(null); toast(sign === 'accept' ? 'Proposal accepted and signed' : 'Proposal rejected'); onDone();
         }} /> : null}
     </>

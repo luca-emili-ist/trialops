@@ -11,6 +11,8 @@ jobs:
       - run: npm run db:reset
       # verify = lint (incl. AI-01 provider boundary) + typecheck + tests + traceability
       - run: npm run verify
+        env:
+          TRIALOPS_GATE: foundations,v0,gxp-p0
       - uses: actions/upload-artifact@v4
         if: always()
         with:

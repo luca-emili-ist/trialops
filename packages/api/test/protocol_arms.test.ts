@@ -1,6 +1,6 @@
 import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
-import { startApi, sign, platformId, DEMO_PASSWORD, type Api } from './_helpers.ts';
+import { startApi, sign, platformId, SIGN, type Api } from './_helpers.ts';
 
 let api: Api; let plat: string; let armId: string; let draftId: string;
 before(async () => { api = await startApi(); plat = await platformId(api.admin); });
@@ -48,7 +48,7 @@ test('[DM-02] only drafts can be edited; a version in review is locked until ret
 });
 
 test('[IAM-05] the author of a version cannot approve it', async () => {
-  const r = await api.call('POST', `/v1/appendix-versions/${draftId}/approve`, { as: 'demo|reg', reason: 'approve', body: { password: DEMO_PASSWORD } });
+  const r = await api.call('POST', `/v1/appendix-versions/${draftId}/approve`, { as: 'demo|reg', reason: 'approve', body: SIGN });
   assert.equal(r.status, 403, JSON.stringify(r.body));
   assert.match(r.body.error.message, /IAM-05/);
 });
@@ -58,17 +58,17 @@ test('[CMP-02][AI-05] approval needs re-authentication by a person; agents canno
   assert.equal(wrong.status, 401);
   const agent = await sign({ sub: 'agent:protocol-author', actor_type: 'agent', email: 'agent@x', roles: ['platform_admin'],
     platform_ids: [plat], arm_scopes: '*', site_scopes: '*' });
-  const byAgent = await api.call('POST', `/v1/appendix-versions/${draftId}/approve`, { token: agent, reason: 'approve', body: { password: DEMO_PASSWORD } });
+  const byAgent = await api.call('POST', `/v1/appendix-versions/${draftId}/approve`, { token: agent, reason: 'approve', body: SIGN });
   assert.equal(byAgent.status, 403);
 });
 
 test('[CMP-02][DM-02] a signed approval freezes the version and emits the approval event', async () => {
-  const r = await api.call('POST', `/v1/appendix-versions/${draftId}/approve`, { as: 'demo|admin', reason: 'approve appendix 1.0', body: { password: DEMO_PASSWORD } });
+  const r = await api.call('POST', `/v1/appendix-versions/${draftId}/approve`, { as: 'demo|admin', reason: 'approve appendix 1.0', body: SIGN });
   assert.equal(r.status, 200, JSON.stringify(r.body));
   assert.equal(r.body.status, 'approved');
   assert.match(r.body.signature.target_hash, /^[0-9a-f]{64}$/);
   const sig = (await api.admin.query('select signer_sub, meaning, auth_method from core.signature where id = $1', [r.body.signature.id])).rows[0];
-  assert.deepEqual(sig, { signer_sub: 'demo|admin', meaning: 'approval', auth_method: 'reauth_password' });
+  assert.deepEqual(sig, { signer_sub: 'demo|admin', meaning: 'approval', auth_method: 'reauth_mfa' });
   const ev = (await api.admin.query("select type from core.event_outbox where subject = $1", [`arm_appendix_version/${draftId}`])).rows;
   assert.deepEqual(ev.map(x => x.type), ['arm.appendix.version.approved']);
   const frozen = await api.admin.query("select set_config('trialops.change_reason','x',false)");

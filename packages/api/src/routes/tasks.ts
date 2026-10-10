@@ -41,7 +41,7 @@ async function startWizard(db: Db, claims: Claims, platformId: string, body: Wiz
 const REVIEW_DECISION = { accept: 'accepted', edit: 'edited', reject: 'rejected' } as const;
 
 async function reviewProposal(db: Db, claims: Claims, reauth: Parameters<typeof sign>[2], taskId: string,
-  body: { decision: keyof typeof REVIEW_DECISION; sections?: ProtocolContent; password?: string }): Promise<Row> {
+  body: { decision: keyof typeof REVIEW_DECISION; sections?: ProtocolContent; password?: string; totp?: string }): Promise<Row> {
   requirePerson(claims, 'Reviewing an agent proposal');
   requireRole(claims, PROTOCOL_KINDS.APPENDIX.editRoles, 'Reviewing an appendix proposal');
   const task = await getTask(db, taskId);
@@ -61,7 +61,7 @@ async function reviewProposal(db: Db, claims: Claims, reauth: Parameters<typeof 
   await db.query(`update core.task set outputs = outputs || $2::jsonb where id = $1`, [taskId, JSON.stringify({
     decision: REVIEW_DECISION[body.decision], decided_by: claims.sub,
     edits: body.decision === 'edit' ? diffContent(proposal, final ?? {}) : [] })]);
-  const signature = await sign(db, claims, reauth, { target_table: 'task', target_id: taskId, meaning: 'review', credential: { password: body.password } });
+  const signature = await sign(db, claims, reauth, { target_table: 'task', target_id: taskId, meaning: 'review', credential: { password: body.password, totp: body.totp } });
   if (final) {
     for (const [section, content] of Object.entries(final)) await putSection(db, claims, PROTOCOL_KINDS.APPENDIX, appendixId, section, content);
     // CMP-09: the accepted content keeps a persistent marker of its AI origin and of the person who reviewed it.
@@ -140,11 +140,11 @@ export const taskRoutes = [
           model: ai?.model ?? null, model_version: ai?.model_version ?? null } };
     } }),
 
-  route<{ decision: keyof typeof REVIEW_DECISION; sections?: ProtocolContent; password?: string }>({
+  route<{ decision: keyof typeof REVIEW_DECISION; sections?: ProtocolContent; password?: string; totp?: string }>({
     method: 'post', path: '/v1/tasks/:id/review', needsReason: true, tag: 'tasks', reqs: ['AI-05', 'APP-TK-04', 'M01-02', 'CMP-02', 'CMP-09', 'CMP-11'],
     summary: 'Accept, edit or reject an agent proposal with a signature',
     body: { type: 'object', additionalProperties: false, required: ['decision'],
-      properties: { decision: { enum: ['accept', 'edit', 'reject'] }, sections: { type: 'object' }, password: { type: 'string' } } },
+      properties: { decision: { enum: ['accept', 'edit', 'reject'] }, sections: { type: 'object' }, password: { type: 'string' }, totp: { type: 'string', maxLength: 16 } } },
     handler: async ({ db, claims, params, body, services }) => reviewProposal(db, claims, services.reauth, params.id!, body) }),
 
   route({ method: 'get', path: '/v1/platforms/:id/ai-review-stats', summary: 'Acceptance and edit rate of AI proposals per task type',

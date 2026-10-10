@@ -27,7 +27,7 @@ export const NAV: { label: string; href: string; pages: PageKey[]; group: string
   { label: 'AI ledger', href: '#/ai', pages: ['aiLedger'], group: 'Trust' },
   { label: 'Audit trail', href: '#/audit', pages: ['auditTrail'], group: 'Trust', roles: AUDIT_ROLES },
 ];
-const PUBLIC: PageKey[] = ['login', 'uiCatalogue'];
+const PUBLIC: PageKey[] = ['login', 'loginMfa', 'loginMfaEnrol', 'uiCatalogue'];
 
 export function App() {
   const route = useRoute();
@@ -51,7 +51,7 @@ export function App() {
     dashboard: <Dashboard />, arms: <Arms />, armDetail: <ArmDetail id={p.id!} />, armWizard: <ArmWizard />,
     protocolEditor: <ProtocolEditor kind={p.kind as 'master' | 'appendix'} id={p.id!} />, sites: <Sites />, siteDetail: <SiteDetail id={p.id!} />,
     tasks: <Tasks />, taskDetail: <TaskDetail id={p.id!} />, apps: <Apps />, oidcAuthorize: <OidcAuthorize />, aiLedger: <AiLedger />, auditTrail: <AuditTrail />,
-    notFound: <NotFound />, login: null, uiCatalogue: null,
+    notFound: <NotFound />, login: null, loginMfa: null, loginMfaEnrol: null, uiCatalogue: null,
   }[route.page];
   const nav: NavItem[] = NAV.filter(n => !n.roles || s.can(...n.roles)).map(n => ({ label: n.label, href: n.href, group: n.group, active: n.pages.includes(route.page) }));
   return (

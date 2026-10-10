@@ -9,7 +9,7 @@ import { requireRole, type Role } from '../lib/roles.ts';
 import { sign, signatureManifests } from '../lib/sign.ts';
 import { ajv, check } from '../lib/validate.ts';
 import { diffContent } from '../lib/diff.ts';
-import type { Reauthenticator } from '../lib/reauth.ts';
+import type { Credential, Reauthenticator } from '../lib/reauth.ts';
 
 export type ProtocolContent = Record<string, unknown>;
 const validateContent = ajv.compile(sectionsSchema);
@@ -103,13 +103,13 @@ export async function putSection(db: Db, claims: Claims, k: Kind, id: string, se
 }
 
 /** Approval: signature with re-authentication, then status change; the previous approved version is superseded. */
-export async function approve(db: Db, claims: Claims, reauth: Reauthenticator | undefined, k: Kind, id: string, password: string | undefined)
+export async function approve(db: Db, claims: Claims, reauth: Reauthenticator | undefined, k: Kind, id: string, credential: Credential)
   : Promise<Row> {
   requireRole(claims, k.approveRoles, `Approving the ${k.label}`);
   const v = await getVersion(db, k, id);
   if (!v) throw new HttpError(404, 'not_found', `${k.label} version not found`);
   if (v.status !== 'in_review') throw new HttpError(409, 'not_in_review', `${k.label} version must be in review to be approved`);
-  const sig = await sign(db, claims, reauth, { target_table: k.table, target_id: id, meaning: 'approval', credential: { password } });
+  const sig = await sign(db, claims, reauth, { target_table: k.table, target_id: id, meaning: 'approval', credential });
   const parent = k.parentCol === 'arm_id' ? v.arm_id : v.platform_id;
   await db.query(`update core.${k.table} set status = 'superseded' where ${k.parentCol} = $1 and status = 'approved' and id <> $2`, [parent, id]);
   const out = (await db.query(`update core.${k.table} set status = 'approved', approved_signature_id = $2 where id = $1 returning ${colsFor(k)}`,
@@ -151,10 +151,10 @@ function routesFor(k: Kind): RouteDef[] {
         if (!r) throw new HttpError(409, 'not_in_review', 'only versions in review can be returned to draft');
         return r;
       } }),
-    route<{ password?: string }>({ method: 'post', path: `${k.base}/:vid/approve`, needsReason: true,
+    route<{ password?: string; totp?: string }>({ method: 'post', path: `${k.base}/:vid/approve`, needsReason: true,
       summary: `Approve a ${k.label} version with a Part 11 signature`, tag: 'protocol', reqs: ['M01-01', 'DM-02', 'CMP-02', 'IAM-05', 'CMP-11'],
-      body: { type: 'object', additionalProperties: false, properties: { password: { type: 'string' } } },
-      handler: async ({ db, claims, params, body, services }) => approve(db, claims, services.reauth, k, params.vid!, body.password) }),
+      body: { type: 'object', additionalProperties: false, properties: { password: { type: 'string' }, totp: { type: 'string', maxLength: 16 } } },
+      handler: async ({ db, claims, params, body, services }) => approve(db, claims, services.reauth, k, params.vid!, { password: body.password, totp: body.totp }) }),
     route({ method: 'get', path: `${k.base}/:vid/diff`, summary: `Section diff of a ${k.label} version against another (default: approved)`,
       tag: 'protocol', reqs: ['M01-01', 'M01-02'], query: { against: uuid },
       handler: async ({ db, params, query }) => {

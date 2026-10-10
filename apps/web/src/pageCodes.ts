@@ -14,6 +14,8 @@ export const PAGE_CODES = {
   aiLedger: 'TRO-050',
   auditTrail: 'TRO-051',
   login: 'TRO-090',
+  loginMfa: 'TRO-091',        // sign-in step: authenticator code (IAM-01); not a route, part of the sign-in
+  loginMfaEnrol: 'TRO-092',   // sign-in step: enrolment of a first authenticator (IAM-01)
   notFound: 'TRO-098',
   uiCatalogue: 'TRO-099',
 } as const;

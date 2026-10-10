@@ -125,9 +125,9 @@ export function AuditTrail() {
       {signing && range && s.platform ? <SignDialog title="Record the audit trail review" meaning="review"
         what={`You confirm that you reviewed events seq ${range.from}–${range.to} (${filterText}). Conclusion: ${conclusion.trim()}`}
         confirmLabel="Sign review" reasonDefault="Periodic audit trail review" onClose={() => setSigning(false)}
-        onSign={async (password, reason) => {
+        onSign={async (password, reason, totp) => {
           await api('POST', '/v1/audit-reviews', { reason, body: { platform_id: s.platform!.id, filters: applied, from_seq: range.from, to_seq: range.to,
-            conclusion: conclusion.trim(), password } });
+            conclusion: conclusion.trim(), password, totp } });
           setSigning(false); setConclusion(''); toast('Review recorded and signed'); reviews.reload();
         }} /> : null}
     </>
