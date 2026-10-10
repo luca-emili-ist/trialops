@@ -1,6 +1,6 @@
 # Compliance matrix
 
-Generated 2026-10-10T09:54:56.671Z by scripts/trace.mjs from docs/compliance/crosswalk.json and docs/requirements.json.
+Generated 2026-10-10T10:26:10.559Z by scripts/trace.mjs from docs/compliance/crosswalk.json and docs/requirements.json.
 Technical clauses are covered by requirements and their tests; procedural clauses are covered by SOPs of the quality system.
 
 ## P11 — US 21 CFR Part 11 — Electronic records; electronic signatures

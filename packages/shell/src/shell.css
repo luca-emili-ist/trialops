@@ -176,3 +176,7 @@ a { color: var(--c-accent); }
   .table tr { break-inside: avoid; }
   .shell-footer { padding: var(--s-2) 0; }
 }
+
+/* A table cell with long text (e.g. audit changes): wide enough to stay readable in a few lines */
+.cell-wide { display: block; min-width: 20rem; }
+@media (max-width: 760px) { .cell-wide { min-width: 16rem; } }

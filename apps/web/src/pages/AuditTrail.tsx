@@ -99,9 +99,9 @@ export function AuditTrail() {
             { key: 'record_id', label: 'Record', render: r => <span className="t-mono" title={r.record_id ?? ''}>{short(r.record_id)}</span> },
             { key: 'action', label: 'Action', render: r => <StatusPill tone={ACTION_TONE[r.action] ?? 'neutral'}>{r.action}</StatusPill>, sortValue: r => r.action },
             { key: 'reason', label: 'Reason', wrap: true, render: r => r.reason ?? '—' },
-            { key: 'changes', label: 'Changes (old → new)', wrap: true, render: r => !r.changes ? '—'
+            { key: 'changes', label: 'Changes (old → new)', wrap: true, render: r => <span className="cell-wide">{!r.changes ? '—'
               : r.changes.length > CLIP ? <><span className="no-print" title={r.changes}>{r.changes.slice(0, CLIP)}… <span className="t-muted">(full text in the
-                CSV export and in print)</span></span><span className="print-only">{r.changes}</span></> : r.changes },
+                CSV export and in print)</span></span><span className="print-only">{r.changes}</span></> : r.changes}</span> },
           ]} />}
       </Panel>
       <Panel title="Record a review" meta="The review covers the events listed above with the current filters. It is complete only with your signature (meaning: review).">
