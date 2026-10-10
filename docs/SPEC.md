@@ -490,6 +490,28 @@ La demo non deve essere validata, ma deve essere costruita in modo che la valida
 | CMP-08 | GDPR / HIPAA | Pseudonimizzazione nel core, minimizzazione, registro dei trattamenti, DPA con fornitori, residenza dei dati per regione |
 | CMP-09 | EU AI Act | Valutazione d'uso per ogni agente; trasparenza verso l'utente quando un contenuto è generato dall'AI |
 
+**Aggiornamento 2026-10-10 (GCP by design, decisioni di Luca).** L'analisi completa delle norme USA, UE e Giappone e la
+gap analysis sono in `docs/compliance/GCP_BY_DESIGN.md`; le clausole normative sono in `docs/compliance/crosswalk.json`
+e ogni requisito di `docs/requirements.json` dichiara impatto GxP, rischio, tipo di test e clausole coperte. Si
+aggiungono ai riferimenti sopra: Q&A FDA ott 2024 sui sistemi elettronici nelle sperimentazioni, guideline EMA 2023 sui
+sistemi computerizzati negli studi clinici, Reg. (UE) 536/2014 art. 57–58 (TMF, 25 anni), ICH E6(R3) Annex 2, per il
+Giappone J-GCP, linee guida ERES (2005) e CSV (2010), APPI. Il Giappone è nel perimetro da subito (regione dati e
+localizzazione). Nuovi requisiti:
+
+| ID | Release | Requisito tecnico |
+| --- | --- | --- |
+| CMP-10 | gxp-p0 | Consultazione dell'audit trail per QA/ispettori: filtri, export PDF/CSV leggibile, revisioni registrate e firmate |
+| CMP-11 | gxp-p0 | Manifestazione della firma (nome, data/ora UTC, significato, motivo) su schermo, stampa ed export |
+| CMP-15 | gxp-p0 | Ogni tabella del core è auditata o in un elenco di eccezioni motivate, verificato da test |
+| VAL-05 | gxp-p0 | Requisiti con profilo di conformità e matrici di conformità per norma generate in CI |
+| CMP-12 | v1 | Sigillo Ed25519 dei blocchi di audit ancorato fuori dal database, DDL registrati, ruoli DB separati |
+| CMP-13 | v1 | Accessi in lettura ai dati non in cieco ed export registrati |
+| CMP-14 | v1 | Copie certificate di un record o di un intero trial in formato aperto |
+
+CMP-03, CMP-09, IAM-01 e NFR-04 passano alla release `gxp-p0` (in parallelo alla demo); NFR-06 include la regione
+Giappone; NFR-07 include il giapponese per le pagine rivolte a siti e soggetti. Hosting della prima release GxP:
+Supabase (decisione del 2026-10-10), da qualificare come fornitore.
+
 **Pacchetto di validazione per release (generato dalla pipeline)**
 
 1. Specifica dei requisiti con ID (questo documento è la versione 0).

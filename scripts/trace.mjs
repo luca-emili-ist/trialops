@@ -33,6 +33,42 @@ for (const r of req.requirements) {
   md += `| ${r.id} | ${r.release} | ${r.text} | ${t.map(x => x.file).filter((v, i, a) => a.indexOf(v) === i).join(', ') || '—'} (${t.length}) | ${res} |\n`;
 }
 writeFileSync(join(root, 'docs/traceability.md'), md);
+
+// Compliance fields (VAL-05): every requirement declares GxP impact, risk, assurance and the regulatory clauses it serves.
+const cw = JSON.parse(readFileSync(join(root, 'docs/compliance/crosswalk.json'), 'utf8'));
+const codes = new Map(cw.clauses.map(c => [c.code, c]));
+const errors = [];
+const enums = { gxp_impact: ['direct', 'indirect', 'none'], risk: ['high', 'medium', 'low'], assurance: ['scripted', 'automated', 'unscripted'] };
+for (const r of req.requirements) {
+  for (const [k, allowed] of Object.entries(enums)) if (!allowed.includes(r[k])) errors.push(`${r.id}: ${k} must be one of ${allowed.join('/')}`);
+  if (!Array.isArray(r.regs)) { errors.push(`${r.id}: regs missing`); continue; }
+  for (const c of r.regs) if (!codes.has(c)) errors.push(`${r.id}: unknown regulatory clause ${c}`);
+  if (r.gxp_impact === 'direct' && !r.regs.length) errors.push(`${r.id}: direct GxP impact without regulatory references`);
+  if (r.risk === 'high' && r.assurance !== 'scripted') errors.push(`${r.id}: high risk requires scripted assurance (CSA)`);
+}
+const status = {};
+for (const r of req.requirements) {
+  const t = tests.filter(x => x.reqs.includes(r.id));
+  status[r.id + '|' + r.release] = !t.length ? 'NO TEST' : t.every(x => x.result === 'PASS') ? 'PASS' : t.some(x => x.result === 'FAIL') ? 'FAIL' : 'NOT RUN';
+}
+let cm = `# Compliance matrix\n\nGenerated ${new Date().toISOString()} by scripts/trace.mjs from docs/compliance/crosswalk.json and docs/requirements.json.\n`;
+cm += 'Technical clauses are covered by requirements and their tests; procedural clauses are covered by SOPs of the quality system.\n';
+let gaps = 0;
+for (const [fw, title] of Object.entries(cw.frameworks)) {
+  cm += `\n## ${fw} — ${title}\n\n| Clause | Ref | Title | Control | Requirements (release: result) | Status |\n| --- | --- | --- | --- | --- | --- |\n`;
+  for (const c of cw.clauses.filter(x => x.framework === fw)) {
+    const rs = req.requirements.filter(r => r.regs?.includes(c.code));
+    const cells = rs.map(r => `${r.id} (${r.release}: ${status[r.id + '|' + r.release]})`).join(', ');
+    const st = c.control === 'procedural' ? 'SOP' : !rs.length ? 'GAP — no requirement' : rs.every(r => status[r.id + '|' + r.release] === 'PASS') ? 'covered'
+      : rs.some(r => status[r.id + '|' + r.release] === 'PASS') ? 'partial' : 'planned';
+    if (st.startsWith('GAP')) gaps++;
+    cm += `| ${c.code} | ${c.ref} | ${c.title} | ${c.control} | ${cells || '—'} | ${st} |\n`;
+  }
+}
+writeFileSync(join(root, 'docs/compliance/compliance-matrix.md'), cm);
+console.log(`compliance: ${cw.clauses.length} clauses, ${gaps} technical gaps without requirement, ${errors.length} requirement errors`);
+for (const e of errors) console.error('  ' + e);
+if (errors.length) process.exitCode = 1;
 const total = {};
 for (const r of req.requirements) total[r.release] = (total[r.release] || 0) + 1;
 const progress = Object.keys(total).map(k => `${k} ${passing[k] || 0}/${total[k]}`).join(', ');

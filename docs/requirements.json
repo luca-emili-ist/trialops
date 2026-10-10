@@ -1,310 +1,1154 @@
 {
- "source": "Specifiche di sviluppo \u2014 Piattaforma TA3 Clinical Operations, 2026-10-06",
+ "source": "Specifiche di sviluppo — Piattaforma TA3 Clinical Operations, 2026-10-06; compliance fields per docs/compliance/GCP_BY_DESIGN.md, 2026-10-10",
  "requirements": [
   {
    "id": "CMP-01",
    "release": "foundations",
-   "text": "Append-only, hash-chained audit trail; tampering detectable"
+   "text": "Append-only, hash-chained audit trail; tampering detectable",
+   "gxp_impact": "direct",
+   "risk": "high",
+   "assurance": "scripted",
+   "regs": [
+    "P11-10e",
+    "A11-9",
+    "EMA-CS-AUDIT",
+    "JP-ERES-AUTH",
+    "HIPAA-312",
+    "FDA-ESQA-AUDIT",
+    "E6R3-COMPSYS"
+   ]
   },
   {
    "id": "CMP-02",
    "release": "foundations",
-   "text": "Part 11 e-signatures: immutable, linked to signed version"
+   "text": "Part 11 e-signatures: immutable, linked to signed version",
+   "gxp_impact": "direct",
+   "risk": "high",
+   "assurance": "scripted",
+   "regs": [
+    "P11-70",
+    "P11-100a",
+    "A11-14",
+    "EMA-CS-SIGNOFF",
+    "JP-ERES-ESIG"
+   ]
   },
   {
    "id": "CMP-04",
    "release": "foundations",
-   "text": "ALCOA+: who/when/old/new/reason captured on every GxP change"
+   "text": "ALCOA+: who/when/old/new/reason captured on every GxP change",
+   "gxp_impact": "direct",
+   "risk": "high",
+   "assurance": "scripted",
+   "regs": [
+    "EMA-CS-ALCOA",
+    "P11-10e",
+    "A11-9",
+    "E6R3-DATALIFECYCLE"
+   ]
   },
   {
    "id": "DM-01",
    "release": "foundations",
-   "text": "Every clinical entity carries platform_id (+ arm_id, site_id)"
+   "text": "Every clinical entity carries platform_id (+ arm_id, site_id)",
+   "gxp_impact": "direct",
+   "risk": "medium",
+   "assurance": "automated",
+   "regs": [
+    "E6R3-DATALIFECYCLE",
+    "EMA-CS-ALCOA"
+   ]
   },
   {
    "id": "DM-02",
    "release": "foundations",
-   "text": "Approved controlled versions are immutable; approval needs signature"
+   "text": "Approved controlled versions are immutable; approval needs signature",
+   "gxp_impact": "direct",
+   "risk": "high",
+   "assurance": "scripted",
+   "regs": [
+    "P11-10f",
+    "P11-70",
+    "A11-14",
+    "JP-ERES-AUTH"
+   ]
   },
   {
    "id": "DM-03",
    "release": "foundations",
-   "text": "Change reason mandatory on GxP updates; no physical delete"
+   "text": "Change reason mandatory on GxP updates; no physical delete",
+   "gxp_impact": "direct",
+   "risk": "high",
+   "assurance": "scripted",
+   "regs": [
+    "P11-10e",
+    "A11-9",
+    "EMA-CS-AUDIT",
+    "JP-ERES-AUTH"
+   ]
   },
   {
    "id": "DM-05",
    "release": "foundations",
-   "text": "Deterministic synthetic demo seed; no real data"
+   "text": "Deterministic synthetic demo seed; no real data",
+   "gxp_impact": "indirect",
+   "risk": "medium",
+   "assurance": "automated",
+   "regs": [
+    "GDPR-25",
+    "APPI-SENSITIVE"
+   ]
   },
   {
    "id": "IAM-02",
    "release": "foundations",
-   "text": "RLS driven by JWT claims platform_ids / arm_scopes / site_scopes"
+   "text": "RLS driven by JWT claims platform_ids / arm_scopes / site_scopes",
+   "gxp_impact": "direct",
+   "risk": "high",
+   "assurance": "scripted",
+   "regs": [
+    "P11-10d",
+    "P11-10g",
+    "A11-12",
+    "EMA-CS-USERMGMT",
+    "HIPAA-312",
+    "E6R3-COMPSYS"
+   ]
   },
   {
    "id": "IAM-03",
    "release": "foundations",
-   "text": "Sponsors see and write only their own arm"
+   "text": "Sponsors see and write only their own arm",
+   "gxp_impact": "direct",
+   "risk": "high",
+   "assurance": "scripted",
+   "regs": [
+    "P11-10g",
+    "A11-12",
+    "GDPR-25",
+    "E6R3-BLINDING"
+   ]
   },
   {
    "id": "IAM-04",
    "release": "foundations",
-   "text": "Unblinded data only in sac_enclave for the unblinded role"
+   "text": "Unblinded data only in sac_enclave for the unblinded role",
+   "gxp_impact": "direct",
+   "risk": "high",
+   "assurance": "scripted",
+   "regs": [
+    "E6R3-BLINDING",
+    "EMA-CS-IRT",
+    "P11-10g"
+   ]
   },
   {
    "id": "IAM-05",
    "release": "foundations",
-   "text": "Separation of duties: the author of a GxP document or change cannot approve it"
+   "text": "Separation of duties: the author of a GxP document or change cannot approve it",
+   "gxp_impact": "direct",
+   "risk": "high",
+   "assurance": "scripted",
+   "regs": [
+    "P11-10g",
+    "P11-10f",
+    "A11-12"
+   ]
   },
   {
    "id": "IAM-07",
    "release": "foundations",
-   "text": "Agents are never unblinded"
+   "text": "Agents are never unblinded",
+   "gxp_impact": "direct",
+   "risk": "high",
+   "assurance": "scripted",
+   "regs": [
+    "E6R3-BLINDING",
+    "FDA-AI-HUMAN"
+   ]
   },
   {
    "id": "AI-05",
    "release": "foundations",
-   "text": "GxP AI output is a proposal until a person signs"
+   "text": "GxP AI output is a proposal until a person signs",
+   "gxp_impact": "direct",
+   "risk": "high",
+   "assurance": "scripted",
+   "regs": [
+    "FDA-AI-HUMAN",
+    "P11-10f",
+    "AIACT-50"
+   ]
   },
   {
    "id": "AI-06",
    "release": "foundations",
-   "text": "AI ledger with model version and input hash"
+   "text": "AI ledger with model version and input hash",
+   "gxp_impact": "direct",
+   "risk": "medium",
+   "assurance": "automated",
+   "regs": [
+    "FDA-AI-LIFECYCLE",
+    "P11-10e",
+    "EMA-CS-ALCOA"
+   ]
   },
   {
    "id": "AI-11",
    "release": "foundations",
-   "text": "AI never sees unblinded data outside the SAC enclave"
+   "text": "AI never sees unblinded data outside the SAC enclave",
+   "gxp_impact": "direct",
+   "risk": "high",
+   "assurance": "scripted",
+   "regs": [
+    "E6R3-BLINDING",
+    "FDA-AI-HUMAN"
+   ]
   },
   {
    "id": "APP-MF-01",
    "release": "foundations",
-   "text": "App manifest validated against published JSON Schema"
+   "text": "App manifest validated against published JSON Schema",
+   "gxp_impact": "indirect",
+   "risk": "medium",
+   "assurance": "automated",
+   "regs": [
+    "A11-5",
+    "E6R3-SERVICEPROVIDER"
+   ]
   },
   {
    "id": "APP-MF-02",
    "release": "foundations",
-   "text": "App activation requires approval; scopes granted on approval"
+   "text": "App activation requires approval; scopes granted on approval",
+   "gxp_impact": "direct",
+   "risk": "medium",
+   "assurance": "automated",
+   "regs": [
+    "P11-10g",
+    "A11-12",
+    "E6R3-SERVICEPROVIDER"
+   ]
   },
   {
    "id": "APP-MF-04",
    "release": "foundations",
-   "text": "Uninstall revokes scopes"
+   "text": "Uninstall revokes scopes",
+   "gxp_impact": "direct",
+   "risk": "medium",
+   "assurance": "automated",
+   "regs": [
+    "P11-10d",
+    "A11-12"
+   ]
   },
   {
    "id": "APP-TK-02",
    "release": "foundations",
-   "text": "Task state machine with logged transitions"
+   "text": "Task state machine with logged transitions",
+   "gxp_impact": "direct",
+   "risk": "medium",
+   "assurance": "automated",
+   "regs": [
+    "P11-10f",
+    "P11-10e"
+   ]
   },
   {
    "id": "APP-TK-04",
    "release": "foundations",
-   "text": "GxP tasks by agents/apps pass waiting_review + signature"
+   "text": "GxP tasks by agents/apps pass waiting_review + signature",
+   "gxp_impact": "direct",
+   "risk": "high",
+   "assurance": "scripted",
+   "regs": [
+    "P11-10f",
+    "FDA-AI-HUMAN",
+    "EMA-CS-SIGNOFF"
+   ]
   },
   {
    "id": "APP-DT-04",
    "release": "foundations",
-   "text": "Domain events in CloudEvents 1.0 via outbox"
+   "text": "Domain events in CloudEvents 1.0 via outbox",
+   "gxp_impact": "indirect",
+   "risk": "low",
+   "assurance": "automated",
+   "regs": [
+    "A11-5"
+   ]
   },
   {
    "id": "M01-04",
    "release": "foundations",
-   "text": "Arm lifecycle with allowed transitions and events"
+   "text": "Arm lifecycle with allowed transitions and events",
+   "gxp_impact": "direct",
+   "risk": "medium",
+   "assurance": "automated",
+   "regs": [
+    "P11-10f",
+    "E6R3-DATALIFECYCLE"
+   ]
   },
   {
    "id": "M05-02",
    "release": "foundations",
-   "text": "Enrollment funnel per site (blinded)"
+   "text": "Enrollment funnel per site (blinded)",
+   "gxp_impact": "direct",
+   "risk": "medium",
+   "assurance": "automated",
+   "regs": [
+    "E6R3-BLINDING",
+    "E6R3-RBQM"
+   ]
   },
   {
    "id": "M07-01",
    "release": "foundations",
-   "text": "SAE expedited reporting clock"
+   "text": "SAE expedited reporting clock",
+   "gxp_impact": "direct",
+   "risk": "high",
+   "assurance": "scripted",
+   "regs": [
+    "E6R3-SAFETY",
+    "P11-10f"
+   ]
   },
   {
    "id": "M11-01",
    "release": "foundations",
-   "text": "SURPASS TA3 metric catalogue with targets"
+   "text": "SURPASS TA3 metric catalogue with targets",
+   "gxp_impact": "none",
+   "risk": "low",
+   "assurance": "unscripted",
+   "regs": []
   },
   {
    "id": "M11-02",
    "release": "foundations",
-   "text": "Arm onboarding metrics computed from records"
+   "text": "Arm onboarding metrics computed from records",
+   "gxp_impact": "indirect",
+   "risk": "low",
+   "assurance": "automated",
+   "regs": [
+    "E6R3-RBQM"
+   ]
   },
   {
    "id": "APP-ID-01",
    "release": "v0",
-   "text": "OIDC SSO via identity broker"
+   "text": "OIDC SSO via identity broker",
+   "gxp_impact": "direct",
+   "risk": "high",
+   "assurance": "scripted",
+   "regs": [
+    "P11-10d",
+    "P11-300",
+    "A11-12",
+    "EMA-CS-USERMGMT"
+   ]
   },
   {
    "id": "APP-ID-02",
    "release": "v0",
-   "text": "Access token carries sub, email, org_id and TrialOps claims platform_ids, arm_scopes, roles, blinding"
+   "text": "Access token carries sub, email, org_id and TrialOps claims platform_ids, arm_scopes, roles, blinding",
+   "gxp_impact": "direct",
+   "risk": "high",
+   "assurance": "scripted",
+   "regs": [
+    "P11-10g",
+    "E6R3-BLINDING",
+    "A11-12"
+   ]
   },
   {
    "id": "APP-ID-02",
    "release": "foundations",
-   "text": "TrialOps claims (platform/arm/site scopes, blinding) added to the Supabase token"
+   "text": "TrialOps claims (platform/arm/site scopes, blinding) added to the Supabase token",
+   "gxp_impact": "direct",
+   "risk": "high",
+   "assurance": "scripted",
+   "regs": [
+    "P11-10g",
+    "E6R3-BLINDING",
+    "A11-12"
+   ]
   },
   {
    "id": "AI-01",
    "release": "v0",
-   "text": "All AI calls through POST /api/ai/tasks"
+   "text": "All AI calls through POST /api/ai/tasks",
+   "gxp_impact": "direct",
+   "risk": "medium",
+   "assurance": "automated",
+   "regs": [
+    "FDA-AI-LIFECYCLE",
+    "GDPR-32",
+    "HIPAA-312"
+   ]
   },
   {
    "id": "M01-01",
    "release": "v0",
-   "text": "Structured Master Protocol / appendix editor"
+   "text": "Structured Master Protocol / appendix editor",
+   "gxp_impact": "direct",
+   "risk": "medium",
+   "assurance": "scripted",
+   "regs": [
+    "P11-10f",
+    "E6R3-RECORDS"
+   ]
   },
   {
    "id": "M01-02",
    "release": "v0",
-   "text": "New-arm wizard with AI-drafted appendix and task plan"
+   "text": "New-arm wizard with AI-drafted appendix and task plan",
+   "gxp_impact": "direct",
+   "risk": "medium",
+   "assurance": "scripted",
+   "regs": [
+    "FDA-AI-HUMAN",
+    "AIACT-50"
+   ]
   },
   {
    "id": "M02-01",
    "release": "v0",
-   "text": "Site registry"
+   "text": "Site registry",
+   "gxp_impact": "direct",
+   "risk": "low",
+   "assurance": "automated",
+   "regs": [
+    "E6R3-RECORDS"
+   ]
   },
   {
    "id": "M02-03",
    "release": "v0",
-   "text": "Per-arm site activation workflow"
+   "text": "Per-arm site activation workflow",
+   "gxp_impact": "direct",
+   "risk": "medium",
+   "assurance": "automated",
+   "regs": [
+    "P11-10f",
+    "E6R3-RECORDS"
+   ]
   },
   {
    "id": "APP-TK-01",
    "release": "v1",
-   "text": "Task model and inbox"
+   "text": "Task model and inbox",
+   "gxp_impact": "indirect",
+   "risk": "low",
+   "assurance": "unscripted",
+   "regs": []
   },
   {
    "id": "APP-TK-03",
    "release": "v1",
-   "text": "Apps claim and close tasks via API"
+   "text": "Apps claim and close tasks via API",
+   "gxp_impact": "direct",
+   "risk": "medium",
+   "assurance": "automated",
+   "regs": [
+    "P11-10g",
+    "A11-5"
+   ]
   },
   {
    "id": "AI-07",
    "release": "v1",
-   "text": "Tool registry AUTO/CONFIRM/BLOCK"
+   "text": "Tool registry AUTO/CONFIRM/BLOCK",
+   "gxp_impact": "direct",
+   "risk": "high",
+   "assurance": "scripted",
+   "regs": [
+    "FDA-AI-HUMAN",
+    "P11-10g"
+   ]
   },
   {
    "id": "AI-08",
    "release": "v1",
-   "text": "Internal policy engine with signed decision records"
+   "text": "Internal policy engine with signed decision records",
+   "gxp_impact": "direct",
+   "risk": "high",
+   "assurance": "scripted",
+   "regs": [
+    "FDA-AI-HUMAN",
+    "P11-10e"
+   ]
   },
   {
    "id": "M03-01",
    "release": "v1",
-   "text": "Arm addendum generation"
+   "text": "Arm addendum generation",
+   "gxp_impact": "indirect",
+   "risk": "low",
+   "assurance": "unscripted",
+   "regs": []
   },
   {
    "id": "M04-02",
    "release": "v1",
-   "text": "IRB package assembly"
+   "text": "IRB package assembly",
+   "gxp_impact": "direct",
+   "risk": "medium",
+   "assurance": "scripted",
+   "regs": [
+    "E6R3-RECORDS",
+    "FDA-AI-HUMAN"
+   ]
   },
   {
    "id": "M05-01",
    "release": "v1",
-   "text": "AI-assisted pre-screening"
+   "text": "AI-assisted pre-screening",
+   "gxp_impact": "direct",
+   "risk": "high",
+   "assurance": "scripted",
+   "regs": [
+    "FDA-AI-COU",
+    "FDA-AI-HUMAN",
+    "GDPR-25",
+    "APPI-SENSITIVE"
+   ]
   },
   {
    "id": "M08-02",
    "release": "v1",
-   "text": "Agent-proposed deviations"
+   "text": "Agent-proposed deviations",
+   "gxp_impact": "direct",
+   "risk": "high",
+   "assurance": "scripted",
+   "regs": [
+    "E6R3-RBQM",
+    "FDA-AI-HUMAN"
+   ]
   },
   {
    "id": "M09-02",
    "release": "v1",
-   "text": "AI-assisted TMF filing"
+   "text": "AI-assisted TMF filing",
+   "gxp_impact": "direct",
+   "risk": "medium",
+   "assurance": "scripted",
+   "regs": [
+    "CTR-57",
+    "E6R3-RECORDS",
+    "FDA-AI-HUMAN"
+   ]
   },
   {
    "id": "FIN-03",
    "release": "v1",
-   "text": "Shared-cost allocation keys"
+   "text": "Shared-cost allocation keys",
+   "gxp_impact": "none",
+   "risk": "low",
+   "assurance": "unscripted",
+   "regs": []
   },
   {
    "id": "FIN-07",
    "release": "v1",
-   "text": "Sponsor runway linked to enrollment forecast"
+   "text": "Sponsor runway linked to enrollment forecast",
+   "gxp_impact": "none",
+   "risk": "low",
+   "assurance": "unscripted",
+   "regs": []
   },
   {
    "id": "APP-DT-01",
    "release": "v2",
-   "text": "Versioned REST API in OpenAPI 3.1"
+   "text": "Versioned REST API in OpenAPI 3.1",
+   "gxp_impact": "indirect",
+   "risk": "low",
+   "assurance": "automated",
+   "regs": [
+    "A11-5"
+   ]
   },
   {
    "id": "APP-AU-01",
    "release": "v2",
-   "text": "Apps push audit events to the core"
+   "text": "Apps push audit events to the core",
+   "gxp_impact": "direct",
+   "risk": "high",
+   "assurance": "scripted",
+   "regs": [
+    "P11-10e",
+    "A11-9",
+    "EMA-CS-AUDIT"
+   ]
   },
   {
    "id": "FIN-09",
    "release": "v2",
-   "text": "Cost per arm vs CRO quotes"
+   "text": "Cost per arm vs CRO quotes",
+   "gxp_impact": "none",
+   "risk": "low",
+   "assurance": "unscripted",
+   "regs": []
   },
   {
    "id": "DEMO-01",
    "release": "v2",
-   "text": "One-command demo reset"
+   "text": "One-command demo reset",
+   "gxp_impact": "none",
+   "risk": "low",
+   "assurance": "unscripted",
+   "regs": []
   },
   {
    "id": "EDC-01",
    "release": "v1",
-   "text": "Versioned CRF library linked to protocol visits"
+   "text": "Versioned CRF library linked to protocol visits",
+   "gxp_impact": "direct",
+   "risk": "medium",
+   "assurance": "scripted",
+   "regs": [
+    "CDISC-SUB",
+    "A11-4",
+    "E6R3-DATALIFECYCLE"
+   ]
   },
   {
    "id": "EDC-03",
    "release": "v1",
-   "text": "Site data entry"
+   "text": "Site data entry",
+   "gxp_impact": "direct",
+   "risk": "high",
+   "assurance": "scripted",
+   "regs": [
+    "EMA-CS-ALCOA",
+    "EMA-CS-INVCONTROL",
+    "P11-10h"
+   ]
   },
   {
    "id": "EDC-04",
    "release": "v1",
-   "text": "Declarative edit checks"
+   "text": "Declarative edit checks",
+   "gxp_impact": "direct",
+   "risk": "high",
+   "assurance": "scripted",
+   "regs": [
+    "A11-6",
+    "P11-10f"
+   ]
   },
   {
    "id": "EDC-05",
    "release": "v1",
-   "text": "Query workflow"
+   "text": "Query workflow",
+   "gxp_impact": "direct",
+   "risk": "medium",
+   "assurance": "scripted",
+   "regs": [
+    "EMA-CS-ALCOA",
+    "P11-10e"
+   ]
   },
   {
    "id": "EDC-11",
    "release": "v1",
-   "text": "No arm data in blinded eCRF"
+   "text": "No arm data in blinded eCRF",
+   "gxp_impact": "direct",
+   "risk": "high",
+   "assurance": "scripted",
+   "regs": [
+    "E6R3-BLINDING"
+   ]
   },
   {
    "id": "EDC-12",
    "release": "v1",
-   "text": "visit.completed event and data-collection metric"
+   "text": "visit.completed event and data-collection metric",
+   "gxp_impact": "indirect",
+   "risk": "low",
+   "assurance": "automated",
+   "regs": [
+    "E6R3-RBQM"
+   ]
   },
   {
    "id": "EDC-02",
    "release": "v2",
-   "text": "eCRF versions per arm/stage"
+   "text": "eCRF versions per arm/stage",
+   "gxp_impact": "direct",
+   "risk": "medium",
+   "assurance": "scripted",
+   "regs": [
+    "A11-4",
+    "E6R3-DATALIFECYCLE"
+   ]
   },
   {
    "id": "EDC-06",
    "release": "v2",
-   "text": "SDV and reviews"
+   "text": "SDV and reviews",
+   "gxp_impact": "direct",
+   "risk": "medium",
+   "assurance": "scripted",
+   "regs": [
+    "E6R3-RBQM",
+    "EMA-CS-SIGNOFF"
+   ]
   },
   {
    "id": "EDC-07",
    "release": "v2",
-   "text": "PI signature"
+   "text": "PI signature",
+   "gxp_impact": "direct",
+   "risk": "high",
+   "assurance": "scripted",
+   "regs": [
+    "EMA-CS-SIGNOFF",
+    "P11-50",
+    "P11-70",
+    "JP-ERES-ESIG"
+   ]
   },
   {
    "id": "EDC-08",
    "release": "v2",
-   "text": "Locks and data freeze"
+   "text": "Locks and data freeze",
+   "gxp_impact": "direct",
+   "risk": "high",
+   "assurance": "scripted",
+   "regs": [
+    "E6R3-DATALIFECYCLE",
+    "P11-10f"
+   ]
   },
   {
    "id": "DEMO-04",
    "release": "v0",
-   "text": "Visible 'synthetic data - demonstration environment' label and page code on every page"
+   "text": "Visible 'synthetic data - demonstration environment' label and page code on every page",
+   "gxp_impact": "indirect",
+   "risk": "low",
+   "assurance": "automated",
+   "regs": [
+    "GDPR-25"
+   ]
   },
   {
    "id": "AI-09",
    "release": "v1",
-   "text": "Per-job limits (max_steps, max_tokens, max_cost, max_execution_time); an overrun stops the job and creates a task for a person"
+   "text": "Per-job limits (max_steps, max_tokens, max_cost, max_execution_time); an overrun stops the job and creates a task for a person",
+   "gxp_impact": "direct",
+   "risk": "medium",
+   "assurance": "scripted",
+   "regs": [
+    "FDA-AI-HUMAN",
+    "FDA-AI-LIFECYCLE"
+   ]
+  },
+  {
+   "id": "IAM-01",
+   "release": "gxp-p0",
+   "text": "MFA mandatory for every role with GxP impact (TOTP or passkey); signing with MFA step-up",
+   "gxp_impact": "direct",
+   "risk": "high",
+   "assurance": "scripted",
+   "regs": [
+    "P11-10d",
+    "P11-200a",
+    "P11-300",
+    "A11-12",
+    "EMA-CS-USERMGMT",
+    "EMA-CS-SECURITY",
+    "HIPAA-312"
+   ]
+  },
+  {
+   "id": "CMP-03",
+   "release": "gxp-p0",
+   "text": "Session idle timeout and account lockout after repeated failed logins or signing attempts, both recorded in the audit trail",
+   "gxp_impact": "direct",
+   "risk": "high",
+   "assurance": "scripted",
+   "regs": [
+    "P11-10d",
+    "P11-300",
+    "A11-12",
+    "EMA-CS-SECURITY",
+    "HIPAA-312"
+   ]
+  },
+  {
+   "id": "CMP-10",
+   "release": "gxp-p0",
+   "text": "Audit trail review for QA/inspector roles: filter by record, user and period; readable PDF/CSV export; reviews recorded and signed",
+   "gxp_impact": "direct",
+   "risk": "high",
+   "assurance": "scripted",
+   "regs": [
+    "P11-10b",
+    "P11-10e",
+    "A11-9",
+    "EMA-CS-AUDITREVIEW",
+    "FDA-ESQA-AUDIT",
+    "JP-ERES-LEGIB"
+   ]
+  },
+  {
+   "id": "CMP-11",
+   "release": "gxp-p0",
+   "text": "Signature manifestation (printed name, UTC date/time, meaning, reason) on screen, print and export; reason stored on the signature record",
+   "gxp_impact": "direct",
+   "risk": "high",
+   "assurance": "scripted",
+   "regs": [
+    "P11-50",
+    "A11-14",
+    "A11-8",
+    "JP-ERES-ESIG",
+    "EMA-CS-SIGNOFF"
+   ]
+  },
+  {
+   "id": "CMP-15",
+   "release": "gxp-p0",
+   "text": "Every table in the core schema is audited (attach_std) or listed in a justified exception list; checked by a test",
+   "gxp_impact": "direct",
+   "risk": "high",
+   "assurance": "scripted",
+   "regs": [
+    "P11-10e",
+    "A11-9",
+    "EMA-CS-AUDIT"
+   ]
+  },
+  {
+   "id": "CMP-09",
+   "release": "gxp-p0",
+   "text": "AI-generated content carries a persistent marker (agent, ai_request, reviewer) wherever it is shown or exported; users are told when content is AI-generated",
+   "gxp_impact": "direct",
+   "risk": "medium",
+   "assurance": "scripted",
+   "regs": [
+    "AIACT-50",
+    "FDA-AI-HUMAN",
+    "EMA-CS-ALCOA"
+   ]
+  },
+  {
+   "id": "NFR-04",
+   "release": "gxp-p0",
+   "text": "Backups with point-in-time recovery, documented quarterly restore test, retention policy per platform (default 25 years) and archive readable for the whole period",
+   "gxp_impact": "direct",
+   "risk": "high",
+   "assurance": "scripted",
+   "regs": [
+    "A11-7",
+    "A11-17",
+    "P11-10c",
+    "EMA-CS-BACKUP",
+    "EMA-CS-ARCHIVE",
+    "CTR-58",
+    "JP-ERES-PRESERV",
+    "JP-GCP-RECORDS",
+    "FDA-ESQA-RETAIN",
+    "E6R3-COMPSYS"
+   ]
+  },
+  {
+   "id": "CMP-12",
+   "release": "v1",
+   "text": "Audit ledger sealed in blocks with Ed25519 and anchored outside the database; DDL on audited objects recorded; database admin roles segregated",
+   "gxp_impact": "direct",
+   "risk": "high",
+   "assurance": "scripted",
+   "regs": [
+    "P11-10e",
+    "A11-9",
+    "JP-ERES-AUTH"
+   ]
+  },
+  {
+   "id": "CMP-13",
+   "release": "v1",
+   "text": "Read access to unblinded data (sac_enclave) and every export recorded and reportable",
+   "gxp_impact": "direct",
+   "risk": "high",
+   "assurance": "scripted",
+   "regs": [
+    "E6R3-BLINDING",
+    "EMA-CS-IRT",
+    "HIPAA-312"
+   ]
+  },
+  {
+   "id": "CMP-14",
+   "release": "v1",
+   "text": "Certified copies: export of a record or a whole trial (data, audit trail, signatures, hashes) in an open, human-readable format",
+   "gxp_impact": "direct",
+   "risk": "high",
+   "assurance": "scripted",
+   "regs": [
+    "P11-10b",
+    "EMA-CS-CERTCOPY",
+    "A11-8",
+    "CTR-57",
+    "JP-ERES-LEGIB"
+   ]
+  },
+  {
+   "id": "CMP-05",
+   "release": "v1",
+   "text": "ICH E6(R3) data governance: critical-to-quality factors, RBQM, reconstructability of every decision and adaptation, service provider oversight",
+   "gxp_impact": "direct",
+   "risk": "medium",
+   "assurance": "scripted",
+   "regs": [
+    "E6R3-RBQM",
+    "E6R3-DATALIFECYCLE",
+    "E6R3-SERVICEPROVIDER"
+   ]
+  },
+  {
+   "id": "CMP-06",
+   "release": "v1",
+   "text": "Each GxP AI task type has a context of use, risk, credibility plan, test results and monitoring (docs/ai/<task_type>.md)",
+   "gxp_impact": "direct",
+   "risk": "high",
+   "assurance": "scripted",
+   "regs": [
+    "FDA-AI-COU",
+    "FDA-AI-CRED"
+   ]
+  },
+  {
+   "id": "CMP-07",
+   "release": "v1",
+   "text": "AI test data independent from development, pre-specified metrics, explainability through cited sources, model change control",
+   "gxp_impact": "direct",
+   "risk": "medium",
+   "assurance": "scripted",
+   "regs": [
+    "FDA-AI-CRED",
+    "FDA-AI-LIFECYCLE"
+   ]
+  },
+  {
+   "id": "CMP-08",
+   "release": "v1",
+   "text": "Privacy by design across GDPR, HIPAA and APPI: pseudonymisation in the core, minimisation, record of processing, DPA/BAA with every provider, data residency per region",
+   "gxp_impact": "direct",
+   "risk": "high",
+   "assurance": "scripted",
+   "regs": [
+    "GDPR-25",
+    "GDPR-32",
+    "GDPR-44",
+    "HIPAA-312",
+    "APPI-SENSITIVE",
+    "APPI-TRANSFER"
+   ]
+  },
+  {
+   "id": "AI-02",
+   "release": "v1",
+   "text": "Every GxP task type registered with intended use, risk, exact approved model and version, versioned prompt, validator, thresholds, test dataset",
+   "gxp_impact": "direct",
+   "risk": "high",
+   "assurance": "scripted",
+   "regs": [
+    "FDA-AI-COU",
+    "FDA-AI-CRED"
+   ]
+  },
+  {
+   "id": "AI-03",
+   "release": "v1",
+   "text": "GxP task types pinned to a dated model snapshot; a model change is a change request with regression on the test dataset",
+   "gxp_impact": "direct",
+   "risk": "high",
+   "assurance": "scripted",
+   "regs": [
+    "FDA-AI-LIFECYCLE",
+    "A11-4"
+   ]
+  },
+  {
+   "id": "AI-04",
+   "release": "v1",
+   "text": "Fixed generation parameters, JSON Schema output, mandatory source citation for extraction and classification",
+   "gxp_impact": "direct",
+   "risk": "medium",
+   "assurance": "scripted",
+   "regs": [
+    "FDA-AI-CRED",
+    "EMA-CS-ALCOA"
+   ]
+  },
+  {
+   "id": "AI-10",
+   "release": "v1",
+   "text": "Continuous monitoring per task type (accuracy on reviewed samples, drift, rejection rate); below threshold the task type falls back to suggestion-only",
+   "gxp_impact": "direct",
+   "risk": "medium",
+   "assurance": "scripted",
+   "regs": [
+    "FDA-AI-LIFECYCLE"
+   ]
+  },
+  {
+   "id": "APP-DT-02",
+   "release": "v1",
+   "text": "Writes require Idempotency-Key; optimistic concurrency with If-Match on the version",
+   "gxp_impact": "direct",
+   "risk": "medium",
+   "assurance": "automated",
+   "regs": [
+    "EMA-CS-ALCOA",
+    "A11-5"
+   ]
+  },
+  {
+   "id": "APP-DT-05",
+   "release": "v1",
+   "text": "Provenance on every app-written datum: source_app, source_record_id, source_version, transformation_id",
+   "gxp_impact": "direct",
+   "risk": "medium",
+   "assurance": "automated",
+   "regs": [
+    "EMA-CS-ALCOA",
+    "E6R3-DATALIFECYCLE",
+    "P11-10h"
+   ]
+  },
+  {
+   "id": "NFR-05",
+   "release": "v1",
+   "text": "TLS 1.2+, encryption at rest, server-side secrets, SAST, dependency scanning and SBOM in CI; penetration test before production",
+   "gxp_impact": "direct",
+   "risk": "medium",
+   "assurance": "automated",
+   "regs": [
+    "P11-30",
+    "EMA-CS-SECURITY",
+    "GDPR-32",
+    "HIPAA-312"
+   ]
+  },
+  {
+   "id": "NFR-06",
+   "release": "v1",
+   "text": "Same code deployable in EU, US and Japan regions with data kept separate per region",
+   "gxp_impact": "direct",
+   "risk": "high",
+   "assurance": "scripted",
+   "regs": [
+    "GDPR-44",
+    "APPI-TRANSFER",
+    "HIPAA-312"
+   ]
+  },
+  {
+   "id": "NFR-07",
+   "release": "v1",
+   "text": "WCAG 2.1 AA; UI localisable, with English and Japanese for site- and subject-facing pages",
+   "gxp_impact": "indirect",
+   "risk": "medium",
+   "assurance": "unscripted",
+   "regs": [
+    "JP-GCP-RECORDS"
+   ]
+  },
+  {
+   "id": "VAL-01",
+   "release": "v1",
+   "text": "Every test carries the requirement IDs it covers; CI fails when a gated requirement has no passing test",
+   "gxp_impact": "direct",
+   "risk": "medium",
+   "assurance": "automated",
+   "regs": [
+    "A11-4",
+    "EMA-CS-VALID",
+    "JP-CSV-LIFECYCLE",
+    "P11-10a"
+   ]
+  },
+  {
+   "id": "VAL-02",
+   "release": "v1",
+   "text": "No direct change in test or production: promotion only through the pipeline with approval; IQ check after every deploy",
+   "gxp_impact": "direct",
+   "risk": "high",
+   "assurance": "scripted",
+   "regs": [
+    "A11-4",
+    "A11-10",
+    "EMA-CS-VALID",
+    "JP-CSV-LIFECYCLE",
+    "P11-10a",
+    "E6R3-COMPSYS"
+   ]
+  },
+  {
+   "id": "VAL-03",
+   "release": "v1",
+   "text": "Database migrations tested on a synthetic or anonymised copy before promotion",
+   "gxp_impact": "direct",
+   "risk": "medium",
+   "assurance": "automated",
+   "regs": [
+    "EMA-CS-MIGRATION",
+    "A11-4"
+   ]
+  },
+  {
+   "id": "VAL-04",
+   "release": "v1",
+   "text": "L2–L3 apps not activated in production without the supplier validation package and passing contract tests",
+   "gxp_impact": "direct",
+   "risk": "medium",
+   "assurance": "scripted",
+   "regs": [
+    "E6R3-SERVICEPROVIDER",
+    "A11-3"
+   ]
+  },
+  {
+   "id": "VAL-05",
+   "release": "gxp-p0",
+   "text": "Requirements carry gxp_impact, risk, assurance and regulatory references; CI generates per-regulation compliance matrices from docs/compliance/crosswalk.json",
+   "gxp_impact": "direct",
+   "risk": "medium",
+   "assurance": "automated",
+   "regs": [
+    "A11-4",
+    "EMA-CS-VALID",
+    "JP-CSV-LIFECYCLE",
+    "P11-10a"
+   ]
+  },
+  {
+   "id": "IAM-06",
+   "release": "v2",
+   "text": "Periodic access review every 90 days generated as a signed task for the platform admin",
+   "gxp_impact": "direct",
+   "risk": "medium",
+   "assurance": "scripted",
+   "regs": [
+    "A11-12",
+    "EMA-CS-USERMGMT",
+    "P11-10d"
+   ]
+  },
+  {
+   "id": "APP-ID-03",
+   "release": "v2",
+   "text": "SCIM 2.0 user provisioning to apps; deactivation propagated within 5 minutes",
+   "gxp_impact": "direct",
+   "risk": "medium",
+   "assurance": "automated",
+   "regs": [
+    "EMA-CS-USERMGMT",
+    "P11-10d"
+   ]
   }
  ]
 }

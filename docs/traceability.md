@@ -1,6 +1,6 @@
 # Traceability matrix
 
-Generated 2026-10-07T23:29:35.736Z by scripts/trace.mjs from test tags and test-results.xml.
+Generated 2026-10-10T08:37:44.765Z by scripts/trace.mjs from test tags and test-results.xml.
 
 | Requirement | Release | Description | Tests | Result |
 | --- | --- | --- | --- | --- |
@@ -65,3 +65,33 @@ Generated 2026-10-07T23:29:35.736Z by scripts/trace.mjs from test tags and test-
 | EDC-08 | v2 | Locks and data freeze | — (0) | NO TEST |
 | DEMO-04 | v0 | Visible 'synthetic data - demonstration environment' label and page code on every page | apps/web/test/pages.test.ts (3) | PASS |
 | AI-09 | v1 | Per-job limits (max_steps, max_tokens, max_cost, max_execution_time); an overrun stops the job and creates a task for a person | packages/api/test/ai.test.ts, packages/api/test/jobs.test.ts (7) | PASS |
+| IAM-01 | gxp-p0 | MFA mandatory for every role with GxP impact (TOTP or passkey); signing with MFA step-up | — (0) | NO TEST |
+| CMP-03 | gxp-p0 | Session idle timeout and account lockout after repeated failed logins or signing attempts, both recorded in the audit trail | — (0) | NO TEST |
+| CMP-10 | gxp-p0 | Audit trail review for QA/inspector roles: filter by record, user and period; readable PDF/CSV export; reviews recorded and signed | — (0) | NO TEST |
+| CMP-11 | gxp-p0 | Signature manifestation (printed name, UTC date/time, meaning, reason) on screen, print and export; reason stored on the signature record | — (0) | NO TEST |
+| CMP-15 | gxp-p0 | Every table in the core schema is audited (attach_std) or listed in a justified exception list; checked by a test | db/tests/compliance.test.mjs (2) | PASS |
+| CMP-09 | gxp-p0 | AI-generated content carries a persistent marker (agent, ai_request, reviewer) wherever it is shown or exported; users are told when content is AI-generated | — (0) | NO TEST |
+| NFR-04 | gxp-p0 | Backups with point-in-time recovery, documented quarterly restore test, retention policy per platform (default 25 years) and archive readable for the whole period | — (0) | NO TEST |
+| CMP-12 | v1 | Audit ledger sealed in blocks with Ed25519 and anchored outside the database; DDL on audited objects recorded; database admin roles segregated | — (0) | NO TEST |
+| CMP-13 | v1 | Read access to unblinded data (sac_enclave) and every export recorded and reportable | — (0) | NO TEST |
+| CMP-14 | v1 | Certified copies: export of a record or a whole trial (data, audit trail, signatures, hashes) in an open, human-readable format | — (0) | NO TEST |
+| CMP-05 | v1 | ICH E6(R3) data governance: critical-to-quality factors, RBQM, reconstructability of every decision and adaptation, service provider oversight | — (0) | NO TEST |
+| CMP-06 | v1 | Each GxP AI task type has a context of use, risk, credibility plan, test results and monitoring (docs/ai/<task_type>.md) | — (0) | NO TEST |
+| CMP-07 | v1 | AI test data independent from development, pre-specified metrics, explainability through cited sources, model change control | — (0) | NO TEST |
+| CMP-08 | v1 | Privacy by design across GDPR, HIPAA and APPI: pseudonymisation in the core, minimisation, record of processing, DPA/BAA with every provider, data residency per region | — (0) | NO TEST |
+| AI-02 | v1 | Every GxP task type registered with intended use, risk, exact approved model and version, versioned prompt, validator, thresholds, test dataset | — (0) | NO TEST |
+| AI-03 | v1 | GxP task types pinned to a dated model snapshot; a model change is a change request with regression on the test dataset | — (0) | NO TEST |
+| AI-04 | v1 | Fixed generation parameters, JSON Schema output, mandatory source citation for extraction and classification | — (0) | NO TEST |
+| AI-10 | v1 | Continuous monitoring per task type (accuracy on reviewed samples, drift, rejection rate); below threshold the task type falls back to suggestion-only | — (0) | NO TEST |
+| APP-DT-02 | v1 | Writes require Idempotency-Key; optimistic concurrency with If-Match on the version | — (0) | NO TEST |
+| APP-DT-05 | v1 | Provenance on every app-written datum: source_app, source_record_id, source_version, transformation_id | — (0) | NO TEST |
+| NFR-05 | v1 | TLS 1.2+, encryption at rest, server-side secrets, SAST, dependency scanning and SBOM in CI; penetration test before production | — (0) | NO TEST |
+| NFR-06 | v1 | Same code deployable in EU, US and Japan regions with data kept separate per region | — (0) | NO TEST |
+| NFR-07 | v1 | WCAG 2.1 AA; UI localisable, with English and Japanese for site- and subject-facing pages | — (0) | NO TEST |
+| VAL-01 | v1 | Every test carries the requirement IDs it covers; CI fails when a gated requirement has no passing test | — (0) | NO TEST |
+| VAL-02 | v1 | No direct change in test or production: promotion only through the pipeline with approval; IQ check after every deploy | — (0) | NO TEST |
+| VAL-03 | v1 | Database migrations tested on a synthetic or anonymised copy before promotion | — (0) | NO TEST |
+| VAL-04 | v1 | L2–L3 apps not activated in production without the supplier validation package and passing contract tests | — (0) | NO TEST |
+| VAL-05 | gxp-p0 | Requirements carry gxp_impact, risk, assurance and regulatory references; CI generates per-regulation compliance matrices from docs/compliance/crosswalk.json | db/tests/compliance.test.mjs (1) | PASS |
+| IAM-06 | v2 | Periodic access review every 90 days generated as a signed task for the platform admin | — (0) | NO TEST |
+| APP-ID-03 | v2 | SCIM 2.0 user provisioning to apps; deactivation propagated within 5 minutes | — (0) | NO TEST |
