@@ -1,8 +1,8 @@
 // TRO-012 New-arm wizard (M01-02): arm details → agents prepare (Protocol author, Onboarding planner) → a person reviews
 // the diff with sources and signs → ready for submission. Resumable through #/arms/new?arm=<id>.
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { PageHeader, Panel, Button, TextField, SelectField, Field, Textarea, Steps, DataTable, DiffList, StatusPill, SignDialog,
-  Loading, ErrorNote, DefinitionList, EmptyState, useToast, type SectionDiff } from '@trialops/shell';
+  Loading, ErrorNote, DefinitionList, EmptyState, useToast, AiProvenance, type SectionDiff, type AiProvenanceLike } from '@trialops/shell';
 import { api, runJob } from '../api.ts';
 import { useData, useSession } from '../session.tsx';
 import { go } from '../router.ts';
@@ -11,7 +11,7 @@ import { human, tone, fmtDateTime } from '../format.ts';
 interface Task { id: string; type: string; title: string; assignee: string; assignee_kind: string; state: string; arm_id: string; created_at: string; updated_at: string }
 interface Doc { ref: string; title: string; text: string }
 interface Diff { appendix_version_id: string; sections: SectionDiff[]; sources: { section: string; item_id: string; ref: string; quote: string }[];
-  consistency_checks: { check: string; result: string; detail: string }[] }
+  consistency_checks: { check: string; result: string; detail: string }[]; ai_generated?: AiProvenanceLike }
 
 const EXAMPLE_DOCS: Doc[] = [
   { ref: 'SPONSOR-BRIEF-D', title: 'Sponsor briefing document (synthetic)', text: 'MRD-12 is an oral small molecule. The recommended phase 2 dose is 40 mg once daily. The proposed primary endpoint is the change in functional score at 24 weeks. Trough sampling at weeks 4, 12 and 24 will support exposure-response analysis.' },
@@ -142,7 +142,8 @@ function Review({ task, onDone }: { task: Task; onDone: () => void }) {
   return (
     <>
       <div className="grid-2">
-        <Panel title="Proposed appendix — changes to the draft" meta="Proposal by the Protocol author agent. It changes nothing until a person accepts it with a signature.">
+        <Panel title="AI-generated appendix proposal — changes to the draft" meta="Proposal by the Protocol author agent. It changes nothing until a person accepts it with a signature.">
+          <AiProvenance provenance={d.ai_generated ?? { agent: task.assignee }} />
           <DiffList sections={d.sections} />
         </Panel>
         <div className="stack">
@@ -176,13 +177,14 @@ function Review({ task, onDone }: { task: Task; onDone: () => void }) {
 }
 
 function Done({ arm, author, created, armId }: { arm: { code: string; created_at: string }; author: Task; created: number; armId: string }) {
-  const versions = useData<{ items: { id: string; status: string; version_label: string }[] }>(`/v1/arms/${armId}/appendix-versions`);
+  const versions = useData<{ items: { id: string; status: string; version_label: string; ai_provenance: AiProvenanceLike | null }[] }>(`/v1/arms/${armId}/appendix-versions`);
   const v = versions.data?.items.at(-1);
   const hours = (Date.parse(author.updated_at) - Date.parse(arm.created_at)) / 36e5;
   return (
     <Panel title={author.state === 'completed' ? `${arm.code} is ready for submission` : 'Proposal rejected'}>
       <DefinitionList items={[
         ['Appendix', v ? <a href={`#/protocol/appendix/${v.id}`}>v{v.version_label} — {human(v.status)}</a> : '—'],
+        ...(v?.ai_provenance ? [['Content origin', <AiProvenance provenance={v.ai_provenance} />] as [string, ReactNode]] : []),
         ['Tasks created', `${created} assigned to regulatory, contracts, sites, supply, data management and training`],
         ['Time from arm creation to signed review', hours < 1 ? `${Math.max(1, Math.round(hours * 60))} minutes` : `${hours.toFixed(1)} hours`],
         ['Next', 'A regulatory lead or platform admin who did not author the appendix approves it with a signature; then the arm can be approved.'],

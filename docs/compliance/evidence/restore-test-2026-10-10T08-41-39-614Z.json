@@ -1,0 +1,75 @@
+{
+ "requirement": "NFR-04",
+ "procedure": "docs/compliance/BACKUP_RESTORE.md",
+ "started_at": "2026-10-10T08:41:39.614Z",
+ "source": "postgres://postgres:***@localhost:54339/trialops",
+ "target": "postgres://postgres:***@localhost:54339/trialops_restore_20261010084139",
+ "pg_dump": "pg_dump (PostgreSQL) 18.4 (Homebrew)",
+ "backup": {
+  "sha256": "f9054b2c43979ae21bf231de877f6d56326d149687b4bd8d69386133d01dcb6f",
+  "bytes": 295989,
+  "seconds": 0.806
+ },
+ "restore": {
+  "seconds": 1.86
+ },
+ "checks": {
+  "row_counts_equal": true,
+  "differing_tables": [],
+  "last_audit_hash_equal": true,
+  "audit_chain_clean_source": true,
+  "audit_chain_clean_restored": true
+ },
+ "source_snapshot": {
+  "counts": {
+   "core.adverse_event": 12,
+   "core.agent_decision_record": 0,
+   "core.ai_job": 0,
+   "core.ai_request": 0,
+   "core.app_installation": 1,
+   "core.app_role_assignment": 0,
+   "core.app_scope_grant": 0,
+   "core.arm": 4,
+   "core.arm_appendix_version": 3,
+   "core.arm_stage_transition": 0,
+   "core.audit_event": 522,
+   "core.contract": 10,
+   "core.control_sharing_rule": 3,
+   "core.deviation": 30,
+   "core.document": 16,
+   "core.document_version": 0,
+   "core.event_outbox": 132,
+   "core.master_protocol_version": 1,
+   "core.metric_definition": 9,
+   "core.oidc_code": 0,
+   "core.organization": 14,
+   "core.person": 19,
+   "core.platform": 1,
+   "core.role_assignment": 19,
+   "core.signature": 4,
+   "core.site": 6,
+   "core.site_arm_activation": 24,
+   "core.site_certification": 17,
+   "core.site_concurrent_trial": 9,
+   "core.site_investigator": 17,
+   "core.subject": 240,
+   "core.subject_status_history": 240,
+   "core.submission": 7,
+   "core.task": 5,
+   "core.task_event": 5,
+   "core.time_entry": 60
+  },
+  "last_audit": {
+   "seq": 522,
+   "hash": "4b1ec0869461fa2a24d4f3363a728010e6f37d5e4cc5a68a5fefedc2515c5dca"
+  },
+  "audit_verify_broken_seq": null,
+  "migrations": {
+   "n": "16",
+   "last": "0016_retention_policy.sql"
+  }
+ },
+ "tables": 36,
+ "finished_at": "2026-10-10T08:41:43.542Z",
+ "result": "PASS"
+}

@@ -1,13 +1,15 @@
 // TRO-013 Structured Master Protocol / arm appendix editor (M01-01) on controlled versions (DM-02, CMP-02, IAM-05).
-import { useState } from 'react';
-import { PageHeader, Panel, Button, StatusPill, Loading, ErrorNote, DefinitionList, ReasonDialog, SignDialog, TextField, Modal, useToast } from '@trialops/shell';
+import { useState, type ReactNode } from 'react';
+import { PageHeader, Panel, Button, StatusPill, Loading, ErrorNote, DefinitionList, ReasonDialog, SignDialog, TextField, Modal, useToast,
+  SignatureManifest, AiProvenance, type SignatureLike, type AiProvenanceLike } from '@trialops/shell';
 import { api } from '../api.ts';
 import { useData, useSession } from '../session.tsx';
 import { go } from '../router.ts';
 import { fmtDateTime, human, tone, short } from '../format.ts';
 import { SECTIONS, SectionEditor, clean, type Content } from '../components/ProtocolSections.tsx';
 
-interface Version { id: string; platform_id: string; arm_id?: string; version_label: string; usdm: Content; status: string; approved_signature_id: string | null; updated_at: string; row_version: number }
+interface Version { id: string; platform_id: string; arm_id?: string; version_label: string; usdm: Content; status: string; approved_signature_id: string | null;
+  approved_signature: SignatureLike | null; ai_provenance?: AiProvenanceLike | null; updated_at: string; row_version: number }
 
 export function ProtocolEditor({ kind, id }: { kind: 'master' | 'appendix'; id: string }) {
   const base = kind === 'master' ? '/v1/protocol-versions' : '/v1/appendix-versions';
@@ -40,7 +42,8 @@ export function ProtocolEditor({ kind, id }: { kind: 'master' | 'appendix'; id: 
       <Panel meta={`Version id ${short(ver.id)} · row version ${ver.row_version} · last change ${fmtDateTime(ver.updated_at)}`}>
         <DefinitionList items={[
           ['Status', <StatusPill tone={tone(ver.status)}>{human(ver.status)}</StatusPill>],
-          ['Approval signature', ver.approved_signature_id ? <span className="t-mono">{short(ver.approved_signature_id)}</span> : 'Not signed'],
+          ['Approval signature', <SignatureManifest signature={ver.approved_signature} />],
+          ...(ver.ai_provenance ? [['Content origin', <AiProvenance provenance={ver.ai_provenance} />] as [string, ReactNode]] : []),
         ]} />
       </Panel>
       {SECTIONS.map(sec => {

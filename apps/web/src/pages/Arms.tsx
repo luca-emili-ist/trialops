@@ -1,6 +1,7 @@
 // TRO-010 Arms and TRO-011 Arm detail: lifecycle draft → approved → active → suspended → closed / graduated (M01-04).
 import { useState } from 'react';
-import { PageHeader, Panel, DataTable, StatusPill, Button, Loading, ErrorNote, DefinitionList, ReasonDialog, SelectField, Modal, Steps, EmptyState, useToast } from '@trialops/shell';
+import { PageHeader, Panel, DataTable, StatusPill, Button, Loading, ErrorNote, DefinitionList, ReasonDialog, SelectField, Modal, Steps, EmptyState, useToast,
+  SignatureManifest, AiProvenance, type SignatureLike, type AiProvenanceLike } from '@trialops/shell';
 import { api } from '../api.ts';
 import { useData, useSession } from '../session.tsx';
 import { go } from '../router.ts';
@@ -8,7 +9,7 @@ import { fmtDate, human, tone } from '../format.ts';
 
 interface Arm { id: string; platform_id: string; code: string; name: string; sponsor: string | null; intervention_type: string; status: string; current_stage: string | null;
   has_prior_human_data: boolean | null; approved_any_indication: boolean | null; created_at: string;
-  appendix_versions?: { id: string; version_label: string; status: string; created_at: string }[];
+  appendix_versions?: { id: string; version_label: string; status: string; created_at: string; approved_signature: SignatureLike | null; ai_provenance: AiProvenanceLike | null }[];
   stage_history?: { from_stage: string | null; to_stage: string; transitioned_at: string }[] }
 interface Version { id: string; version_label: string; status: string; created_at: string }
 interface Activation { id: string; site_number: string; site_name: string; site_id: string; status: string; next_step: string | null;
@@ -75,6 +76,8 @@ export function ArmDetail({ id }: { id: string }) {
               { key: 'version_label', label: 'Version' },
               { key: 'status', label: 'Status', render: v => <StatusPill tone={tone(v.status)}>{human(v.status)}</StatusPill> },
               { key: 'created_at', label: 'Created', render: v => fmtDate(v.created_at), sortValue: v => v.created_at },
+              { key: 'approved_signature', label: 'Approval signature', wrap: true, render: v => <div className="stack-sm">
+                <SignatureManifest signature={v.approved_signature} empty="—" />{v.ai_provenance ? <AiProvenance provenance={v.ai_provenance} /> : null}</div> },
             ]} />
           {a.stage_history?.length ? <Steps steps={a.stage_history.map(h => ({ label: fmtDate(h.transitioned_at), value: human(h.to_stage), state: 'done' as const }))} /> : null}
         </Panel>

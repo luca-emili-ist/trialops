@@ -4,7 +4,7 @@ import type { Db, Row } from '../db.ts';
 import type { Claims } from '../auth.ts';
 import { HttpError } from '../errors.ts';
 import { requirePerson, requireRole } from '../lib/roles.ts';
-import { sign } from '../lib/sign.ts';
+import { sign, signatureManifests } from '../lib/sign.ts';
 import { diffContent } from '../lib/diff.ts';
 import { createArm, newArmSchema, type NewArm } from './arms.ts';
 import { createDraft, getVersion, putSection, validateProtocolContent, PROTOCOL_KINDS, type ProtocolContent } from './protocol.ts';
@@ -64,6 +64,15 @@ async function reviewProposal(db: Db, claims: Claims, reauth: Parameters<typeof 
   const signature = await sign(db, claims, reauth, { target_table: 'task', target_id: taskId, meaning: 'review', credential: { password: body.password } });
   if (final) {
     for (const [section, content] of Object.entries(final)) await putSection(db, claims, PROTOCOL_KINDS.APPENDIX, appendixId, section, content);
+    // CMP-09: the accepted content keeps a persistent marker of its AI origin and of the person who reviewed it.
+    const ai = task.outputs.ai_request_id ? (await db.query('select id, model, model_version from core.ai_request where id = $1',
+      [task.outputs.ai_request_id])).rows[0] : undefined;
+    if (ai) {
+      await db.query('update core.arm_appendix_version set ai_provenance = $2 where id = $1', [appendixId, JSON.stringify({
+        ai_request_id: ai.id, agent: String(task.assignee).replace(/^agent:/, ''), model: ai.model, model_version: ai.model_version,
+        task_id: taskId, reviewed_by: signature.signer_name, reviewed_by_sub: claims.sub, decision: REVIEW_DECISION[body.decision],
+        review_signature_id: signature.id })]);
+    }
     await db.query("update core.arm_appendix_version set status = 'in_review' where id = $1 and status = 'draft'", [appendixId]);
   }
   await db.query('update core.task set review_signature_id = $2, state = $3 where id = $1',
@@ -103,29 +112,36 @@ export const taskRoutes = [
         [params.id, query.state === 'all', OPEN, query.arm_id ?? null, query.mine === 'true', claims.roles ?? [], claims.person_id ?? ''])).rows,
     }) }),
 
-  route({ method: 'get', path: '/v1/tasks/:id', summary: 'Task with inputs, outputs and state history', tag: 'tasks', reqs: ['APP-TK-02'],
+  route({ method: 'get', path: '/v1/tasks/:id', summary: 'Task with inputs, outputs, state history and review signature manifestation', tag: 'tasks',
+    reqs: ['APP-TK-02', 'CMP-11'],
     handler: async ({ db, params }) => {
       const t = await getTask(db, params.id!);
       if (!t) return undefined;
       const events = (await db.query('select from_state, to_state, actor_sub, actor_type, at from core.task_event where task_id = $1 order by id',
         [t.id])).rows;
-      return { ...t, events };
+      const review_signature = t.review_signature_id ? (await signatureManifests(db, [t.review_signature_id])).get(t.review_signature_id) ?? null : null;
+      return { ...t, events, review_signature };
     } }),
 
-  route({ method: 'get', path: '/v1/tasks/:id/proposal-diff', summary: 'Diff between the appendix draft and the agent proposal', tag: 'tasks',
-    reqs: ['M01-02', 'AI-05'],
+  route({ method: 'get', path: '/v1/tasks/:id/proposal-diff', summary: 'Diff between the appendix draft and the agent proposal (marked AI-generated)',
+    tag: 'tasks', reqs: ['M01-02', 'AI-05', 'CMP-09'],
     handler: async ({ db, params }) => {
       const t = await getTask(db, params.id!);
       if (!t) return undefined;
       const proposal = t.outputs?.proposal;
       if (!proposal) throw new HttpError(409, 'no_proposal', 'the task holds no proposal yet');
       const draft = await getVersion(db, PROTOCOL_KINDS.APPENDIX, t.inputs.appendix_version_id);
+      // CMP-09: the reviewer is told the proposal is AI-generated, by which agent and model (from the AI ledger).
+      const ai = t.outputs?.ai_request_id ? (await db.query('select id, model, model_version from core.ai_request where id = $1',
+        [t.outputs.ai_request_id])).rows[0] : undefined;
       return { task_id: t.id, appendix_version_id: draft?.id ?? null, sections: diffContent(draft?.usdm ?? {}, proposal.sections),
-        sources: proposal.sources ?? [], consistency_checks: proposal.consistency_checks ?? [] };
+        sources: proposal.sources ?? [], consistency_checks: proposal.consistency_checks ?? [],
+        ai_generated: { ai_request_id: ai?.id ?? t.outputs?.ai_request_id ?? null, agent: String(t.assignee).replace(/^agent:/, ''),
+          model: ai?.model ?? null, model_version: ai?.model_version ?? null } };
     } }),
 
   route<{ decision: keyof typeof REVIEW_DECISION; sections?: ProtocolContent; password?: string }>({
-    method: 'post', path: '/v1/tasks/:id/review', needsReason: true, tag: 'tasks', reqs: ['AI-05', 'APP-TK-04', 'M01-02', 'CMP-02'],
+    method: 'post', path: '/v1/tasks/:id/review', needsReason: true, tag: 'tasks', reqs: ['AI-05', 'APP-TK-04', 'M01-02', 'CMP-02', 'CMP-09', 'CMP-11'],
     summary: 'Accept, edit or reject an agent proposal with a signature',
     body: { type: 'object', additionalProperties: false, required: ['decision'],
       properties: { decision: { enum: ['accept', 'edit', 'reject'] }, sections: { type: 'object' }, password: { type: 'string' } } },

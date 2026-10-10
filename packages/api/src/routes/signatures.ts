@@ -1,11 +1,11 @@
 // Part 11 signature service for the UI and for apps (APP-ID-06, CMP-02): the signer re-authenticates in TrialOps.
 import { route, uuid } from '../route.ts';
-import { sign, SIGNABLE_TABLES, type Meaning } from '../lib/sign.ts';
+import { sign, SIGNABLE_TABLES, MANIFEST_COLS, type Meaning } from '../lib/sign.ts';
 
 export const signatureRoutes = [
   route<{ target_table: string; target_id: string; meaning: Meaning; password?: string }>({
-    method: 'post', path: '/v1/signatures', status: 201, summary: 'Sign a record (re-authentication required)', tag: 'signatures',
-    reqs: ['CMP-02'],
+    method: 'post', path: '/v1/signatures', status: 201, needsReason: true, tag: 'signatures',
+    summary: 'Sign a record (re-authentication required; the X-Change-Reason is stored on the signature)', reqs: ['CMP-02', 'CMP-11'],
     body: { type: 'object', required: ['target_table', 'target_id', 'meaning'], additionalProperties: false,
       properties: { target_table: { enum: SIGNABLE_TABLES }, target_id: uuid,
         meaning: { enum: ['author', 'review', 'approval', 'verification', 'responsibility'] }, password: { type: 'string' } } },
@@ -14,10 +14,9 @@ export const signatureRoutes = [
       requested_by_app: claims.actor_type === 'app' ? claims.app_id : undefined,
     }),
   }),
-  route({ method: 'get', path: '/v1/signatures', summary: 'Signatures on a record', tag: 'signatures', reqs: ['CMP-02'],
+  route({ method: 'get', path: '/v1/signatures', summary: 'Signatures on a record, with their manifestation', tag: 'signatures', reqs: ['CMP-02', 'CMP-11'],
     query: { target_id: uuid },
     handler: async ({ db, query }) => ({
-      items: (await db.query(`select id, signer_sub, signer_name, meaning, target_table, target_id, target_hash, auth_method, signed_at
-        from core.signature where target_id = $1 order by signed_at`, [query.target_id ?? null])).rows,
+      items: (await db.query(`select ${MANIFEST_COLS}, target_hash from core.signature where target_id = $1 order by signed_at`, [query.target_id ?? null])).rows,
     }) }),
 ];

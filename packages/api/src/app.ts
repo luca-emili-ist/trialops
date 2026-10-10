@@ -46,7 +46,12 @@ export function createApp({ pool, verify, services = {}, routes = allRoutes }: A
           : await ctxBase.tx(db => r.handler({ ...ctxBase, db }));
         for (const fn of after) await fn();
         if (out === undefined) throw new HttpError(404, 'not_found', 'not found');
-        if (r.raw) { const { status, headers, body } = out as RawResponse; res.status(status).set(headers ?? {}).json(body); return; }
+        if (r.raw) {
+          const { status, headers, body } = out as RawResponse;
+          // a string body is sent as is with the route's content type (e.g. the CSV export of the audit trail)
+          if (typeof body === 'string') res.status(status).set(headers ?? {}).send(body); else res.status(status).set(headers ?? {}).json(body);
+          return;
+        }
         res.status(r.status ?? 200).json(out);
       } catch (e) { next(e); }
     });

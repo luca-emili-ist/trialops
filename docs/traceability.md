@@ -1,6 +1,6 @@
 # Traceability matrix
 
-Generated 2026-10-10T08:37:44.765Z by scripts/trace.mjs from test tags and test-results.xml.
+Generated 2026-10-10T09:02:11.991Z by scripts/trace.mjs from test tags and test-results.xml.
 
 | Requirement | Release | Description | Tests | Result |
 | --- | --- | --- | --- | --- |
@@ -67,11 +67,11 @@ Generated 2026-10-10T08:37:44.765Z by scripts/trace.mjs from test tags and test-
 | AI-09 | v1 | Per-job limits (max_steps, max_tokens, max_cost, max_execution_time); an overrun stops the job and creates a task for a person | packages/api/test/ai.test.ts, packages/api/test/jobs.test.ts (7) | PASS |
 | IAM-01 | gxp-p0 | MFA mandatory for every role with GxP impact (TOTP or passkey); signing with MFA step-up | — (0) | NO TEST |
 | CMP-03 | gxp-p0 | Session idle timeout and account lockout after repeated failed logins or signing attempts, both recorded in the audit trail | — (0) | NO TEST |
-| CMP-10 | gxp-p0 | Audit trail review for QA/inspector roles: filter by record, user and period; readable PDF/CSV export; reviews recorded and signed | — (0) | NO TEST |
-| CMP-11 | gxp-p0 | Signature manifestation (printed name, UTC date/time, meaning, reason) on screen, print and export; reason stored on the signature record | — (0) | NO TEST |
+| CMP-10 | gxp-p0 | Audit trail review for QA/inspector roles: filter by record, user and period; readable PDF/CSV export; reviews recorded and signed | apps/web/test/pages.test.ts, db/tests/audit_review.test.mjs, packages/api/test/audit_review.test.ts (14) | PASS |
+| CMP-11 | gxp-p0 | Signature manifestation (printed name, UTC date/time, meaning, reason) on screen, print and export; reason stored on the signature record | apps/web/test/pages.test.ts, db/tests/audit_review.test.mjs, packages/api/test/audit_review.test.ts, packages/shell/test/manifest.test.ts (7) | PASS |
 | CMP-15 | gxp-p0 | Every table in the core schema is audited (attach_std) or listed in a justified exception list; checked by a test | db/tests/compliance.test.mjs (2) | PASS |
-| CMP-09 | gxp-p0 | AI-generated content carries a persistent marker (agent, ai_request, reviewer) wherever it is shown or exported; users are told when content is AI-generated | — (0) | NO TEST |
-| NFR-04 | gxp-p0 | Backups with point-in-time recovery, documented quarterly restore test, retention policy per platform (default 25 years) and archive readable for the whole period | — (0) | NO TEST |
+| CMP-09 | gxp-p0 | AI-generated content carries a persistent marker (agent, ai_request, reviewer) wherever it is shown or exported; users are told when content is AI-generated | apps/web/test/pages.test.ts, db/tests/audit_review.test.mjs, packages/api/test/audit_review.test.ts, packages/shell/test/manifest.test.ts (5) | PASS |
+| NFR-04 | gxp-p0 | Backups with point-in-time recovery, documented quarterly restore test, retention policy per platform (default 25 years) and archive readable for the whole period | db/tests/retention.test.mjs (3) | PASS |
 | CMP-12 | v1 | Audit ledger sealed in blocks with Ed25519 and anchored outside the database; DDL on audited objects recorded; database admin roles segregated | — (0) | NO TEST |
 | CMP-13 | v1 | Read access to unblinded data (sac_enclave) and every export recorded and reportable | — (0) | NO TEST |
 | CMP-14 | v1 | Certified copies: export of a record or a whole trial (data, audit trail, signatures, hashes) in an open, human-readable format | — (0) | NO TEST |

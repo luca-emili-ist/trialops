@@ -152,3 +152,27 @@ a { color: var(--c-accent); }
 .table-caption { text-align: left; padding: var(--s-2) var(--s-3); color: var(--c-ink-muted); caption-side: top; }
 .shell-user .btn-ghost { color: var(--c-nav-ink-active); padding: 0; justify-self: start; text-decoration: underline; }
 .diff-lines { margin: 0; padding-left: var(--s-4); display: grid; gap: var(--s-1); white-space: pre-wrap; }
+
+/* Signature manifestation (CMP-11) and AI provenance marker (CMP-09) */
+.sig-manifest { display: inline-flex; gap: var(--s-2); align-items: baseline; color: var(--c-ink); font-size: var(--fs-sm); overflow-wrap: anywhere; }
+.sig-manifest-mark { color: var(--c-sign); font-weight: 700; }
+.ai-provenance { display: inline-flex; gap: var(--s-2); align-items: baseline; font-size: var(--fs-sm); color: var(--c-ink); overflow-wrap: anywhere; }
+.ai-badge { flex: none; font-size: var(--fs-xs); font-weight: 700; letter-spacing: var(--tracking-label); color: var(--c-info); background: var(--c-info-bg); border: 1px solid var(--c-info); border-radius: var(--radius); padding: 0 var(--s-1); line-height: 1.5; }
+.print-only { display: none; }
+
+/* Print view: the PDF export of a page (audit trail review). Navigation and controls are left out; tables print in full. */
+@media print {
+  @page { margin: 1.5cm; }
+  body { background: var(--c-surface); font-size: var(--fs-sm); }
+  .shell { display: block; }
+  .shell-nav, .no-print, .btn, .modal-backdrop, .toasts { display: none !important; }
+  .print-only { display: block; }
+  .shell-content { max-width: none; padding: 0; }
+  .shell-banner { border: 1px solid var(--c-demo); }
+  .panel { border: 0; padding: 0; }
+  .table-wrap { max-height: none; overflow: visible; border: 0; }
+  .table th { position: static; }
+  .table td { height: auto; padding-block: var(--s-1); white-space: normal; }
+  .table tr { break-inside: avoid; }
+  .shell-footer { padding: var(--s-2) 0; }
+}

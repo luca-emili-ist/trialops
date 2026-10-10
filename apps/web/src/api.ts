@@ -40,3 +40,19 @@ export async function runJob<R = any>(method: string, path: string, opts: { body
   if (job.status === 'failed') throw new Error(job.error ?? 'The AI job failed');
   return job.result as R;
 }
+
+/** Downloads a file produced by the API (e.g. the CSV export of the audit trail) with the bearer token of the session. */
+export async function download(path: string, fallbackName: string): Promise<void> {
+  const headers: Record<string, string> = {};
+  if (token) headers.authorization = `Bearer ${token}`;
+  const res = await fetch(path, { headers });
+  if (!res.ok) {
+    const data = await res.json().catch(() => null);
+    throw new ApiError(res.status, data?.error?.code ?? 'error', data?.error?.message ?? `Download failed (${res.status})`);
+  }
+  const name = /filename="([^"]+)"/.exec(res.headers.get('content-disposition') ?? '')?.[1] ?? fallbackName;
+  const url = URL.createObjectURL(await res.blob());
+  const a = document.createElement('a');
+  a.href = url; a.download = name; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}

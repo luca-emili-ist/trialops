@@ -6,6 +6,7 @@ import type { Db, Row } from '../db.ts';
 import type { Claims } from '../auth.ts';
 import { HttpError } from '../errors.ts';
 import { requireRole } from '../lib/roles.ts';
+import { signatureManifests } from '../lib/sign.ts';
 
 const ARM_COLS = `a.id, a.platform_id, a.code, a.name, a.sponsor_org_id, o.name sponsor, a.intervention_type, a.has_prior_human_data,
   a.approved_any_indication, a.status, a.current_stage, a.created_at, a.updated_at, a.row_version`;
@@ -48,18 +49,20 @@ export const armRoutes = [
     body: newArmSchema, handler: async ({ db, claims, params, body }) => createArm(db, claims, params.id!, body) }),
 
   route({ method: 'get', path: '/v1/arms/:id', summary: 'Arm detail with appendix versions, stage history and site activations', tag: 'arms',
-    reqs: ['M01-04', 'M02-03'],
+    reqs: ['M01-04', 'M02-03', 'CMP-11'],
     handler: async ({ db, params }) => {
       const arm = await getArm(db, params.id!);
       if (!arm) return undefined;
       // one query at a time: a pg client runs queries sequentially
-      const appendices = await db.query(`select id, version_label, status, approved_signature_id, created_at from core.arm_appendix_version
+      const appendices = await db.query(`select id, version_label, status, approved_signature_id, ai_provenance, created_at from core.arm_appendix_version
           where arm_id = $1 and status <> 'void' order by created_at`, [arm.id]);
       const stages = await db.query(`select from_stage, to_stage, transitioned_at from core.arm_stage_transition where arm_id = $1 and status <> 'void'
           order by transitioned_at`, [arm.id]);
       const activations = await db.query(`select x.id, x.site_id, s.site_number, x.status, x.green_light_at from core.site_arm_activation x
           join core.site s on s.id = x.site_id where x.arm_id = $1 and x.status <> 'void' order by s.site_number`, [arm.id]);
-      return { ...arm, appendix_versions: appendices.rows, stage_history: stages.rows, site_activations: activations.rows };
+      const sigs = await signatureManifests(db, appendices.rows.map(v => v.approved_signature_id));
+      const versions = appendices.rows.map(v => ({ ...v, approved_signature: sigs.get(v.approved_signature_id) ?? null }));
+      return { ...arm, appendix_versions: versions, stage_history: stages.rows, site_activations: activations.rows };
     } }),
 
   route<{ to: string }>({ method: 'post', path: '/v1/arms/:id/status', needsReason: true, summary: 'Move an arm along its lifecycle',

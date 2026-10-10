@@ -1,7 +1,7 @@
 // TRO-099 Design system catalogue: every base component in its states. Reference for anyone writing pages (docs/DESIGN.md).
 import { useState } from 'react';
 import { AppShell, PageHeader, Panel, Button, TextField, SelectField, Field, Textarea, StatusPill, KeyFigures, DataTable, MetricBar, Steps,
-  DiffList, EmptyState, DefinitionList, SignDialog, ReasonDialog, Loading, ErrorNote, useToast } from '@trialops/shell';
+  DiffList, EmptyState, DefinitionList, SignDialog, ReasonDialog, Loading, ErrorNote, useToast, SignatureManifest, AiProvenance } from '@trialops/shell';
 import { PAGE_CODES } from '../pageCodes.ts';
 
 const rows = [{ id: '101', name: 'Lakeside University Hospital', randomized: 34, status: 'active' }, { id: '106', name: 'Riverside Academic Medical Center', randomized: 7, status: 'on_hold' }];
@@ -51,6 +51,15 @@ export function UiCatalogue() {
           <EmptyState title="No tasks here">Nothing is waiting for you.</EmptyState><Loading /><ErrorNote error="The API did not answer." />
         </Panel>
       </div>
+      <Panel title="Signature manifestation and AI provenance" meta="Shown beside every signed record (Part 11 §11.50) and on every piece of accepted AI-generated content (AI Act art. 50).">
+        <DefinitionList items={[
+          ['Signed', <SignatureManifest signature={{ signer_name: 'Dana Whitfield', meaning: 'approval', signed_at: '2026-10-07T14:03:21Z', reason: 'Content reviewed and approved' }} />],
+          ['Signed before 0017', <SignatureManifest signature={{ signer_name: 'Dana Whitfield', meaning: 'approval', signed_at: '2025-04-21T14:00:00Z', reason: null }} />],
+          ['Not signed', <SignatureManifest signature={null} />],
+          ['AI content, reviewed', <AiProvenance provenance={{ agent: 'protocol-author', model: 'claude-opus-5-5', reviewed_by: 'Marcus Ortega', decision: 'accepted' }} />],
+          ['AI proposal', <AiProvenance provenance={{ agent: 'protocol-author', model: 'claude-opus-5-5' }} />],
+        ]} />
+      </Panel>
       <Panel title="Dialogs and toasts">
         <div className="row"><Button variant="sign" onClick={() => setDialog('sign')}>Open signature dialog</Button>
           <Button onClick={() => setDialog('reason')}>Open reason dialog</Button><Button onClick={() => toast('Saved')}>Show toast</Button>

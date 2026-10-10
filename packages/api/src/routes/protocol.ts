@@ -6,7 +6,7 @@ import type { Db, Row } from '../db.ts';
 import type { Claims } from '../auth.ts';
 import { HttpError } from '../errors.ts';
 import { requireRole, type Role } from '../lib/roles.ts';
-import { sign } from '../lib/sign.ts';
+import { sign, signatureManifests } from '../lib/sign.ts';
 import { ajv, check } from '../lib/validate.ts';
 import { diffContent } from '../lib/diff.ts';
 import type { Reauthenticator } from '../lib/reauth.ts';
@@ -39,10 +39,17 @@ const APPENDIX: Kind = {
 };
 
 const cols = 'id, platform_id, version_label, usdm, status, approved_signature_id, created_at, updated_at, row_version';
-const colsFor = (k: Kind) => k.table === 'arm_appendix_version' ? `${cols}, arm_id, master_protocol_version_id` : cols;
+const colsFor = (k: Kind) => k.table === 'arm_appendix_version' ? `${cols}, arm_id, master_protocol_version_id, ai_provenance` : cols;
+
+/** Adds the manifestation of the approval signature (CMP-11): name, meaning, UTC time, reason, authentication. */
+export async function withApprovalSignature(db: Db, rows: Row[]): Promise<Row[]> {
+  const m = await signatureManifests(db, rows.map(r => r.approved_signature_id));
+  return rows.map(r => ({ ...r, approved_signature: r.approved_signature_id ? m.get(r.approved_signature_id) ?? null : null }));
+}
 
 export async function getVersion(db: Db, k: Kind, id: string): Promise<Row | undefined> {
-  return (await db.query(`select ${colsFor(k)} from core.${k.table} where id = $1`, [id])).rows[0];
+  const r = (await db.query(`select ${colsFor(k)} from core.${k.table} where id = $1`, [id])).rows[0];
+  return r ? (await withApprovalSignature(db, [r]))[0] : undefined;
 }
 
 /** Latest approved version under a parent, the base for a new draft. */
@@ -107,7 +114,7 @@ export async function approve(db: Db, claims: Claims, reauth: Reauthenticator | 
   await db.query(`update core.${k.table} set status = 'superseded' where ${k.parentCol} = $1 and status = 'approved' and id <> $2`, [parent, id]);
   const out = (await db.query(`update core.${k.table} set status = 'approved', approved_signature_id = $2 where id = $1 returning ${colsFor(k)}`,
     [id, sig.id])).rows[0];
-  return { ...out, signature: sig };
+  return { ...out, approved_signature: sig, signature: sig };
 }
 
 function routesFor(k: Kind): RouteDef[] {
@@ -115,15 +122,16 @@ function routesFor(k: Kind): RouteDef[] {
   return [
     route({ method: 'get', path: k.parentPath, summary: `${k.label} versions`, tag: 'protocol', reqs,
       handler: async ({ db, params }) => ({
-        items: (await db.query(`select ${colsFor(k)} from core.${k.table} where ${k.parentCol} = $1 and status <> 'void' order by created_at`,
-          [params.id])).rows,
+        items: await withApprovalSignature(db, (await db.query(`select ${colsFor(k)} from core.${k.table} where ${k.parentCol} = $1
+          and status <> 'void' order by created_at`, [params.id])).rows),
       }) }),
     route<{ version_label: string; usdm?: unknown; copy_from?: string }>({ method: 'post', path: k.parentPath, status: 201,
       summary: `New draft ${k.label} version (copies the approved one unless usdm or copy_from is given)`, tag: 'protocol', reqs,
       body: { type: 'object', required: ['version_label'], additionalProperties: false,
         properties: { version_label: { type: 'string', minLength: 1, maxLength: 40 }, usdm: { type: 'object' }, copy_from: uuid } },
       handler: async ({ db, claims, params, body }) => createDraft(db, claims, k, params.id!, body) }),
-    route({ method: 'get', path: `${k.base}/:vid`, summary: `${k.label} version`, tag: 'protocol', reqs,
+    route({ method: 'get', path: `${k.base}/:vid`, summary: `${k.label} version with approval signature manifestation and AI provenance`,
+      tag: 'protocol', reqs: [...reqs, 'CMP-11', 'CMP-09'],
       handler: async ({ db, params }) => getVersion(db, k, params.vid!) }),
     route<{ content: unknown }>({ method: 'put', path: `${k.base}/:vid/sections/:section`, needsReason: true,
       summary: `Replace one structured section of a draft ${k.label} (ICH M11 / USDM)`, tag: 'protocol', reqs: ['M01-01', 'DM-02', 'DM-03'],
@@ -144,7 +152,7 @@ function routesFor(k: Kind): RouteDef[] {
         return r;
       } }),
     route<{ password?: string }>({ method: 'post', path: `${k.base}/:vid/approve`, needsReason: true,
-      summary: `Approve a ${k.label} version with a Part 11 signature`, tag: 'protocol', reqs: ['M01-01', 'DM-02', 'CMP-02', 'IAM-05'],
+      summary: `Approve a ${k.label} version with a Part 11 signature`, tag: 'protocol', reqs: ['M01-01', 'DM-02', 'CMP-02', 'IAM-05', 'CMP-11'],
       body: { type: 'object', additionalProperties: false, properties: { password: { type: 'string' } } },
       handler: async ({ db, claims, params, body, services }) => approve(db, claims, services.reauth, k, params.vid!, body.password) }),
     route({ method: 'get', path: `${k.base}/:vid/diff`, summary: `Section diff of a ${k.label} version against another (default: approved)`,

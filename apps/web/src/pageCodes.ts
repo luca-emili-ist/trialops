@@ -12,6 +12,7 @@ export const PAGE_CODES = {
   apps: 'TRO-040',
   oidcAuthorize: 'TRO-041',
   aiLedger: 'TRO-050',
+  auditTrail: 'TRO-051',
   login: 'TRO-090',
   notFound: 'TRO-098',
   uiCatalogue: 'TRO-099',

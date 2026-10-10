@@ -1,6 +1,7 @@
 // TRO-030 Task inbox and TRO-031 Task detail: state history, agent run, review of agent proposals (AI-05, APP-TK-04).
 import { useState, type ReactNode } from 'react';
-import { PageHeader, Panel, DataTable, StatusPill, Button, Loading, ErrorNote, DefinitionList, SelectField, SignDialog, DiffList, EmptyState, useToast, type SectionDiff } from '@trialops/shell';
+import { PageHeader, Panel, DataTable, StatusPill, Button, Loading, ErrorNote, DefinitionList, SelectField, SignDialog, DiffList, EmptyState, useToast,
+  SignatureManifest, AiProvenance, type SectionDiff, type SignatureLike, type AiProvenanceLike } from '@trialops/shell';
 import { api, runJob } from '../api.ts';
 import { useData, useSession } from '../session.tsx';
 import { go } from '../router.ts';
@@ -8,7 +9,7 @@ import { fmtDate, fmtDateTime, human, tone } from '../format.ts';
 import { SECTIONS, SectionEditor, clean, type Content } from '../components/ProtocolSections.tsx';
 
 interface Task { id: string; type: string; title: string; arm_code: string | null; assignee_kind: string; assignee: string; state: string; gxp_impact: boolean;
-  priority: string; due_at: string | null; created_at: string; inputs?: Content; outputs?: Content | null; events?: { from_state: string | null; to_state: string; actor_sub: string; actor_type: string; at: string }[] }
+  priority: string; due_at: string | null; created_at: string; inputs?: Content; outputs?: Content | null; review_signature?: SignatureLike | null; events?: { from_state: string | null; to_state: string; actor_sub: string; actor_type: string; at: string }[] }
 
 export function Tasks() {
   const { platform } = useSession();
@@ -69,7 +70,8 @@ export function TaskDetail({ id }: { id: string }) {
       {t.type === 'arm.onboarding.plan' && t.outputs?.checklist ? <Panel title="Onboarding checklist">
         <DataTable rows={(t.outputs.checklist as { area: string; item: string }[]).map((c, i) => ({ ...c, k: `${i}` }))} rowKey={c => c.k}
           columns={[{ key: 'area', label: 'Area', render: c => human(c.area) }, { key: 'item', wrap: true, label: 'Item' }]} /></Panel> : null}
-      {t.outputs?.decision ? <Panel title="Review decision"><DefinitionList items={[['Decision', <StatusPill tone={tone(t.outputs.decision)}>{human(t.outputs.decision)}</StatusPill>], ['By', t.outputs.decided_by]]} />
+      {t.outputs?.decision ? <Panel title="Review decision"><DefinitionList items={[['Decision', <StatusPill tone={tone(t.outputs.decision)}>{human(t.outputs.decision)}</StatusPill>],
+          ['Signature', <SignatureManifest signature={t.review_signature} empty={t.outputs.decided_by} />]]} />
         {t.outputs.edits?.length ? <DiffList sections={t.outputs.edits as SectionDiff[]} /> : null}</Panel> : null}
     </>
   );
@@ -77,13 +79,14 @@ export function TaskDetail({ id }: { id: string }) {
 
 function ProposalReview({ task, onDone }: { task: Task; onDone: () => void }) {
   const toast = useToast();
-  const diff = useData<{ sections: SectionDiff[] }>(`/v1/tasks/${task.id}/proposal-diff`);
+  const diff = useData<{ sections: SectionDiff[]; ai_generated?: AiProvenanceLike }>(`/v1/tasks/${task.id}/proposal-diff`);
   const [edited, setEdited] = useState<Content | null>(null);
   const [sign, setSign] = useState<null | 'accept' | 'edit' | 'reject'>(null);
   const proposal = (task.outputs?.proposal?.sections ?? {}) as Content;
   return (
     <>
-      <Panel title={edited ? 'Edit the proposal before accepting' : 'Proposal'} actions={<>
+      <Panel title={edited ? 'Edit the AI-generated proposal before accepting' : 'AI-generated proposal'}
+        meta={<AiProvenance provenance={diff.data?.ai_generated ?? { agent: task.assignee }} />} actions={<>
         {edited ? <Button onClick={() => setEdited(null)}>Discard edits</Button> : <Button onClick={() => setEdited(structuredClone(proposal))}>Edit before accepting</Button>}
         {edited ? <Button variant="sign" onClick={() => setSign('edit')}>Accept with edits and sign</Button> : <Button variant="sign" onClick={() => setSign('accept')}>Accept and sign</Button>}
         <Button variant="danger" onClick={() => setSign('reject')}>Reject</Button></>}>
