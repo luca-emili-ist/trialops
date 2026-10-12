@@ -220,5 +220,6 @@ export function useData<T>(path: string | null): { data: T | null; error: string
       e => live && setState({ data: null, error: (e as Error).message, loading: false }));
     return () => { live = false; };
   }, [path, n]);
-  return { ...state, reload: () => setN(x => x + 1) };
+  const reload = useCallback(() => setN(x => x + 1), []);   // stable, so callers can list it in effect dependencies
+  return { ...state, reload };
 }

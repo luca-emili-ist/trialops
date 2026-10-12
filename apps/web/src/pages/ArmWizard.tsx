@@ -1,7 +1,7 @@
 // TRO-012 New-arm wizard (M01-02): arm details → agents prepare (Protocol author, Onboarding planner) → a person reviews
 // the diff with sources and signs → ready for submission. Resumable through #/arms/new?arm=<id>.
 import { useEffect, useState, type ReactNode } from 'react';
-import { PageHeader, Panel, Button, TextField, SelectField, Field, Textarea, Steps, DataTable, DiffList, StatusPill, SignDialog,
+import { PageHeader, Panel, Button, TextField, SelectField, Field, Textarea, ProcessMap, DataTable, DiffList, StatusPill, SignDialog,
   Loading, ErrorNote, DefinitionList, EmptyState, useToast, AiProvenance, type SectionDiff, type AiProvenanceLike } from '@trialops/shell';
 import { api, runJob } from '../api.ts';
 import { useData, useSession } from '../session.tsx';
@@ -80,8 +80,14 @@ function Details({ onCreated }: { onCreated: (armId: string) => void }) {
 }
 
 function WizardSteps({ current }: { current: number }) {
-  const labels = ['Arm details', 'Agents prepare', 'Review and sign', 'Ready for submission'];
-  return <Steps steps={labels.map((l, i) => ({ label: `Step ${i + 1}`, value: l, state: i < current ? 'done' : i === current ? 'current' : 'todo' }))} />;
+  const steps = [
+    { key: 'details', label: 'Arm details', actor: 'person' as const, autonomy: 'Done by platform operations' },
+    { key: 'agents', label: 'Agents prepare', actor: 'agent' as const, autonomy: 'Agents draft, nothing changes yet' },
+    { key: 'review', label: 'Review and sign', actor: 'person' as const, gate: true, autonomy: 'A person accepts or rejects' },
+    { key: 'ready', label: 'Ready for submission', actor: 'person' as const, gate: true, autonomy: 'Approval needs another person' },
+  ];
+  return <ProcessMap label="Onboarding of the arm" steps={steps.map((s, i) => ({ ...s, state: i < current ? 'done' : i === current ? 'current' : 'todo',
+    status: i < current ? 'done' : i === current ? (s.actor === 'agent' ? 'agents' : 'now') : undefined }))} />;
 }
 
 function Progress({ armId }: { armId: string }) {
@@ -142,7 +148,7 @@ function Review({ task, onDone }: { task: Task; onDone: () => void }) {
   return (
     <>
       <div className="grid-2">
-        <Panel title="AI-generated appendix proposal — changes to the draft" meta="Proposal by the Protocol author agent. It changes nothing until a person accepts it with a signature.">
+        <Panel ai title="AI-generated appendix proposal — changes to the draft" meta="Proposal by the Protocol author agent. It changes nothing until a person accepts it with a signature.">
           <AiProvenance provenance={d.ai_generated ?? { agent: task.assignee }} />
           <DiffList sections={d.sections} />
         </Panel>

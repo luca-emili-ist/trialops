@@ -22,8 +22,8 @@ export function Login() {
   return (
     <div className="shell-main">
       <div className="shell-banner">Synthetic data — demonstration environment</div>
-      <main className="shell-content" id="main">
-        <header className="page-header"><div><div className="crumbs">InSilicoTrials</div><h1>Sign in to TrialOps</h1>
+      <main className="shell-content signin" id="main">
+        <header className="page-header"><div><div className="signin-mark" aria-hidden="true" /><div className="crumbs">InSilicoTrials</div><h1>Sign in to TrialOps</h1>
           <p>Clinical operations platform for adaptive platform trials.</p></div></header>
         {s.notice && !step ? <Panel title="Session ended"><p role="status">{s.notice}</p></Panel> : null}
         {step?.kind === 'challenge' ? <TotpChallenge /> : step?.kind === 'enrol' ? <TotpEnrol qr={step.qr} secret={step.secret} />

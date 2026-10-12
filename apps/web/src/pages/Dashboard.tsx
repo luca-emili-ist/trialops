@@ -1,6 +1,6 @@
 // TRO-001 Platform overview: arms, sites, enrollment, SURPASS metrics against target with drill-down to the event.
 import { useState } from 'react';
-import { PageHeader, KeyFigures, Panel, DataTable, StatusPill, MetricBar, Button, Loading, ErrorNote, DefinitionList, EmptyState } from '@trialops/shell';
+import { PageHeader, KeyFigures, Panel, DataTable, StatusPill, MetricBar, Button, Loading, ErrorNote, DefinitionList, EmptyState, AttentionList } from '@trialops/shell';
 import { useData, useSession } from '../session.tsx';
 import { go } from '../router.ts';
 import { fmtDateTime, human, tone, METRIC_LABEL } from '../format.ts';
@@ -25,6 +25,10 @@ export function Dashboard() {
   const rows = (metrics.data?.items ?? []).flatMap(m => (m.per_arm ? m.values : [m.headline ?? { arm_id: null, arm_code: null, value: null, status: 'no_data' }])
     .map(v => ({ m, v, key: `${m.code}:${v.arm_id ?? 'platform'}` })))
     .sort((a, b) => Number(a.v.value === null) - Number(b.v.value === null));   // measured metrics first
+  const target = (m: Metric) => [m.interim_target !== null ? `interim ${m.interim_target}` : null, m.final_target !== null ? `final ${m.final_target}` : null]
+    .filter(Boolean).join(' · ');
+  // Exceptions first (P3): off-target metrics get their own list with the reason; the rest stays neutral in the table.
+  const offTarget = rows.filter(r => r.v.status === 'off_target');
   return (
     <>
       <PageHeader crumbs={o.lead_operator} title={`${o.code} — ${o.title}`}
@@ -37,6 +41,16 @@ export function Dashboard() {
         { label: 'My open tasks', value: review.data?.items.length ?? '—', note: `${review.data?.items.filter(t => t.state === 'waiting_review').length ?? 0} awaiting review` },
       ]} />
       <div className="grid-2">
+        <div className="stack">
+        <Panel title="Needs attention" meta={metrics.data ? `${offTarget.length} of ${rows.length} measures off target` : undefined}>
+          {metrics.error ? <ErrorNote error={metrics.error} /> : !metrics.data ? <Loading /> :
+            <AttentionList clear="Every SURPASS TA3 measure is within target or has no data yet." items={offTarget.map(r => ({
+              key: r.key, severity: 'bad' as const, title: `${r.v.arm_code ?? 'Platform'} · ${r.m.name}`,
+              reason: `Off target. Open it to see the records and events behind the value.`,
+              value: r.v.value === null ? '—' : `${r.v.value} ${r.m.unit}`, target: target(r.m) || undefined,
+              onOpen: () => setDrill({ code: r.m.code, arm: r.v.arm_id }),
+            }))} />}
+        </Panel>
         <Panel title="SURPASS TA3 metrics against target" meta={metrics.data ? `Computed from records at ${fmtDateTime(metrics.data.computed_at)} · bar marks: interim (ink) and final (green) target` : undefined}>
           {metrics.error ? <ErrorNote error={metrics.error} /> : !metrics.data ? <Loading /> :
             <DataTable rows={rows} rowKey={r => r.key} selectedKey={drill ? `${drill.code}:${drill.arm ?? 'platform'}` : null}
@@ -45,10 +59,12 @@ export function Dashboard() {
                 { key: 'metric', wrap: true, label: 'Metric', render: r => r.m.name, sortValue: r => r.m.name },
                 { key: 'arm', label: 'Arm', render: r => r.v.arm_code ?? 'Platform', sortValue: r => r.v.arm_code },
                 { key: 'value', label: 'Measured', align: 'right', render: r => r.v.value === null ? '—' : `${r.v.value} ${r.m.unit}`, sortValue: r => r.v.value },
-                { key: 'bar', label: 'Interim · final', render: r => <MetricBar value={r.v.value} interim={r.m.interim_target} final={r.m.final_target} /> },
+                { key: 'bar', label: 'Interim · final', render: r => <MetricBar value={r.v.value} interim={r.m.interim_target} final={r.m.final_target}
+                  tone={r.v.status === 'off_target' ? 'bad' : undefined} /> },
                 { key: 'status', label: 'Status', render: r => <StatusPill tone={tone(r.v.status)}>{METRIC_LABEL[r.v.status] ?? human(r.v.status)}</StatusPill>, sortValue: r => r.v.status },
               ]} />}
         </Panel>
+        </div>
         {drill ? <Drilldown pid={pid} code={drill.code} arm={drill.arm} onClose={() => setDrill(null)} /> :
           <Panel title="Arms">
             <DataTable rows={o.arms} rowKey={a => a.id} onRowClick={a => go(`/arms/${a.id}`)} columns={[

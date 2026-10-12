@@ -48,6 +48,8 @@ export function TaskDetail({ id }: { id: string }) {
   return (
     <>
       <PageHeader crumbs={<a href="#/tasks">Tasks</a>} title={t.title}
+        facts={[['State', human(t.state)], ['Arm', t.arm_code ?? '—'], ['Assigned to', t.assignee_kind === 'agent' ? t.assignee.replace('agent:', '') : human(t.assignee)],
+          ['Due', fmtDate(t.due_at)], ...(t.gxp_impact ? [['GxP', 'signed by a person'] as [string, string]] : [])]}
         actions={runnable ? <Button variant="primary" disabled={busy} onClick={() => { setBusy(true); runJob<{ outcome: string; error?: string }>('POST', `/v1/tasks/${id}/run-agent`)
           .then(r => toast(r.outcome === 'success' ? 'Agent finished' : `Agent: ${r.outcome} ${r.error ?? ''}`, r.outcome !== 'success'), e => toast((e as Error).message, true))
           .finally(() => { setBusy(false); task.reload(); }); }}>{busy ? 'Agent working…' : 'Run the agent'}</Button> : undefined} />
@@ -85,7 +87,7 @@ function ProposalReview({ task, onDone }: { task: Task; onDone: () => void }) {
   const proposal = (task.outputs?.proposal?.sections ?? {}) as Content;
   return (
     <>
-      <Panel title={edited ? 'Edit the AI-generated proposal before accepting' : 'AI-generated proposal'}
+      <Panel ai title={edited ? 'Edit the AI-generated proposal before accepting' : 'AI-generated proposal'}
         meta={<AiProvenance provenance={diff.data?.ai_generated ?? { agent: task.assignee }} />} actions={<>
         {edited ? <Button onClick={() => setEdited(null)}>Discard edits</Button> : <Button onClick={() => setEdited(structuredClone(proposal))}>Edit before accepting</Button>}
         {edited ? <Button variant="sign" onClick={() => setSign('edit')}>Accept with edits and sign</Button> : <Button variant="sign" onClick={() => setSign('accept')}>Accept and sign</Button>}

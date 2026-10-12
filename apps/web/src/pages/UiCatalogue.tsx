@@ -1,7 +1,7 @@
 // TRO-099 Design system catalogue: every base component in its states. Reference for anyone writing pages (docs/DESIGN.md).
 import { useState } from 'react';
 import { AppShell, PageHeader, Panel, Button, TextField, SelectField, Field, Textarea, StatusPill, KeyFigures, DataTable, MetricBar, Steps,
-  DiffList, EmptyState, DefinitionList, SignDialog, ReasonDialog, Loading, ErrorNote, useToast, SignatureManifest, AiProvenance } from '@trialops/shell';
+  DiffList, EmptyState, DefinitionList, SignDialog, ReasonDialog, Loading, ErrorNote, useToast, SignatureManifest, AiProvenance, AttentionList, ProcessMap } from '@trialops/shell';
 import { PAGE_CODES } from '../pageCodes.ts';
 
 const rows = [{ id: '101', name: 'Lakeside University Hospital', randomized: 34, status: 'active' }, { id: '106', name: 'Riverside Academic Medical Center', randomized: 7, status: 'on_hold' }];
@@ -11,8 +11,10 @@ export function UiCatalogue() {
   const [dialog, setDialog] = useState<null | 'sign' | 'reason'>(null);
   return (
     <AppShell brand="TrialOps" subtitle="Design system" pageCode={PAGE_CODES.uiCatalogue} banner="Synthetic data — demonstration environment"
-      nav={[{ label: 'Components', href: '#/ui', active: true, group: 'Catalogue' }, { label: 'Back to the app', href: '#/', group: 'Catalogue' }]}>
-      <PageHeader crumbs="Direction C · sober regulatory" title="Component catalogue" subtitle="Pages use only these components and the tokens in packages/shell/src/tokens.css."
+      nav={[{ label: 'Components', href: '#/ui', active: true, group: 'Catalogue' }, { label: 'Tasks (count)', href: '#/ui?count', group: 'Catalogue', count: 3, severity: 'warn' },
+        { label: 'Back to the app', href: '#/', group: 'Catalogue' }]}>
+      <PageHeader crumbs="Direction A · clinical glass" title="Component catalogue" subtitle="Pages use only these components and the tokens in packages/shell/src/tokens.css."
+        facts={[['Version', 'v0.3 draft'], ['State', 'In review'], ['Owner', 'Dana Whitfield']]}
         actions={<><Button variant="primary">Primary</Button><Button variant="sign">Sign</Button></>} />
       <Panel title="Buttons">
         <div className="row"><Button variant="sign">Sign and approve</Button><Button variant="primary">Start new arm</Button><Button>Secondary</Button>
@@ -21,6 +23,19 @@ export function UiCatalogue() {
       <Panel title="Status">
         <div className="row"><StatusPill tone="ok">Final target met</StatusPill><StatusPill tone="warn">Interim target met</StatusPill><StatusPill tone="bad">Off target</StatusPill>
           <StatusPill tone="info">In progress</StatusPill><StatusPill tone="neutral">Draft</StatusPill></div>
+      </Panel>
+      <ProcessMap label="Onboarding of an arm" steps={[
+        { key: 'd', label: 'Arm details', state: 'done', status: 'done', actor: 'person', autonomy: <>Autonomy <b>manual</b></> },
+        { key: 'a', label: 'Draft appendix', state: 'current', status: 'agent', actor: 'agent', autonomy: <>Autonomy <b>agent drafts, person signs</b></> },
+        { key: 'r', label: 'Clinical review', state: 'todo', gate: true, actor: 'person', autonomy: <>Waiting for <b>Dana Whitfield</b></> },
+        { key: 's', label: 'Submit to IRB', state: 'todo', gate: true, actor: 'person', autonomy: <>Autonomy <b>manual</b></> },
+      ]} />
+      <Panel title="Needs attention (exceptions first)" meta="Only anomalies are coloured, each with a line saying why. Everything in range stays neutral.">
+        <AttentionList items={[
+          { key: '1', severity: 'bad', title: 'Site 106 · IRB response overdue', reason: 'The ethics committee has not answered the ARM-C amendment.', value: '+6 d', target: 'due Oct 5', onOpen: () => toast('Opened') },
+          { key: '2', severity: 'warn', title: 'ARM-B · consent to randomization', reason: '3 subjects wait for the central eligibility read.', value: '19 d', target: 'target ≤ 14' },
+        ]} />
+        <AttentionList items={[]} />
       </Panel>
       <KeyFigures items={[{ label: 'Arms active', value: '3 + control' }, { label: 'Sites active', value: '6 of 6' }, { label: 'Randomized', value: 141, note: '240 identified' }]} />
       <div className="grid-2">
@@ -33,7 +48,7 @@ export function UiCatalogue() {
           <Field label="Rationale"><Textarea aria-label="Rationale" defaultValue="MRD-12 showed target engagement in phase 1." /></Field>
         </Panel>
         <Panel title="Metric bar and steps">
-          <DefinitionList items={[['Contract, ARM-A (30 d)', <MetricBar value={30} interim={30} final={7} />], ['IRB, ARM-C (6 d)', <MetricBar value={6} interim={21} final={7} />], ['No data', <MetricBar value={null} interim={7} final={2} />]]} />
+          <DefinitionList items={[['Contract, ARM-A (30 d)', <MetricBar value={30} interim={30} final={7} tone="bad" />], ['IRB, ARM-C (6 d)', <MetricBar value={6} interim={21} final={7} />], ['No data', <MetricBar value={null} interim={7} final={2} />]]} />
           <Steps steps={[{ label: 'Qualification', value: 'Oct 1', state: 'done' }, { label: 'Contract', value: 'Oct 4', state: 'done' }, { label: 'IRB', value: '—', state: 'current' }, { label: 'Green light', value: '—', state: 'todo' }]} />
         </Panel>
       </div>
@@ -43,7 +58,7 @@ export function UiCatalogue() {
           { key: 'status', label: 'Status', render: r => <StatusPill tone={r.status === 'active' ? 'ok' : 'warn'}>{r.status.replace('_', ' ')}</StatusPill> }]} />
       </Panel>
       <div className="grid-2">
-        <Panel title="Diff of a proposal">
+        <Panel ai title="Diff of an AI proposal (iridescent edge until signed)" meta={<AiProvenance provenance={{ agent: 'protocol-author', model: 'claude-opus-5-5' }} />}>
           <DiffList sections={[{ section: 'objectives', change: 'changed', items: [{ id: 'OBJ1', change: 'added', after: { text: 'Efficacy versus shared control at week 24' } },
             { id: 'OBJ2', change: 'changed', after: { text: 'Safety over 28 weeks' } }] }, { section: 'synopsis', change: 'removed', before: { title: 'Old synopsis' } }]} />
         </Panel>

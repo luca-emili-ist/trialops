@@ -31,7 +31,7 @@ export function ProtocolEditor({ kind, id }: { kind: 'master' | 'appendix'; id: 
   return (
     <>
       <PageHeader crumbs={<><a href="#/arms">Arms & protocol</a>{ver.arm_id ? <> · <a href={`#/arms/${ver.arm_id}`}>Arm</a></> : null}</>}
-        title={`${title} v${ver.version_label}`}
+        title={`${title} v${ver.version_label}`} facts={[['Version', ver.version_label], ['State', human(ver.status)]]}
         subtitle="Structured content following ICH M11 headings and CDISC USDM objects. Approved versions are frozen; changes start a new version."
         actions={<>
           {isDraft && canEdit ? <Button variant="primary" onClick={() => setDialog('submit')}>Send for review</Button> : null}

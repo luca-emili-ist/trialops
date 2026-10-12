@@ -1,7 +1,8 @@
-// Web shell (evolution of the Grant OS shell: module navigation, user context, page code footer) in direction C.
+// Web shell (evolution of the Grant OS shell: module navigation, user context, page code footer) in direction A "clinical glass".
 import type { ReactNode } from 'react';
 
-export interface NavItem { label: string; href: string; active?: boolean; group?: string }
+/** `count`: items waiting in that area, `severity` colours it only when something is wrong (P11, peripheral layer by severity). */
+export interface NavItem { label: string; href: string; active?: boolean; group?: string; count?: number; severity?: 'neutral' | 'warn' | 'bad' }
 
 export function AppShell({ brand, subtitle, nav, user, banner, pageCode, children }: {
   brand: string; subtitle?: string; nav: NavItem[]; user?: ReactNode; banner?: ReactNode; pageCode: string; children: ReactNode;
@@ -15,7 +16,8 @@ export function AppShell({ brand, subtitle, nav, user, banner, pageCode, childre
           const out: ReactNode[] = [];
           if (n.group && n.group !== lastGroup) out.push(<div className="nav-group" key={`g-${n.group}`}>{n.group}</div>);
           lastGroup = n.group;
-          out.push(<a key={n.href} href={n.href} aria-current={n.active ? 'page' : undefined}>{n.label}</a>);
+          out.push(<a key={n.href} href={n.href} aria-current={n.active ? 'page' : undefined}><span>{n.label}</span>
+            {n.count ? <span className="nav-count" data-severity={n.severity ?? 'neutral'} aria-label={`${n.count} waiting`}>{n.count}</span> : null}</a>);
           return out;
         })}
         {user ? <div className="shell-user">{user}</div> : null}

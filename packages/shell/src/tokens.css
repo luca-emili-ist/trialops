@@ -1,55 +1,77 @@
-/* TrialOps design tokens — direction C "sober regulatory" (chosen by Luca Emili, 2026-10-07).
-   The language of controlled documents: serif headings, night-blue navigation, hairlines instead of cards, green for
-   signing actions, signatures and versions always beside the content. No colour, size or font outside this file. */
-@import url('https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&family=Source+Serif+4:opsz,wght@8..60,600&family=Source+Code+Pro:wght@400;500&display=swap');
+/* TrialOps design tokens — direction A "clinical glass" (chosen by Luca Emili, 2026-10-12; replaces direction C).
+   Light frosted surfaces on a cool ground. AI-generated content is a material of its own: an iridescent violet–teal edge
+   until a person signs it. Cobalt for actions, green only for actions that sign or approve, colour for anomalies only.
+   No colour, size or font outside this file. */
+@import url('https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@600;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
 
 :root {
   /* type */
-  --font-display: 'Source Serif 4', Georgia, 'Times New Roman', serif;
-  --font-ui: 'Source Sans 3', system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --font-mono: 'Source Code Pro', ui-monospace, Menlo, monospace;
+  --font-display: 'Schibsted Grotesk', 'IBM Plex Sans', system-ui, sans-serif;
+  --font-ui: 'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, Menlo, monospace;
   --fs-xs: 0.75rem;   /* 12 labels, footers */
   --fs-sm: 0.8125rem; /* 13 table meta */
   --fs-md: 0.875rem;  /* 14 body, tables */
-  --fs-lg: 1rem;      /* 16 card titles */
-  --fs-xl: 1.375rem;  /* 22 page titles */
+  --fs-lg: 1rem;      /* 16 panel titles */
+  --fs-xl: 1.875rem;  /* 30 page titles */
+  --fs-xl-compact: 1.5rem; /* 24 page titles on phones */
   --fs-2xl: 1.75rem;  /* 28 key figures */
   --lh: 1.5;
-  --tracking-label: 0.06em;
+  --tracking-label: 0.08em;
+  --tracking-display: -0.025em;
 
-  /* colour: paper, ink, night blue, signing green, states */
-  --c-page: #FBFAF7;
+  /* colour: ice ground, night ink, cobalt actions, signing green, iridescent AI, states */
+  --c-page: #E9EEF5;
+  --c-page-glow-1: #D9E2FF;
+  --c-page-glow-2: #D6F3F2;
   --c-surface: #FFFFFF;
-  --c-surface-alt: #F4F2EC;
-  --c-line: #DCD8CF;
-  --c-line-strong: #1E2430;
-  --c-ink: #1E2430;
-  --c-ink-muted: #5E6676;
-  --c-nav: #1F3A5F;
-  --c-nav-ink: #C9D3E1;
-  --c-nav-ink-active: #FFFFFF;
-  --c-nav-active: rgba(255, 255, 255, 0.1);
-  --c-accent: #1F3A5F;          /* links, focus, neutral bars */
-  --c-sign: #1E6B52;            /* actions that sign or approve */
-  --c-sign-hover: #17543F;
+  --c-glass: rgba(255, 255, 255, 0.78);
+  --c-glass-nav: rgba(255, 255, 255, 0.5);
+  --c-surface-alt: #F4F7FB;
+  --c-line: #D5DDE8;
+  --c-line-strong: #B9C4D4;
+  --c-ink: #0E1A2B;
+  --c-ink-muted: #56637A;
+  --c-nav: transparent;
+  --c-nav-ink: #56637A;
+  --c-nav-ink-active: #0E1A2B;
+  --c-nav-active: #FFFFFF;
+  --c-accent: #2346D8;          /* links, focus, primary actions */
+  --c-accent-hover: #1B38B4;
+  --c-sign: #0D7A5F;            /* actions that sign or approve */
+  --c-sign-hover: #0A624C;
   --c-on-strong: #FFFFFF;
-  --c-ok: #1E6B52;    --c-ok-bg: #E3F1EA;
-  --c-warn: #8A5A00;  --c-warn-bg: #F7EEDB;
-  --c-bad: #9B2C2C;   --c-bad-bg: #F6E3E3;
-  --c-info: #1F3A5F;  --c-info-bg: #E6ECF4;
-  --c-neutral: #5E6676; --c-neutral-bg: #EEECE6;
-  --c-focus: #2F6FB3;
-  --c-overlay: rgba(30, 36, 48, 0.45);
-  --c-demo: #8A5A00;
+  --c-ai-1: #7A5CFA;            /* AI material: gradient from violet … */
+  --c-ai-2: #17A9C4;            /* … to teal */
+  --c-ai: #6247E0;              /* AI text on light (contrast ≥ 4.5:1) */
+  --c-ai-bg: #F2F0FF;
+  --c-ok: #0D7A5F;    --c-ok-bg: #E4F4EE;
+  --c-warn: #9A5600;  --c-warn-bg: #FFF1DD;
+  --c-bad: #B4232F;   --c-bad-bg: #FDE8EA;
+  --c-info: #2346D8;  --c-info-bg: #E8EDFD;
+  --c-neutral: #56637A; --c-neutral-bg: #EDF1F6;
+  --c-bar: #8A97AB;             /* measured value within target: neutral */
+  --c-focus: #2346D8;
+  --c-overlay: rgba(14, 26, 43, 0.4);
+  --c-demo: #9A5600;
 
   /* space (4px scale), shape, size */
   --s-1: 0.25rem; --s-2: 0.5rem; --s-3: 0.75rem; --s-4: 1rem; --s-5: 1.25rem; --s-6: 1.5rem; --s-8: 2rem; --s-10: 2.5rem;
-  --radius: 2px;
+  --radius-sm: 6px;             /* pills, chips inside controls */
+  --radius: 10px;               /* buttons, inputs, inner boxes */
+  --radius-lg: 16px;            /* panels, modals */
+  --radius-pill: 999px;
   --row-h: 2.5rem;              /* 40px table rows */
-  --control-h: 2.25rem;         /* 36px inputs and buttons; 44px on touch */
-  --nav-w: 15rem;
-  --content-max: 82rem;
-  --shadow-modal: 0 12px 32px rgba(30, 36, 48, 0.18);
+  --control-h: 2.375rem;        /* 38px inputs and buttons; 44px on touch */
+  --nav-w: 14.5rem;
+  --content-max: 84rem;
+  --blur: 16px;
+  --shadow-panel: 0 0 0 1px var(--c-line), 0 10px 30px rgba(14, 26, 43, 0.05);
+  --shadow-raised: 0 1px 2px rgba(14, 26, 43, 0.06), 0 0 0 1px var(--c-line);
+  --shadow-modal: 0 24px 60px rgba(14, 26, 43, 0.22);
+  --shadow-ai: 0 8px 24px rgba(98, 71, 224, 0.1);
   --bar-h: 0.375rem;
+  --ai-edge: 1.5px;
+  --ai-sheen-duration: 9s;
 }
 @media (pointer: coarse) { :root { --control-h: 2.75rem; --row-h: 2.75rem; } }

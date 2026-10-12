@@ -56,6 +56,8 @@ export function ArmDetail({ id }: { id: string }) {
   return (
     <>
       <PageHeader crumbs={<a href="#/arms">Arms & protocol</a>} title={`${a.code} — ${a.name}`} subtitle={a.sponsor ? `Sponsor: ${a.sponsor}` : 'Platform arm'}
+        facts={[['State', human(a.status)], ['Stage', human(a.current_stage)], ['Appendix', latest ? `v${latest.version_label} · ${human(latest.status)}` : 'none yet'],
+          ['Type', a.intervention_type]]}
         actions={ops ? <>
           {(NEXT[a.status] ?? []).map(n => <Button key={n} variant={n === 'approved' || n === 'active' ? 'primary' : 'secondary'} onClick={() => setTo(n)}>
             {n === 'approved' ? 'Approve arm' : n === 'active' ? 'Activate' : human(n).replace(/^./, c => c.toUpperCase())}</Button>)}

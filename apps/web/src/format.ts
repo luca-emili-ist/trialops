@@ -8,7 +8,7 @@ export const short = (id?: string | null) => id ? id.slice(0, 8) : '—';
 const TONES: Record<string, Tone> = {
   active: 'ok', approved: 'ok', completed: 'ok', activated: 'ok', success: 'ok', final_met: 'ok', accepted: 'ok', executed: 'ok', effective: 'ok',
   draft: 'neutral', candidate: 'neutral', created: 'neutral', assigned: 'info', in_progress: 'info', pending_approval: 'warn', in_review: 'warn',
-  waiting_review: 'warn', interim_met: 'warn', edited: 'warn', qualified: 'info', on_hold: 'warn', suspended: 'warn',
+  waiting_review: 'warn', interim_met: 'neutral', edited: 'warn', qualified: 'info', on_hold: 'warn', suspended: 'warn',
   off_target: 'bad', rejected: 'bad', blocked: 'bad', error: 'bad', validation_failed: 'bad', uninstalled: 'neutral', superseded: 'neutral',
   closed: 'neutral', graduated: 'ok', void: 'neutral', no_data: 'neutral', timeout: 'bad', expired: 'bad', cancelled: 'neutral',
 };
