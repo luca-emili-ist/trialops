@@ -1,6 +1,6 @@
 # Compliance matrix
 
-Generated 2026-10-10T10:26:10.559Z by scripts/trace.mjs from docs/compliance/crosswalk.json and docs/requirements.json.
+Generated 2026-10-12T14:23:15.756Z by scripts/trace.mjs from docs/compliance/crosswalk.json and docs/requirements.json.
 Technical clauses are covered by requirements and their tests; procedural clauses are covered by SOPs of the quality system.
 
 ## P11 — US 21 CFR Part 11 — Electronic records; electronic signatures
@@ -46,8 +46,8 @@ Technical clauses are covered by requirements and their tests; procedural clause
 | A11-6 | §6 | Accuracy checks on critical data entered manually | technical | EDC-04 (v1: NO TEST) | planned |
 | A11-7 | §7 | Data storage: protection, accessibility, regular backups, restore tested | technical | NFR-04 (gxp-p0: PASS) | covered |
 | A11-8 | §8 | Printouts: clear printed copies, indication of changes | technical | CMP-11 (gxp-p0: PASS), CMP-14 (v1: NO TEST) | partial |
-| A11-9 | §9 | Audit trails: record of GMP-relevant changes and deletions with reason; available, convertible, regularly reviewed | technical | CMP-01 (foundations: PASS), CMP-04 (foundations: PASS), DM-03 (foundations: PASS), APP-AU-01 (v2: NO TEST), CMP-10 (gxp-p0: PASS), CMP-15 (gxp-p0: PASS), CMP-12 (v1: NO TEST) | partial |
-| A11-10 | §10 | Change and configuration management | procedural | VAL-02 (v1: NO TEST) | SOP |
+| A11-9 | §9 | Audit trails: record of GMP-relevant changes and deletions with reason; available, convertible, regularly reviewed | technical | CMP-01 (foundations: PASS), CMP-04 (foundations: PASS), DM-03 (foundations: PASS), APP-AU-01 (v2: NO TEST), CMP-10 (gxp-p0: PASS), CMP-15 (gxp-p0: PASS), CMP-12 (v1: NO TEST), UX-02 (v0: PASS) | partial |
+| A11-10 | §10 | Change and configuration management | procedural | VAL-02 (v1: NO TEST), UX-02 (v0: PASS) | SOP |
 | A11-11 | §11 | Periodic evaluation | procedural | — | SOP |
 | A11-12 | §12 | Security: physical and logical access controls, creation/change/cancellation of access authorizations recorded | technical | IAM-02 (foundations: PASS), IAM-03 (foundations: PASS), IAM-05 (foundations: PASS), APP-MF-02 (foundations: PASS), APP-MF-04 (foundations: PASS), APP-ID-01 (v0: PASS), APP-ID-02 (v0: PASS), APP-ID-02 (foundations: PASS), IAM-01 (gxp-p0: PASS), CMP-03 (gxp-p0: PASS), IAM-06 (v2: NO TEST) | partial |
 | A11-13 | §13 | Incident management | procedural | — | SOP |

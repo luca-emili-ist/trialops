@@ -1,5 +1,5 @@
-import { useEffect, useRef } from 'react';
-import { AppShell, Loading, Button, type NavItem } from '@trialops/shell';
+import { useCallback, useEffect, useRef } from 'react';
+import { AppShell, Loading, Button, SuggestChanges, type NavItem, type SuggestedChange, type OpenRequest } from '@trialops/shell';
 import { useRoute, go } from './router.ts';
 import { PAGE_CODES, type PageKey } from './pageCodes.ts';
 import { useSession, useData } from './session.tsx';
@@ -16,6 +16,8 @@ import { AuditTrail, AUDIT_ROLES } from './pages/AuditTrail.tsx';
 import { Login } from './pages/Login.tsx';
 import { UiCatalogue } from './pages/UiCatalogue.tsx';
 import { NotFound } from './pages/NotFound.tsx';
+import { ChangeRequests, CHANGE_ADMIN_ROLES } from './pages/ChangeRequests.tsx';
+import { api, get } from './api.ts';
 
 /** `roles`: the item is shown only to these roles (the API and the database enforce the same rule). */
 export const NAV: { label: string; href: string; pages: PageKey[]; group: string; roles?: readonly string[] }[] = [
@@ -26,6 +28,7 @@ export const NAV: { label: string; href: string; pages: PageKey[]; group: string
   { label: 'Applications', href: '#/apps', pages: ['apps'], group: 'Work' },
   { label: 'AI ledger', href: '#/ai', pages: ['aiLedger'], group: 'Trust' },
   { label: 'Audit trail', href: '#/audit', pages: ['auditTrail'], group: 'Trust', roles: AUDIT_ROLES },
+  { label: 'Change requests', href: '#/change-requests', pages: ['changeRequests'], group: 'Admin', roles: CHANGE_ADMIN_ROLES },
 ];
 const PUBLIC: PageKey[] = ['login', 'loginMfa', 'loginMfaEnrol', 'uiCatalogue'];
 
@@ -46,6 +49,11 @@ export function App() {
   const seenPage = useRef(route.page);
   useEffect(() => { if (seenPage.current !== route.page) { seenPage.current = route.page; reloadInbox(); } }, [route.page, reloadInbox]);
   const code = PAGE_CODES[route.page];
+  // Suggest changes (UX-01, UX-02): stored through the API in the name of the signed-in person, on the current platform.
+  const platformId = s.platform?.id;
+  const suggest = useCallback(async (c: SuggestedChange) => { await api('POST', '/v1/change-requests', { body: { platform_id: platformId, ...c } }); }, [platformId]);
+  const openOn = useCallback(async (page: string) => (await get<{ items: OpenRequest[] }>(
+    `/v1/change-requests?platform_id=${platformId}&status=open&page_code=${encodeURIComponent(page)}`)).items, [platformId]);
   if (s.loading) return <AppShell brand="TrialOps" nav={[]} pageCode={code}><Loading what="Signing in" /></AppShell>;
   if (route.page === 'login') return <Login />;
   if (route.page === 'uiCatalogue') return <UiCatalogue />;
@@ -56,6 +64,7 @@ export function App() {
     dashboard: <Dashboard />, arms: <Arms />, armDetail: <ArmDetail id={p.id!} />, armWizard: <ArmWizard />,
     protocolEditor: <ProtocolEditor kind={p.kind as 'master' | 'appendix'} id={p.id!} />, sites: <Sites />, siteDetail: <SiteDetail id={p.id!} />,
     tasks: <Tasks />, taskDetail: <TaskDetail id={p.id!} />, apps: <Apps />, oidcAuthorize: <OidcAuthorize />, aiLedger: <AiLedger />, auditTrail: <AuditTrail />,
+    changeRequests: <ChangeRequests />,
     notFound: <NotFound />, login: null, loginMfa: null, loginMfaEnrol: null, uiCatalogue: null,
   }[route.page];
   const waiting = inbox.data?.items.filter(t => t.state === 'waiting_review').length ?? 0;
@@ -64,6 +73,7 @@ export function App() {
   return (
     <AppShell brand="TrialOps" subtitle={s.platform ? `${s.platform.code} · ${s.platform.therapeutic_area}` : undefined} nav={nav}
       pageCode={code} banner="Synthetic data — demonstration environment"
+      actions={s.platform ? <SuggestChanges pageCode={code} onSubmit={suggest} loadOpen={openOn} triageHint="Admin → Change requests (TRO-060)" /> : null}
       user={<>
         <span><strong>{s.me.person?.full_name ?? s.me.email ?? s.me.sub}</strong><br />{s.me.roles.map(r => r.replace(/_/g, ' ')).join(', ') || 'no role'}</span>
         <Button variant="ghost" onClick={() => { void s.signOut().then(() => go('/login')); }}>{s.mode === 'dev' ? 'Switch user' : 'Sign out'}</Button>

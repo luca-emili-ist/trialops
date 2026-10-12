@@ -254,3 +254,37 @@ a { color: var(--c-accent); text-underline-offset: 2px; }
 /* A table cell with long text (e.g. audit changes): wide enough to stay readable in a few lines */
 .cell-wide { display: block; min-width: 20rem; }
 @media (max-width: 760px) { .cell-wide { min-width: 16rem; } }
+
+/* Suggest changes (UX-01): button top right, numbered components, request panel. Above modals and toasts. */
+.shell-top { display: flex; align-items: center; justify-content: space-between; gap: var(--s-3); width: 100%; max-width: var(--content-max); margin: 0 auto; padding: var(--s-3) var(--s-6) 0; }
+.shell-top .shell-banner { padding: 0; margin: 0; max-width: none; width: auto; }
+.shell-actions { display: flex; align-items: center; gap: var(--s-2); margin-left: auto; position: relative; z-index: 21; }   /* above the modal backdrop: a dialog can be numbered too */
+.suggest-btn { font: inherit; font-size: var(--fs-xs); font-weight: 600; display: inline-flex; align-items: center; gap: var(--s-2); min-height: var(--control-h); padding: 0 var(--s-3); border: 0; border-radius: var(--radius); cursor: pointer; white-space: nowrap; color: var(--c-ink-muted); background: var(--c-surface); box-shadow: var(--shadow-raised); }
+.suggest-btn:hover { color: var(--c-ink); }
+.suggest-btn[aria-pressed="true"] { color: var(--c-on-strong); background: var(--c-ink); }
+.suggest-icon { flex: none; }
+.suggest-layer { position: fixed; inset: 0; z-index: 40; pointer-events: none; }
+.suggest-bar { position: fixed; top: var(--s-3); left: 50%; transform: translateX(-50%); pointer-events: auto; display: flex; align-items: center; gap: var(--s-2); max-width: calc(100vw - 2rem); padding: var(--s-1) var(--s-1) var(--s-1) var(--s-4); border-radius: var(--radius-pill); background: var(--c-ink); color: var(--c-on-strong); font-size: var(--fs-xs); box-shadow: var(--shadow-modal); }
+.suggest-bar .t-mono { font-size: var(--fs-xs); }
+.suggest-bar-btn { font: inherit; font-weight: 600; border: 0; cursor: pointer; border-radius: var(--radius-pill); padding: var(--s-1) var(--s-3); background: transparent; color: inherit; }
+.suggest-bar-done { background: var(--c-surface); color: var(--c-ink); }
+.suggest-panel .suggest-bar-btn { color: var(--c-ink-muted); font-size: var(--fs-lg); padding: 0 var(--s-2); }
+.suggest-outline { position: fixed; border: 2px dashed var(--c-accent); border-radius: var(--radius-sm); background: color-mix(in srgb, var(--c-info-bg) 55%, transparent); }
+.suggest-num { position: fixed; pointer-events: auto; cursor: pointer; min-width: 1.25rem; height: 1.25rem; padding: 0 var(--s-1); border: 0; border-radius: var(--radius-pill); display: inline-flex; align-items: center; justify-content: center; font-family: var(--font-mono); font-size: 0.6875rem; font-weight: 500; font-variant-numeric: tabular-nums; background: var(--c-ink); color: var(--c-on-strong); box-shadow: var(--shadow-raised); }
+.suggest-num[aria-pressed="true"], .suggest-num:hover { background: var(--c-accent); }
+.suggest-panel { position: fixed; right: var(--s-4); top: calc(var(--s-10) + var(--s-6)); width: min(24rem, calc(100vw - 2rem)); max-height: calc(100vh - 6rem); overflow-y: auto; pointer-events: auto; display: grid; gap: var(--s-3); padding: var(--s-4); border-radius: var(--radius-lg); background: var(--c-surface); color: var(--c-ink); box-shadow: var(--shadow-modal); z-index: 41; }
+.suggest-panel-head { display: flex; justify-content: space-between; align-items: flex-start; gap: var(--s-2); }
+.suggest-panel-head > div { display: grid; gap: var(--s-1); min-width: 0; }
+.suggest-panel-head strong { color: var(--c-accent); }
+.suggest-panel-head small, .suggest-panel small { font-size: var(--fs-xs); color: var(--c-ink-muted); overflow-wrap: anywhere; }
+.suggest-kind { font: inherit; font-size: var(--fs-xs); cursor: pointer; padding: var(--s-1) var(--s-3); border-radius: var(--radius-pill); border: 1px solid var(--c-line); background: var(--c-surface); color: var(--c-ink-muted); }
+.suggest-kind[aria-checked="true"] { border-color: var(--c-ink); color: var(--c-ink); font-weight: 600; }
+.suggest-open { display: grid; gap: var(--s-1); padding-top: var(--s-2); border-top: 1px solid var(--c-line); font-size: var(--fs-xs); color: var(--c-ink-muted); }
+.suggest-open-title { font-family: var(--font-mono); letter-spacing: var(--tracking-label); text-transform: uppercase; }
+.suggest-open [data-same="true"] { color: var(--c-ink); font-weight: 600; }
+.suggest-open .t-mono { font-size: var(--fs-xs); }
+@media (max-width: 52rem) {
+  .shell-top { padding: var(--s-3) var(--s-4) 0; }
+  .suggest-label { display: none; }
+  .suggest-bar > span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+}

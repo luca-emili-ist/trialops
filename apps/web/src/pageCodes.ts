@@ -13,6 +13,7 @@ export const PAGE_CODES = {
   oidcAuthorize: 'TRO-041',
   aiLedger: 'TRO-050',
   auditTrail: 'TRO-051',
+  changeRequests: 'TRO-060',  // Admin: triage of the changes suggested from the pages (UX-02)
   login: 'TRO-090',
   loginMfa: 'TRO-091',        // sign-in step: authenticator code (IAM-01); not a route, part of the sign-in
   loginMfaEnrol: 'TRO-092',   // sign-in step: enrolment of a first authenticator (IAM-01)

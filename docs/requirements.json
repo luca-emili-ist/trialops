@@ -1149,6 +1149,27 @@
     "EMA-CS-USERMGMT",
     "P11-10d"
    ]
+  },
+  {
+   "id": "UX-01",
+   "release": "v0",
+   "text": "Suggest changes: a button at the top right of every signed-in page numbers the components of the page (or of the open dialog) with stable codes <PAGE CODE>.Cnn from the page-code registry, data-fc codes winning, and opens a panel to describe the change (decided by Luca Emili, 2026-10-12)",
+   "gxp_impact": "none",
+   "risk": "low",
+   "assurance": "automated",
+   "regs": []
+  },
+  {
+   "id": "UX-02",
+   "release": "v0",
+   "text": "Change requests: stored in the name of the signed-in person with server UTC time and status new, readable by the persons of the platform; only platform admins change status and triage note (TRO-060), every change audited, removal is a void with a reason",
+   "gxp_impact": "indirect",
+   "risk": "low",
+   "assurance": "automated",
+   "regs": [
+    "A11-10",
+    "A11-9"
+   ]
   }
  ]
 }

@@ -4,8 +4,9 @@ import type { ReactNode } from 'react';
 /** `count`: items waiting in that area, `severity` colours it only when something is wrong (P11, peripheral layer by severity). */
 export interface NavItem { label: string; href: string; active?: boolean; group?: string; count?: number; severity?: 'neutral' | 'warn' | 'bad' }
 
-export function AppShell({ brand, subtitle, nav, user, banner, pageCode, children }: {
-  brand: string; subtitle?: string; nav: NavItem[]; user?: ReactNode; banner?: ReactNode; pageCode: string; children: ReactNode;
+/** `actions`: controls at the top right of every page (e.g. Suggest changes, UX-01). */
+export function AppShell({ brand, subtitle, nav, user, banner, actions, pageCode, children }: {
+  brand: string; subtitle?: string; nav: NavItem[]; user?: ReactNode; banner?: ReactNode; actions?: ReactNode; pageCode: string; children: ReactNode;
 }) {
   let lastGroup: string | undefined;
   return (
@@ -23,7 +24,8 @@ export function AppShell({ brand, subtitle, nav, user, banner, pageCode, childre
         {user ? <div className="shell-user">{user}</div> : null}
       </nav>
       <div className="shell-main">
-        {banner ? <div className="shell-banner">{banner}</div> : null}
+        {banner || actions ? <div className="shell-top">{banner ? <div className="shell-banner">{banner}</div> : <span />}
+          {actions ? <div className="shell-actions no-print">{actions}</div> : null}</div> : null}
         <main className="shell-content" id="main">{children}</main>
         <PageFooter pageCode={pageCode} />
       </div>

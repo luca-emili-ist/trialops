@@ -5,3 +5,5 @@ export * from './ui/DiffList.tsx';
 export * from './AppShell.tsx';
 export * from './ui/manifest.ts';
 export * from './ui/provenance.tsx';
+export * from './ui/suggest.ts';
+export * from './ui/SuggestChanges.tsx';

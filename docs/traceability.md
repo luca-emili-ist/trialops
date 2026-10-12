@@ -1,6 +1,6 @@
 # Traceability matrix
 
-Generated 2026-10-10T10:26:10.551Z by scripts/trace.mjs from test tags and test-results.xml.
+Generated 2026-10-12T14:23:15.751Z by scripts/trace.mjs from test tags and test-results.xml.
 
 | Requirement | Release | Description | Tests | Result |
 | --- | --- | --- | --- | --- |
@@ -95,3 +95,5 @@ Generated 2026-10-10T10:26:10.551Z by scripts/trace.mjs from test tags and test-
 | VAL-05 | gxp-p0 | Requirements carry gxp_impact, risk, assurance and regulatory references; CI generates per-regulation compliance matrices from docs/compliance/crosswalk.json | db/tests/compliance.test.mjs (1) | PASS |
 | IAM-06 | v2 | Periodic access review every 90 days generated as a signed task for the platform admin | — (0) | NO TEST |
 | APP-ID-03 | v2 | SCIM 2.0 user provisioning to apps; deactivation propagated within 5 minutes | — (0) | NO TEST |
+| UX-01 | v0 | Suggest changes: a button at the top right of every signed-in page numbers the components of the page (or of the open dialog) with stable codes <PAGE CODE>.Cnn from the page-code registry, data-fc codes winning, and opens a panel to describe the change (decided by Luca Emili, 2026-10-12) | apps/web/test/pages.test.ts, packages/shell/test/suggest.test.ts (6) | PASS |
+| UX-02 | v0 | Change requests: stored in the name of the signed-in person with server UTC time and status new, readable by the persons of the platform; only platform admins change status and triage note (TRO-060), every change audited, removal is a void with a reason | apps/web/test/pages.test.ts, db/tests/change_requests.test.mjs, packages/api/test/change_requests.test.ts, packages/shell/test/suggest.test.ts (10) | PASS |

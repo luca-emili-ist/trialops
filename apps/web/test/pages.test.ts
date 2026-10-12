@@ -100,3 +100,24 @@ test('[CMP-03] idle timer with a warning 60 s before the limit; the API ending t
   assert.match(readFileSync(join(src, 'api.ts'), 'utf8'), /const SESSION_END_CODES = \['session_idle', 'session_ended', 'account_locked'\];/);
   assert.match(page('Login.tsx'), /<Panel title="Session ended">/);
 });
+
+test('[UX-01] Suggest changes is at the top right of every signed-in page with the code of the page registry', () => {
+  const app = readFileSync(join(src, 'App.tsx'), 'utf8');
+  assert.match(app, /actions=\{s\.platform \? <SuggestChanges pageCode=\{code\} onSubmit=\{suggest\} loadOpen=\{openOn\}/);
+  assert.match(app, /const code = PAGE_CODES\[route\.page\]/, 'the page code comes from the registry, not from the DOM');
+  assert.match(app, /if \(route\.page === 'login'\) return <Login \/>;/, 'the sign-in pages are rendered without the shell, so without the button');
+  assert.match(app, /'\/v1\/change-requests'/);
+});
+
+test('[UX-02] the change requests page has its own code in a new Admin decade and is in the navigation only for platform admins', () => {
+  assert.equal(PAGE_CODES.changeRequests, 'TRO-060');
+  assert.deepEqual(parse('#/change-requests'), { page: 'changeRequests', params: {} });
+  const app = readFileSync(join(src, 'App.tsx'), 'utf8');
+  assert.match(app, /label: 'Change requests', href: '#\/change-requests', pages: \['changeRequests'\], group: 'Admin', roles: CHANGE_ADMIN_ROLES/);
+  const p = page('ChangeRequests.tsx');
+  assert.match(p, /export const CHANGE_ADMIN_ROLES = \['platform_admin'\] as const/);
+  assert.match(p, /changeRequestAsTask\(r\)/, 'Copy as task');
+  assert.match(p, /<ReasonDialog/, 'removal asks for a reason');
+  assert.match(p, /\/void`/, 'removal is a void, never a delete');
+  assert.doesNotMatch(p, /'DELETE'/);
+});

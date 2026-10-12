@@ -18,6 +18,7 @@ const TABLE: [RegExp, PageKey, string[]][] = [
   [/^\/oidc\/authorize$/, 'oidcAuthorize', []],
   [/^\/ai$/, 'aiLedger', []],
   [/^\/audit$/, 'auditTrail', []],
+  [/^\/change-requests$/, 'changeRequests', []],
   [/^\/login$/, 'login', []],
   [/^\/ui$/, 'uiCatalogue', []],
 ];
