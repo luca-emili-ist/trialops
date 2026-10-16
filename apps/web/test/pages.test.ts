@@ -35,6 +35,16 @@ test('[DEMO-04] the synthetic-data label is on every page of the shell', () => {
 
 const page = (f: string) => readFileSync(join(src, 'pages', f), 'utf8');
 
+test('[DEMO-04] the page code in the footer is a button that copies the link to the current page', () => {
+  const shell = readFileSync(join(src, '../../../packages/shell/src/AppShell.tsx'), 'utf8');
+  assert.match(shell, /<PageCodeBadge code=\{pageCode\} \/>/, 'the footer uses the badge');
+  assert.match(shell, /<button type="button" className="page-code t-mono" data-page-code=\{code\}/);
+  assert.match(shell, /navigator\.clipboard\.writeText\(window\.location\.href\)/);
+  assert.match(shell, /'Copy the link to this page'/);
+  assert.match(shell, /'link copied'/);
+  assert.match(shell, /window\.clearTimeout\(id\)/, 'the confirmation timer is cleaned up');
+});
+
 test('[CMP-10] the audit trail page has its own code in the Trust decade and is in the navigation only for QA and admins', () => {
   assert.equal(PAGE_CODES.auditTrail, 'TRO-051');
   assert.equal(PAGE_CODES.aiLedger.slice(0, 6), PAGE_CODES.auditTrail.slice(0, 6), 'same decade as the AI ledger (Trust)');

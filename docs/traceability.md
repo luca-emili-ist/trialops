@@ -1,6 +1,6 @@
 # Traceability matrix
 
-Generated 2026-10-12T14:23:15.751Z by scripts/trace.mjs from test tags and test-results.xml.
+Generated 2026-10-16T15:37:17.144Z by scripts/trace.mjs from test tags and test-results.xml.
 
 | Requirement | Release | Description | Tests | Result |
 | --- | --- | --- | --- | --- |
@@ -63,7 +63,7 @@ Generated 2026-10-12T14:23:15.751Z by scripts/trace.mjs from test tags and test-
 | EDC-06 | v2 | SDV and reviews | — (0) | NO TEST |
 | EDC-07 | v2 | PI signature | — (0) | NO TEST |
 | EDC-08 | v2 | Locks and data freeze | — (0) | NO TEST |
-| DEMO-04 | v0 | Visible 'synthetic data - demonstration environment' label and page code on every page | apps/web/test/pages.test.ts (3) | PASS |
+| DEMO-04 | v0 | Visible 'synthetic data - demonstration environment' label and page code on every page | apps/web/test/pages.test.ts (4) | PASS |
 | AI-09 | v1 | Per-job limits (max_steps, max_tokens, max_cost, max_execution_time); an overrun stops the job and creates a task for a person | packages/api/test/ai.test.ts, packages/api/test/jobs.test.ts (7) | PASS |
 | IAM-01 | gxp-p0 | MFA mandatory for every role with GxP impact (TOTP or passkey); signing with MFA step-up | apps/web/test/pages.test.ts, db/tests/access_controls.test.mjs, packages/api/test/access_controls.test.ts (10) | PASS |
 | CMP-03 | gxp-p0 | Session idle timeout and account lockout after repeated failed logins or signing attempts, both recorded in the audit trail | apps/web/test/pages.test.ts, db/tests/access_controls.test.mjs, packages/api/test/access_controls.test.ts (14) | PASS |

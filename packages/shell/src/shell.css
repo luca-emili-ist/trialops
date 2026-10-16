@@ -39,6 +39,10 @@ a { color: var(--c-accent); text-underline-offset: 2px; }
 .shell-banner { color: var(--c-demo); text-align: left; font-family: var(--font-mono); font-size: var(--fs-xs); padding: var(--s-3) var(--s-6) 0; letter-spacing: var(--tracking-label); text-transform: uppercase; width: 100%; max-width: var(--content-max); margin: 0 auto; }
 .shell-content { flex: 1; width: 100%; max-width: var(--content-max); margin: 0 auto; padding: var(--s-4) var(--s-6) var(--s-8); display: grid; gap: var(--s-5); align-content: start; }
 .shell-footer { display: flex; justify-content: space-between; gap: var(--s-4); padding: var(--s-3) var(--s-6); border-top: 1px solid var(--c-line); color: var(--c-ink-muted); font-family: var(--font-mono); font-size: var(--fs-xs); }
+.shell-footer .page-code { font-family: var(--font-mono); font-size: var(--fs-sm); line-height: inherit; color: inherit; background: none; border: 1px solid transparent; border-radius: var(--radius-sm); padding: 0 var(--s-1); margin: 0 calc(-1 * var(--s-1)); cursor: pointer; }
+.shell-footer .page-code:hover { border-color: var(--c-line-strong); color: var(--c-ink); }
+.shell-footer .page-code:focus-visible { outline: 2px solid var(--c-focus); outline-offset: 1px; }
+.shell-footer .page-code-copied { color: var(--c-ink-muted); }
 .shell-menu { display: none; }
 @media (max-width: 52rem) {
   .shell { grid-template-columns: minmax(0, 1fr); }
