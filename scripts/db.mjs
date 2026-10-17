@@ -59,6 +59,7 @@ async function migrate() {
   const c = new pg.Client({ connectionString: connString() });
   await c.connect();
   await c.query('create table if not exists public.schema_migrations (name text primary key, applied_at timestamptz default now())');
+  await c.query('alter table public.schema_migrations enable row level security'); // never readable via the API
   const done = new Set((await c.query('select name from public.schema_migrations')).rows.map(r => r.name));
   const files = readdirSync(join(root, 'db/migrations')).filter(f => f.endsWith('.sql')).sort();
   for (const f of files) {

@@ -14,6 +14,7 @@ if (!process.env.DATABASE_URL) { console.error('DATABASE_URL is not set'); proce
 const c = new pg.Client({ connectionString: process.env.DATABASE_URL, ssl: supabaseSsl });
 await c.connect();
 await c.query('create table if not exists public.schema_migrations (name text primary key, applied_at timestamptz default now())');
+await c.query('alter table public.schema_migrations enable row level security'); // never readable via the API
 const done = new Set((await c.query('select name from public.schema_migrations')).rows.map(r => r.name));
 const files = [
   ...readdirSync(join(root, 'db/migrations')).filter(f => f.endsWith('.sql')).sort().map(f => ['db/migrations', f]),
