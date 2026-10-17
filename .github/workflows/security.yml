@@ -3,7 +3,7 @@
 #   secrets : gitleaks on the full git history
 #   deps    : OSV-Scanner on package-lock.json (known CVEs)
 #   sast    : Semgrep CE with OWASP / TypeScript / React rules
-# Pinned tool versions, downloaded from the vendors' own GitHub releases / PyPI; no marketplace
+# Actions pinned to full commit SHAs (supply-chain safety). # Pinned tool versions, downloaded from the vendors' own GitHub releases / PyPI; no marketplace
 # actions, no secrets. ENFORCE=0 → findings are reported as warnings (first two weeks), 1 → they fail the run.
 name: security
 
@@ -33,19 +33,19 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         with:
           fetch-depth: 0
       - name: gitleaks (full history)
         run: |
           curl -sSL "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz" | tar -xz gitleaks
-          ./gitleaks git --redact --no-banner --exit-code 1 . || { rc=$?; [ "$ENFORCE" = "1" ] && exit $rc; echo "::warning::gitleaks found possible secrets (report-only mode)"; }
+          ./gitleaks git --redact --verbose --no-banner --exit-code 1 . || { rc=$?; [ "$ENFORCE" = "1" ] && exit $rc; echo "::warning::gitleaks found possible secrets (report-only mode)"; }
 
   deps:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
       - name: OSV-Scanner
         run: |
           curl -sSL -o osv-scanner "https://github.com/google/osv-scanner/releases/download/v${OSV_VERSION}/osv-scanner_linux_amd64"
@@ -56,7 +56,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
       - name: Semgrep CE
         run: |
           pip install --quiet "semgrep==${SEMGREP_VERSION}"
