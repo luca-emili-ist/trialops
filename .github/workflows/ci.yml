@@ -6,9 +6,9 @@ concurrency:
 jobs:
   verify:
     runs-on: ubuntu-latest
-    # Since 2026-10-10 `npm run verify` hangs in CI until GitHub's 6 h limit (≈360 billed min per push).
-    # Cap it until the hang is fixed.
-    timeout-minutes: 20
+    # A run takes ~2 min. The cap stops a hang from billing up to GitHub's 6 h limit (it happened 2026-10-10..17:
+    # scripts/db.mjs blocked its event loop with spawnSync and the embedded Postgres stalled on its log pipe).
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

@@ -5,7 +5,7 @@ import pg from 'pg';
 import { readdirSync, readFileSync, existsSync, rmSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { spawnSync } from 'node:child_process';
+import { spawn } from 'node:child_process';
 import { testFiles } from './test-files.mjs';
 import { createConnection } from 'node:net';
 
@@ -39,6 +39,20 @@ async function start() {
   await admin.end();
 }
 
+/**
+ * Runs a child node process and resolves with its exit code. Never spawnSync here: a blocked event loop stops draining
+ * the stdout/stderr pipes of the embedded Postgres; once the pipe buffer is full, the next server log line (e.g. the
+ * checkpoint lines written by every CREATE/DROP DATABASE of the API tests) blocks that Postgres process for good.
+ * That is what made `npm run verify` hang in CI from 2026-10-10.
+ */
+function runNode(args) {
+  return new Promise((resolve, reject) => {
+    const child = spawn(process.execPath, args, { stdio: 'inherit', env: { ...process.env, DATABASE_URL: connString() } });
+    child.once('error', reject);
+    child.once('exit', (code, signal) => resolve(code ?? (signal ? 1 : 0)));
+  });
+}
+
 export function connString() { return `postgres://postgres:postgres@localhost:${port}/trialops`; }
 
 async function migrate() {
@@ -64,15 +78,15 @@ try {
   await migrate();
   if (process.exitCode) throw new Error('migration failed');
   if (cmd === 'seed' || cmd === 'reset') {
-    const r = spawnSync(process.execPath, [join(root, 'db/seed/seed-demo.mjs')], { stdio: 'inherit', env: { ...process.env, DATABASE_URL: connString() } });
-    if (r.status) process.exitCode = r.status;
+    const status = await runNode([join(root, 'db/seed/seed-demo.mjs')]);
+    if (status) process.exitCode = status;
   }
   if (cmd === 'test') {
     const files = testFiles(root);
-    const r = spawnSync(process.execPath, ['--test', '--test-concurrency=1', '--test-reporter=spec', '--test-reporter-destination=stdout',
-      '--test-reporter=junit', `--test-reporter-destination=${join(root, 'test-results.xml')}`, ...files],
-      { stdio: 'inherit', env: { ...process.env, DATABASE_URL: connString() } });
-    if (r.status) process.exitCode = r.status;
+    // --test-timeout: a test that never ends fails with its name instead of holding the run (CI is capped at 20 min)
+    const status = await runNode(['--test', '--test-concurrency=1', '--test-timeout=120000', '--test-reporter=spec',
+      '--test-reporter-destination=stdout', '--test-reporter=junit', `--test-reporter-destination=${join(root, 'test-results.xml')}`, ...files]);
+    if (status) process.exitCode = status;
   }
 } finally {
   await server.stop();
