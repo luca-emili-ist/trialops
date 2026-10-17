@@ -1,0 +1,66 @@
+# Security checks (shared template, installed by ~/Documents/Claude/scripts/ci/install-ci.py — do not
+# edit here, edit the template and re-install).
+#   secrets : gitleaks on the full git history
+#   deps    : OSV-Scanner on package-lock.json (known CVEs)
+#   sast    : Semgrep CE with OWASP / TypeScript / React rules
+# Pinned tool versions, downloaded from the vendors' own GitHub releases / PyPI; no marketplace
+# actions, no secrets. ENFORCE=0 → findings are reported as warnings (first two weeks), 1 → they fail the run.
+name: security
+
+on:
+  push:
+    branches: [main, dev]
+  pull_request:
+  schedule:
+    - cron: '17 5 * * 1'   # weekly, Monday 05:17 UTC: new CVEs appear without code changes
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: security-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  ENFORCE: '0'
+  GITLEAKS_VERSION: '8.21.2'
+  OSV_VERSION: '1.9.1'
+  SEMGREP_VERSION: '1.90.0'
+
+jobs:
+  secrets:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: gitleaks (full history)
+        run: |
+          curl -sSL "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz" | tar -xz gitleaks
+          ./gitleaks git --redact --no-banner --exit-code 1 . || { rc=$?; [ "$ENFORCE" = "1" ] && exit $rc; echo "::warning::gitleaks found possible secrets (report-only mode)"; }
+
+  deps:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: OSV-Scanner
+        run: |
+          curl -sSL -o osv-scanner "https://github.com/google/osv-scanner/releases/download/v${OSV_VERSION}/osv-scanner_linux_amd64"
+          chmod +x osv-scanner
+          ./osv-scanner --lockfile=package-lock.json || { rc=$?; [ "$ENFORCE" = "1" ] && exit $rc; echo "::warning::OSV-Scanner found vulnerable dependencies (report-only mode)"; }
+
+  sast:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Semgrep CE
+        run: |
+          pip install --quiet "semgrep==${SEMGREP_VERSION}"
+          semgrep scan --metrics=off --error \
+            --config p/owasp-top-ten --config p/typescript --config p/react --config p/secrets \
+            --exclude node_modules --exclude dist --exclude '*.test.ts' --exclude '*.test.tsx' \
+            || { rc=$?; [ "$ENFORCE" = "1" ] && exit $rc; echo "::warning::Semgrep found issues (report-only mode)"; }
