@@ -1,0 +1,12 @@
+{
+  "$schema": "https://raw.githubusercontent.com/stryker-mutator/stryker-js/master/packages/core/schema/stryker-schema.json",
+  "testRunner": "command",
+  "commandRunner": { "command": "node --test --test-concurrency=1 packages/shell/test/suggest.test.ts packages/shell/test/manifest.test.ts" },
+  "mutate": ["packages/shell/src/ui/suggest.ts", "packages/shell/src/ui/manifest.ts"],
+  "ignorePatterns": ["test-results.xml", "reports", "e2e", "docs", ".netlify"],
+  "reporters": ["clear-text", "json"],
+  "coverageAnalysis": "off",
+  "thresholds": { "high": 80, "low": 60, "break": null },
+  "timeoutMS": 30000,
+  "concurrency": 2
+}

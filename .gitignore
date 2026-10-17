@@ -9,3 +9,7 @@ supabase/.temp/
 e2e/report/
 e2e/results/
 e2e/screens/
+
+# Stryker mutation testing
+reports/mutation/
+.stryker-tmp/

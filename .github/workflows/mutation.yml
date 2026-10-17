@@ -1,0 +1,58 @@
+# Mutation testing (shared template, installed by ~/Documents/Claude/scripts/ci/install-ci.py — do not edit
+# here, edit the template and re-install). Installed only in repos that have a stryker.config.json at the root:
+# that file says which modules to mutate (testRunner vitest, reporters must include "json").
+# Weekly, report-only: the mutation score goes to the job summary and the JSON report is kept 30 days as an
+# artifact; the run never fails on a low score. Stryker is installed with --no-save at a pinned version.
+name: mutation
+
+on:
+  schedule:
+    - cron: '23 4 * * 0'   # weekly, Sunday 04:23 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: mutation-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  STRYKER_VERSION: '9.6.1'
+
+jobs:
+  stryker:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm i --no-save --no-audit --no-fund "@stryker-mutator/core@${STRYKER_VERSION}" "@stryker-mutator/vitest-runner@${STRYKER_VERSION}"
+      - name: Stryker
+        run: npx stryker run || echo "::warning::Stryker run failed (report-only)"
+      - name: Mutation score
+        if: always()
+        run: |
+          node -e '
+            const fs = require("fs"), f = "reports/mutation/mutation.json";
+            if (!fs.existsSync(f)) { console.log("no report"); process.exit(0); }
+            const files = JSON.parse(fs.readFileSync(f, "utf8")).files, c = {}, rows = [];
+            const score = s => { const d = (s.Killed||0)+(s.Timeout||0), n = d+(s.Survived||0)+(s.NoCoverage||0); return n ? (100*d/n).toFixed(1) : "-"; };
+            for (const [p, v] of Object.entries(files)) {
+              const s = {}; for (const m of v.mutants) { s[m.status] = (s[m.status]||0)+1; c[m.status] = (c[m.status]||0)+1; }
+              rows.push(`| ${p} | ${score(s)} | ${s.Killed||0} | ${s.Survived||0} | ${s.NoCoverage||0} |`);
+            }
+            const out = [`### Mutation score: ${score(c)}%`, "", "| File | Score % | Killed | Survived | No coverage |", "|---|---|---|---|---|", ...rows].join("\n");
+            fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, out + "\n"); console.log(out);
+          '
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: always()
+        with:
+          name: mutation-report
+          path: reports/mutation/
+          retention-days: 30
+          if-no-files-found: ignore
