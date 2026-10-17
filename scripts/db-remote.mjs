@@ -6,11 +6,12 @@ import { readdirSync, readFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
+import { supabaseSsl } from './pg-ssl.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const cmd = process.argv[2] || 'status';
 if (!process.env.DATABASE_URL) { console.error('DATABASE_URL is not set'); process.exit(1); }
-const c = new pg.Client({ connectionString: process.env.DATABASE_URL, ssl: { rejectUnauthorized: false } });
+const c = new pg.Client({ connectionString: process.env.DATABASE_URL, ssl: supabaseSsl });
 await c.connect();
 await c.query('create table if not exists public.schema_migrations (name text primary key, applied_at timestamptz default now())');
 const done = new Set((await c.query('select name from public.schema_migrations')).rows.map(r => r.name));

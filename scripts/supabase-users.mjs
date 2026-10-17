@@ -5,6 +5,7 @@
 //   admin: ADMIN_EMAIL, ADMIN_PASSWORD -> creates/links the admin as platform_admin of PLAT-001
 // Usage: node scripts/supabase-users.mjs demo|admin   (secrets come from the environment, never printed)
 import pg from 'pg';
+import { supabaseSsl } from './pg-ssl.mjs';
 
 const mode = process.argv[2];
 const { SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, DATABASE_URL } = process.env;
@@ -27,7 +28,7 @@ async function ensureUser(email, password) {
   throw new Error(`could not create or find ${email}: ${r.status} ${await r.text()}`);
 }
 
-const c = new pg.Client({ connectionString: DATABASE_URL, ssl: { rejectUnauthorized: false } });
+const c = new pg.Client({ connectionString: DATABASE_URL, ssl: supabaseSsl });
 await c.connect();
 await c.query('begin');
 await c.query("select set_config('trialops.change_reason', 'link person to Supabase Auth user', true), set_config('trialops.actor', 'system:supabase-users', true)");
