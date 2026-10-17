@@ -1,7 +1,7 @@
 # Mutation testing (shared template, installed by ~/Documents/Claude/scripts/ci/install-ci.py — do not edit
 # here, edit the template and re-install). Installed only in repos that have a stryker.config.json at the root:
 # that file says which modules to mutate (testRunner vitest, reporters must include "json").
-# Weekly, report-only: the mutation score goes to the job summary and the JSON report is kept 30 days as an
+# Weekly, report-only: the mutation score goes to the job summary (and a notice annotation) and the JSON report is kept 30 days as an
 # artifact; the run never fails on a low score. Stryker is installed with --no-save at a pinned version.
 name: mutation
 
@@ -48,6 +48,7 @@ jobs:
             }
             const out = [`### Mutation score: ${score(c)}%`, "", "| File | Score % | Killed | Survived | No coverage |", "|---|---|---|---|---|", ...rows].join("\n");
             fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, out + "\n"); console.log(out);
+            console.log(`::notice title=Mutation score::Mutation score: ${score(c)}%`);  // read by quality-collect.py
           '
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         if: always()
