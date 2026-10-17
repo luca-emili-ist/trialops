@@ -5,6 +5,8 @@
 #   sast    : Semgrep CE with OWASP / TypeScript / React rules
 # Actions pinned to full commit SHAs (supply-chain safety). # Pinned tool versions, downloaded from the vendors' own GitHub releases / PyPI; no marketplace
 # actions, no secrets. ENFORCE=0 → findings are reported as warnings (first two weeks), 1 → they fail the run.
+# Per-repo override: list job names (secrets, deps, sast), one per line, in .github/ci-enforce to make
+# just those jobs fail on findings while ENFORCE stays 0 (the template itself stays identical in every repo).
 name: security
 
 on:
@@ -39,7 +41,7 @@ jobs:
       - name: gitleaks (full history)
         run: |
           curl -sSL "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz" | tar -xz gitleaks
-          ./gitleaks git --redact --verbose --no-banner --exit-code 1 . || { rc=$?; [ "$ENFORCE" = "1" ] && exit $rc; echo "::warning::gitleaks found possible secrets (report-only mode)"; }
+          ./gitleaks git --redact --verbose --no-banner --exit-code 1 . || { rc=$?; { [ "$ENFORCE" = "1" ] || grep -qx secrets .github/ci-enforce 2>/dev/null; } && exit $rc; echo "::warning::gitleaks found possible secrets (report-only mode)"; }
 
   deps:
     runs-on: ubuntu-latest
@@ -50,7 +52,7 @@ jobs:
         run: |
           curl -sSL -o osv-scanner "https://github.com/google/osv-scanner/releases/download/v${OSV_VERSION}/osv-scanner_linux_amd64"
           chmod +x osv-scanner
-          ./osv-scanner --lockfile=package-lock.json || { rc=$?; [ "$ENFORCE" = "1" ] && exit $rc; echo "::warning::OSV-Scanner found vulnerable dependencies (report-only mode)"; }
+          ./osv-scanner --lockfile=package-lock.json || { rc=$?; { [ "$ENFORCE" = "1" ] || grep -qx deps .github/ci-enforce 2>/dev/null; } && exit $rc; echo "::warning::OSV-Scanner found vulnerable dependencies (report-only mode)"; }
 
   sast:
     runs-on: ubuntu-latest
@@ -63,4 +65,4 @@ jobs:
           semgrep scan --metrics=off --error \
             --config p/owasp-top-ten --config p/typescript --config p/react --config p/secrets \
             --exclude node_modules --exclude dist --exclude '*.test.ts' --exclude '*.test.tsx' \
-            || { rc=$?; [ "$ENFORCE" = "1" ] && exit $rc; echo "::warning::Semgrep found issues (report-only mode)"; }
+            || { rc=$?; { [ "$ENFORCE" = "1" ] || grep -qx sast .github/ci-enforce 2>/dev/null; } && exit $rc; echo "::warning::Semgrep found issues (report-only mode)"; }
