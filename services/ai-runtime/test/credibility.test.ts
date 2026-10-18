@@ -21,7 +21,7 @@ const goodS2 = {
     endpoints: [{ id: 'EP1', text: 'Change in functional score at 24 weeks', type: 'efficacy', timeframe: 'Baseline to week 24' }],
     population: { description: 'Platform population.', inclusion: [{ id: 'IN1', text: 'Eligible per Master Protocol section 5.1' }],
       exclusion: [{ id: 'EX1', text: 'Strong CYP3A4 inhibitors or inducers' }] },
-    interventions: [{ name: 'MRD-12', type: 'drug', dose: '40 mg', route: 'oral', frequency: 'once daily' }],
+    interventions: [{ id: 'INT1', name: 'MRD-12', type: 'drug', dose: '40 mg', route: 'oral', frequency: 'once daily' }],
     schedule: { visits: [] },
   },
   sources: [
@@ -29,7 +29,7 @@ const goodS2 = {
     { section: 'endpoints', item_id: 'EP1', ref: B, quote: 'The proposed primary endpoint is the change in functional score at 24 weeks.' },
     { section: 'population', item_id: 'IN1', ref: B, quote: 'Participants must be eligible for the platform as defined in Master Protocol section 5.1.' },
     { section: 'population', item_id: 'EX1', ref: 'IB-S2', quote: 'MRD-12 is a sensitive CYP3A4 substrate.' },
-    { section: 'interventions', item_id: 'MRD-12', ref: B, quote: 'The recommended phase 2 dose is 40 mg once daily.' },
+    { section: 'interventions', item_id: 'INT1', ref: B, quote: 'The recommended phase 2 dose is 40 mg once daily.' },
   ],
   consistency_checks: [{ check: 'Dose', result: 'warning', detail: 'The sponsor brief gives 40 mg once daily, the IB phase 1 study used 50 mg.' }],
 };

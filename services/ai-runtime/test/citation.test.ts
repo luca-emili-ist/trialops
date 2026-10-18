@@ -32,7 +32,7 @@ test('[AI-04] the demo works: the replay answer cites the demo sponsor documents
 });
 
 test('[AI-04] an objective, endpoint, criterion or intervention without a source is refused and recorded as validation_failed', async () => {
-  for (const id of ['OBJ2', 'EP1', 'IN2', 'EX1', 'Placebo matching MRD-12']) {
+  for (const id of ['OBJ2', 'EP1', 'IN2', 'EX1', 'INT2']) {
     const out = clone();
     out.sources = out.sources.filter((s: { item_id: string }) => s.item_id !== id);
     const db = fakeDb();

@@ -1,12 +1,20 @@
 # Credibility plan — `protocol.appendix.draft` (Protocol author agent)
 
-Version 0.2 · 2026-10-18 · status: **plan written, harness ready, not executed** (CMP-06 open, release v1).
-0.2: thresholds and monitoring rules made machine-checkable against the registry (CMP-07), dataset format and
-harness defined, mandatory citation enforced by the runtime (AI-04), monitoring implemented (AI-10).
+Version 0.3 · 2026-10-18 · status: **plan written, harness piloted, not executed on a signed dataset** (CMP-06 open,
+release v1).
+
+Change log:
+- 0.3 (2026-10-18): pilot on an unsigned AI-prepared candidate dataset (not evidence,
+  `evidence/protocol.appendix.draft/PILOT_2026-10-18.md`); prompt `protocol-author` **v2** under CR-AI-0001
+  (`docs/ai/change-requests/CR-AI-0001_protocol-author-prompt-v2.md`); scorer conventions fixed (author keywords or
+  content-word overlap with numbers, interventions by role, structural F1; `services/ai-runtime/datasets/README.md`);
+  the Master Protocol text in the input is citable for inherited content (AI-04); thresholds unchanged.
+- 0.2: thresholds and monitoring rules made machine-checkable against the registry (CMP-07), dataset format and
+  harness defined, mandatory citation enforced by the runtime (AI-04), monitoring implemented (AI-10).
 
 | Field | Value |
 | --- | --- |
-| Registry entry | `protocol.appendix.draft`, prompt `protocol-author` v1, locked in `services/ai-runtime/prompt-lock.json` (AI-02) |
+| Registry entry | `protocol.appendix.draft`, prompt `protocol-author` v2 (CR-AI-0001), locked in `services/ai-runtime/prompt-lock.json` (AI-02) |
 | Model | `claude-opus-5-5` — immutable snapshot id (the Claude 5 family has no dated variant), pinned in `services/ai-runtime/model-lock.json`; drift is blocked at run time and a change needs a change request with live regression (AI-03); Anthropic API; data classes INTERNAL, CONFIDENTIAL_SPONSOR (never CLINICAL_PSEUDONYMIZED or STRICT_LOCAL) |
 | GxP | Yes: the output becomes an arm appendix version only after review and signature (AI-05, DM-02) |
 
@@ -60,7 +68,9 @@ review, signature, separation of duties (IAM-05).
   of other sponsors' data (single sponsor per context).
 
 ## 5. Execution — results
-Not executed yet: the dataset is being built by an independent person. Run:
+Not executed on a counting dataset yet: the dataset is being built by an independent person. A pilot on an unsigned,
+AI-prepared candidate (prompt v1 and v2, 20 cases each) is reported in `evidence/protocol.appendix.draft/PILOT_2026-10-18.md`
+and counts as nothing. Run:
 `TRIALOPS_AI_MODE=live node scripts/ai-credibility.mjs protocol.appendix.draft` (a replay dry run needs `--dry-run`
 and never counts). Evidence goes to `docs/ai/evidence/protocol.appendix.draft/`.
 
