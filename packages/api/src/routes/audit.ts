@@ -9,6 +9,7 @@ import { HttpError } from '../errors.ts';
 import { requirePerson, requireRole, type Role } from '../lib/roles.ts';
 import { sign, signatureManifests } from '../lib/sign.ts';
 import type { Reauthenticator } from '../lib/reauth.ts';
+import { logExport } from '../lib/access-log.ts';
 
 export const AUDIT_REVIEWERS: Role[] = ['qa_auditor', 'platform_admin'];
 const reqs = ['CMP-10'];
@@ -65,7 +66,7 @@ export function changedFields(row: { action: string; old_row: Row | null; new_ro
     .map(k => `${k}: ${val(o[k])} → ${val(n[k])}`).join('; ');
 }
 
-const csvCell = (v: unknown) => {
+export const csvCell = (v: unknown) => {
   const s = v === null || v === undefined ? '' : v instanceof Date ? v.toISOString() : String(v);
   // quote always; neutralise spreadsheet formulas (CSV injection) without changing the readable value
   return `"${(/^[=+\-@\t\r]/.test(s) ? `'${s}` : s).replace(/"/g, '""')}"`;
@@ -117,17 +118,22 @@ export const auditRoutes = [
       return { items: page, next_before: items.length > limit ? page.at(-1)!.seq : null, filters: f, latest_seq: max || null };
     } }),
 
-  route({ method: 'get', path: '/v1/audit-events/export', raw: true, tag: 'audit', reqs,
+  route({ method: 'get', path: '/v1/audit-events/export', raw: true, tag: 'audit', reqs: ['CMP-10', 'CMP-13'],
     summary: 'Readable CSV export of the filtered audit trail (seq, UTC time, actor, table, record, action, reason, old → new)',
     query: { format: { enum: ['csv'] }, table: { type: 'string' }, record_id: uuid, actor: { type: 'string' },
       from: { type: 'string', format: 'date-time' }, to: { type: 'string', format: 'date-time' } },
     handler: async ({ db, claims, query }): Promise<RawResponse> => {
       requireReviewer(claims, 'Exporting the audit trail');
       if ((query.format ?? 'csv') !== 'csv') throw new HttpError(400, 'invalid_format', 'only format=csv is available; use the print view for PDF');
-      const rows = await searchAudit(db, parseFilters(query), { limit: 10000 });
+      const filters = parseFilters(query);
+      const rows = await searchAudit(db, filters, { limit: 10000 });
+      const body = toCsv(rows);
+      // CMP-13: the export is recorded with the hash of the file that leaves the system, in the same transaction
+      const logSeq = await logExport(db, { object: 'core.audit_event', filters, row_count: rows.length, format: 'csv', content: body });
       const stamp = new Date().toISOString().replace(/[:.]/g, '-');
-      return { status: 200, body: toCsv(rows), headers: { 'content-type': 'text/csv; charset=utf-8',
-        'content-disposition': `attachment; filename="trialops-audit-trail-${stamp}.csv"`, 'x-row-count': String(rows.length) } };
+      return { status: 200, body, headers: { 'content-type': 'text/csv; charset=utf-8',
+        'content-disposition': `attachment; filename="trialops-audit-trail-${stamp}.csv"`, 'x-row-count': String(rows.length),
+        'x-access-log-seq': String(logSeq) } };
     } }),
 
   route<ReviewBody>({ method: 'post', path: '/v1/audit-reviews', status: 201, needsReason: true, tag: 'audit', reqs: ['CMP-10', 'CMP-11'],

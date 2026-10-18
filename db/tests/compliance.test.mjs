@@ -14,6 +14,7 @@ const NOT_AUDITED = {
   'core.subject_status_history': { immutable: true, reason: 'history written by the subject state machine; append-only' },
   'core.task_event': { immutable: true, reason: 'history written by the task state machine; append-only' },
   'core.event_outbox': { reason: 'transport queue of domain events derived from audited changes; not a record' },
+  'core.data_access_log': { immutable: true, reason: 'the access log itself (CMP-13): append-only, written only by logging functions' },
   'core.oidc_code': { reason: 'single-use authorization codes valid 60 s; stored only as hashes; not a record' },
 };
 

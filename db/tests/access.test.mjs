@@ -42,10 +42,12 @@ test('[IAM-04] blinded users never see arm allocation', async () => {
   }, { role: 'authenticated', claims: { sub: 'demo|ctm', platform_ids: '*', arm_scopes: '*', site_scopes: '*' } });
 });
 
-test('[IAM-04] the SAC unblinded role can read allocation', async () => {
+test('[IAM-04][CMP-13] the SAC unblinded role can read allocation, only through the logged enclave function', async () => {
   await tx(c, async () => {
-    const n = (await c.query('select count(*) n from sac_enclave.subject_allocation where arm_id is not null')).rows[0].n;
+    const n = (await c.query("select count(*) n from sac_enclave.read_allocation($1, 'interim analysis IA1') where arm_id is not null",
+      [I.platform])).rows[0].n;
     assert.ok(Number(n) > 0);
+    await rejects(c.query('select * from sac_enclave.subject_allocation limit 1'), /permission denied/);
   }, { role: 'unblinded', claims: { sub: 'demo|sac', blinding: 'unblinded' } });
 });
 

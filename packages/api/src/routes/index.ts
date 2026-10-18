@@ -13,5 +13,6 @@ import { jobRoutes } from './jobs.ts';
 import { auditRoutes } from './audit.ts';
 import { authRoutes } from './auth.ts';
 import { changeRoutes } from './changes.ts';
+import { accessLogRoutes } from './access-log.ts';
 
-export const routes: RouteDef[] = [...platformRoutes, ...armRoutes, ...protocolRoutes, ...signatureRoutes, ...siteRoutes, ...metricRoutes, ...aiRoutes, ...jobRoutes, ...taskRoutes, ...appRoutes, ...auditRoutes, ...changeRoutes, ...authRoutes, ...devRoutes];
+export const routes: RouteDef[] = [...platformRoutes, ...armRoutes, ...protocolRoutes, ...signatureRoutes, ...siteRoutes, ...metricRoutes, ...aiRoutes, ...jobRoutes, ...taskRoutes, ...appRoutes, ...auditRoutes, ...accessLogRoutes, ...changeRoutes, ...authRoutes, ...devRoutes];
