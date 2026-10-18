@@ -5,7 +5,7 @@ Version 0.1 · 2026-10-10 · status: **plan written, not executed** (CMP-06 open
 | Field | Value |
 | --- | --- |
 | Registry entry | `arm.onboarding.plan`, prompt `onboarding-planner` v1 |
-| Model | `claude-opus-5-5` — **to be replaced by a dated snapshot id** (AI-03); data classes INTERNAL, CONFIDENTIAL_SPONSOR |
+| Model | `claude-opus-5-5`, pinned in `services/ai-runtime/model-lock.json` (AI-03); data classes INTERNAL, CONFIDENTIAL_SPONSOR |
 | GxP | No for the plan itself. Tasks it marks `gxp_impact: true` go through review and signature when they are completed (APP-TK-04) |
 
 ## 1. Question of interest

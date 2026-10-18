@@ -7,7 +7,7 @@ Rule 12 of CLAUDE.md; CMP-06, AI-02. Structure: FDA draft guidance on AI for reg
 | --- | --- |
 | Version / date / author | |
 | Registry entry | `services/ai-runtime/src/registry.ts` → `<task_type>` (prompt id + version) |
-| Model | dated snapshot id (AI-03), provider, channel, data classes allowed |
+| Model | pinned immutable model id from `model-lock.json` (AI-03), provider, channel, data classes allowed |
 | GxP | yes/no — if yes, output is a proposal signed by a person (AI-05) |
 
 ## 1. Question of interest
