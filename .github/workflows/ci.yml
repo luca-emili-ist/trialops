@@ -11,9 +11,19 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0   # VAL-03: the migration check compares with main
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with: { node-version: 24 }
       - run: npm ci || npm install
+      # VAL-03, rule 4: a migration that reached main is never modified, renamed or removed. On a push to main the
+      # reference is the previous main commit; otherwise the merge-base with main.
+      - name: Migrations already on main are unchanged
+        run: node scripts/migration-check.mjs --base "$BASE"
+        env:
+          BASE: ${{ github.event_name == 'pull_request' && format('origin/{0}', github.base_ref) || (github.ref == 'refs/heads/main' && github.event.before || 'origin/main') }}
+      # VAL-03 rehearsal on a synthetic copy: empty PostgreSQL -> every migration -> synthetic seed; the tests then
+      # re-apply every migration from 0021 on twice (db/tests/migrations_idempotent.test.mjs).
       - run: npm run db:reset
       # verify = lint (incl. AI-01 provider boundary) + typecheck + tests + traceability
       - run: npm run verify
@@ -26,3 +36,25 @@ jobs:
           path: |
             test-results.xml
             docs/traceability.md
+            docs/compliance/compliance-matrix.md
+
+  # NFR-05: dependency scanning (fails on high/critical advisories) and SBOM (CycloneDX) for every run.
+  # SAST (Semgrep), OSV-Scanner and gitleaks run in security.yml.
+  supply-chain:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with: { node-version: 24 }
+      - run: npm ci || npm install
+      - name: Dependency scan (npm audit)
+        run: npm audit --audit-level=high
+      - name: SBOM (CycloneDX)
+        if: always()
+        run: npm sbom --sbom-format cyclonedx > sbom.cdx.json
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        if: always()
+        with:
+          name: sbom-${{ github.sha }}
+          path: sbom.cdx.json
