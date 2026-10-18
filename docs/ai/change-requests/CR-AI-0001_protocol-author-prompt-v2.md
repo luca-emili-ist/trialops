@@ -8,7 +8,7 @@
 | Requested by | Claude Code (TrialOps development engine), from the CMP-06 pilot |
 | Approved by | Luca Emili, 2026-10-18 |
 | Reason | Findings of the CMP-06 pilot: [`PILOT_2026-10-18.md`](../evidence/protocol.appendix.draft/PILOT_2026-10-18.md) |
-| Regression evidence (AI-02/AI-03) | live regression on the task type's test dataset: `docs/ai/evidence/protocol.appendix.draft/2026-10-18_claude-opus-5-5_regression.json`; credibility comparison v1 vs v2 on the 20 pilot cases: see §5 of the pilot note |
+| Regression evidence (AI-02/AI-03) | live regression on the task type's test dataset (v2.4, passed): `docs/ai/evidence/protocol.appendix.draft/2026-10-18_claude-opus-5-5_regression.json`; credibility comparison v1 vs v2 on the 20 pilot cases (not evidence): `…_p2-4.json`, pilot note §10 |
 
 ## 1. Problem (pilot, prompt v1, 20 cases)
 
@@ -75,7 +75,7 @@ refusal, truncation, usage and the reported model come from the final message; t
 Reason: at effort high a long answer kept the connection idle and it was dropped at ~2 minutes (v2.0 C14, v2.3 C18).
 This also protects the production AI worker (Netlify background function), which uses the same adapter.
 
-- draft v2.4 (2026-10-18): v2.3 + streamed transport. **Locked as v2** if its run is accepted (§4).
+- draft v2.4 (2026-10-18): v2.3 + streamed transport. **Locked as v2** with the exception in §5.
 
 ## 3. Risk and controls
 
@@ -88,3 +88,18 @@ USDM object without `text`, so a Master Protocol citation there is still refused
 AI-02 requires a passing live regression on the task type's test dataset (every case `success`). In addition, on the 20
 pilot cases (unsigned dataset, not evidence): schema validity 100 % and no regression in recall or traps against v1
 rescored with the same scorer. Results: §5 of the pilot note.
+
+## 5. Exception to the acceptance rule (approved by Luca Emili, 2026-10-18)
+
+- **Rule**: on the 20 pilot cases, v2 must show 0 cases without output, schema validity 1.00 and no regression against
+  v1 rescored on any metric, a placeholder refusal of a case v1 answered counting as a regression of that case.
+- **What failed** (v2.4, `…_p2-4.json`): C19 was refused by the runtime (`placeholder answer refused: consistency
+  checks: no visit_schedule check (required topic)`): one consistency check only. Its trap (C19-T4) is still flagged by
+  that check. v1 had answered C19.
+- **Why accepted**: every metric is equal to or better than v1 rescored (fidelity 1.000, recall 1.00 / 1.00 / 0.97,
+  traps 1.00, schema 1.00); refused outputs 5 → 1; unsupported items 23 → 0; the residual failure is a visible refusal
+  that never reaches a reviewer as a draft, never a silent pass.
+- **Approved by**: Luca Emili, 2026-10-18.
+- **Follow-up**: if AI-10 monitoring shows a placeholder/validation refusal rate above 0 for this task type, evaluate a
+  two-call design (sections first, consistency checks in a second call on the drafted sections).
+

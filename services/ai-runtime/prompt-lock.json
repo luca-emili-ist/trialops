@@ -9,11 +9,29 @@
           "system_sha256": "5a43e853b410dec0ba6d62d28439907902a423955bc5ea2dd3bc0b901f6998d4",
           "output_schema_sha256": "6b324e6ec3e6843fd328136b85b947660b34e8460a3e2caf4092e35b9ccf0cf8",
           "approved_on": "2026-10-18",
-          "authored_by": ["Luca Emili", "Claude Code (TrialOps development engine)"],
+          "authored_by": [
+            "Luca Emili",
+            "Claude Code (TrialOps development engine)"
+          ],
           "approved_by": null,
           "change_request": null,
           "regression_evidence": null,
           "reason": "initial lock of the prompt in use since demo v0 (no previous version)"
+        },
+        {
+          "version": 2,
+          "system_sha256": "4f1c3c34de584fa81a3316927d0fdbd18674816d9e3c50f0df7651c47523beb9",
+          "output_schema_sha256": "ee0a314412ff2b757b687e91e2d8bd3decdb191ad379018ee4bd14dc4127da96",
+          "approved_on": "2026-10-18",
+          "authored_by": [
+            "Luca Emili",
+            "Claude Code (TrialOps development engine)"
+          ],
+          "approved_by": "Luca Emili",
+          "change_request": "docs/ai/change-requests/CR-AI-0001_protocol-author-prompt-v2.md",
+          "regression_evidence": "docs/ai/evidence/protocol.appendix.draft/2026-10-18_claude-opus-5-5_regression.json",
+          "credibility_pilot_evidence": "docs/ai/evidence/protocol.appendix.draft/2026-10-18_appendix-cred-pilot-codex_v1.1_claude-opus-5-5_p2-4.json",
+          "reason": "CR-AI-0001 (CMP-06 pilot findings): source inside each item, intervention ids, Master Protocol citable for inherited content, topic-tagged consistency checks with required topics, placeholder refusal, effort high / max_tokens 32000, streamed transport. Accepted with an explicit exception (C19 placeholder refusal), approved by Luca Emili 2026-10-18."
         }
       ]
     },
@@ -25,7 +43,10 @@
           "system_sha256": "34a19286e45f37e48fd39bbb120d1400c144bee7e1c07f1414bf056769537f46",
           "output_schema_sha256": "668d07445e802f3e25e43d59ebf5ab790bcebf850c955a0f03252ea2dc49d797",
           "approved_on": "2026-10-18",
-          "authored_by": ["Luca Emili", "Claude Code (TrialOps development engine)"],
+          "authored_by": [
+            "Luca Emili",
+            "Claude Code (TrialOps development engine)"
+          ],
           "approved_by": null,
           "change_request": null,
           "regression_evidence": null,

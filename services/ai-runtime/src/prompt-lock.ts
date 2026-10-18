@@ -20,6 +20,7 @@ export interface PromptVersionLock {
   change_request: string | null;
   regression_evidence: string | null;
   reason: string;
+  credibility_pilot_evidence?: string | null;   // credibility run that supported the decision (not CMP-06 evidence when the dataset is unsigned)
 }
 export interface PromptLock { prompts: Record<string, { task_type: string; versions: PromptVersionLock[] }> }
 
