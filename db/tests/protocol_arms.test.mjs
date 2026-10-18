@@ -57,7 +57,9 @@ test('[DM-01] every clinical table carries platform_id', async () => {
   const exempt = ['platform','organization','person','role_assignment','audit_event','event_outbox','signature','task_event',
     'document_version','app_installation','app_scope_grant','agent_decision_record','metric_definition','subject_status_history','ai_request',
     // identity and session security records (0018, CMP-03): an account works across platforms, they hold no clinical data
-    'auth_event','account_lock','user_session'];
+    'auth_event','account_lock','user_session',
+    // ledger integrity records (0022, CMP-12): seals and DDL cover the whole database, not one platform
+    'audit_seal','audit_anchor','ddl_event'];
   const r = (await c.query(`select t.table_name from information_schema.tables t
      where t.table_schema='core' and t.table_type='BASE TABLE' and t.table_name <> all($1)
        and not exists (select 1 from information_schema.columns k where k.table_schema='core' and k.table_name=t.table_name and k.column_name='platform_id')`, [exempt])).rows;

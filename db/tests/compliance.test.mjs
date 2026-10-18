@@ -15,6 +15,9 @@ const NOT_AUDITED = {
   'core.task_event': { immutable: true, reason: 'history written by the task state machine; append-only' },
   'core.event_outbox': { reason: 'transport queue of domain events derived from audited changes; not a record' },
   'core.data_access_log': { immutable: true, reason: 'the access log itself (CMP-13): append-only, written only by logging functions' },
+  'core.audit_seal': { immutable: true, reason: 'Ed25519 seals of the audit ledger (CMP-12): append-only, written by the sealer function' },
+  'core.audit_anchor': { immutable: true, reason: 'external copies of the seals (CMP-12): append-only' },
+  'core.ddl_event': { immutable: true, reason: 'DDL log written by the event trigger (CMP-12): append-only' },
   'core.oidc_code': { reason: 'single-use authorization codes valid 60 s; stored only as hashes; not a record' },
 };
 

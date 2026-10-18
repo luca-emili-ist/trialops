@@ -1,6 +1,6 @@
 # Compliance matrix
 
-Generated 2026-10-17T22:51:27.482Z by scripts/trace.mjs from docs/compliance/crosswalk.json and docs/requirements.json.
+Generated 2026-10-18T08:36:29.938Z by scripts/trace.mjs from docs/compliance/crosswalk.json and docs/requirements.json.
 Technical clauses are covered by requirements and their tests; procedural clauses are covered by SOPs of the quality system.
 
 ## P11 — US 21 CFR Part 11 — Electronic records; electronic signatures
@@ -8,10 +8,10 @@ Technical clauses are covered by requirements and their tests; procedural clause
 | Clause | Ref | Title | Control | Requirements (release: result) | Status |
 | --- | --- | --- | --- | --- | --- |
 | P11-10a | §11.10(a) | Validation for accuracy, reliability, consistent intended performance, ability to discern invalid or altered records | technical | VAL-01 (v1: NO TEST), VAL-02 (v1: NO TEST), VAL-05 (gxp-p0: PASS) | partial |
-| P11-10b | §11.10(b) | Accurate and complete copies in human readable and electronic form for inspection | technical | CMP-10 (gxp-p0: PASS), CMP-14 (v1: NO TEST) | partial |
+| P11-10b | §11.10(b) | Accurate and complete copies in human readable and electronic form for inspection | technical | CMP-10 (gxp-p0: PASS), CMP-14 (v1: PASS) | covered |
 | P11-10c | §11.10(c) | Protection of records for accurate and ready retrieval throughout the retention period | technical | NFR-04 (gxp-p0: PASS) | covered |
 | P11-10d | §11.10(d) | Limiting system access to authorized individuals | technical | IAM-02 (foundations: PASS), APP-MF-04 (foundations: PASS), APP-ID-01 (v0: PASS), IAM-01 (gxp-p0: PASS), CMP-03 (gxp-p0: PASS), IAM-06 (v2: NO TEST), APP-ID-03 (v2: NO TEST) | partial |
-| P11-10e | §11.10(e) | Secure, computer-generated, time-stamped audit trail; changes do not obscure previous values | technical | CMP-01 (foundations: PASS), CMP-04 (foundations: PASS), DM-03 (foundations: PASS), AI-06 (foundations: PASS), APP-TK-02 (foundations: PASS), AI-08 (v1: NO TEST), APP-AU-01 (v2: NO TEST), EDC-05 (v1: NO TEST), CMP-10 (gxp-p0: PASS), CMP-15 (gxp-p0: PASS), CMP-12 (v1: NO TEST) | partial |
+| P11-10e | §11.10(e) | Secure, computer-generated, time-stamped audit trail; changes do not obscure previous values | technical | CMP-01 (foundations: PASS), CMP-04 (foundations: PASS), DM-03 (foundations: PASS), AI-06 (foundations: PASS), APP-TK-02 (foundations: PASS), AI-08 (v1: NO TEST), APP-AU-01 (v2: NO TEST), EDC-05 (v1: NO TEST), CMP-10 (gxp-p0: PASS), CMP-15 (gxp-p0: PASS), CMP-12 (v1: PASS) | partial |
 | P11-10f | §11.10(f) | Operational system checks to enforce permitted sequencing of steps | technical | DM-02 (foundations: PASS), IAM-05 (foundations: PASS), AI-05 (foundations: PASS), APP-TK-02 (foundations: PASS), APP-TK-04 (foundations: PASS), M01-04 (foundations: PASS), M07-01 (foundations: PASS), M01-01 (v0: PASS), M02-03 (v0: PASS), EDC-04 (v1: NO TEST), EDC-08 (v2: NO TEST) | partial |
 | P11-10g | §11.10(g) | Authority checks: only authorized individuals can use, sign, alter or access records | technical | IAM-02 (foundations: PASS), IAM-03 (foundations: PASS), IAM-04 (foundations: PASS), IAM-05 (foundations: PASS), APP-MF-02 (foundations: PASS), APP-ID-02 (v0: PASS), APP-ID-02 (foundations: PASS), APP-TK-03 (v1: NO TEST), AI-07 (v1: NO TEST) | partial |
 | P11-10h | §11.10(h) | Device checks to determine validity of the source of data input | technical | EDC-03 (v1: NO TEST), APP-DT-05 (v1: NO TEST) | planned |
@@ -41,12 +41,12 @@ Technical clauses are covered by requirements and their tests; procedural clause
 | --- | --- | --- | --- | --- | --- |
 | A11-1 | §1 | Risk management throughout the lifecycle | procedural | — | SOP |
 | A11-3 | §3 | Suppliers and service providers: agreements, assessment | procedural | VAL-04 (v1: NO TEST) | SOP |
-| A11-4 | §4 | Validation: URS, traceability, change control, data migration | technical | EDC-01 (v1: NO TEST), EDC-02 (v2: NO TEST), AI-03 (v1: NO TEST), VAL-01 (v1: NO TEST), VAL-02 (v1: NO TEST), VAL-03 (v1: NO TEST), VAL-05 (gxp-p0: PASS) | partial |
+| A11-4 | §4 | Validation: URS, traceability, change control, data migration | technical | EDC-01 (v1: NO TEST), EDC-02 (v2: NO TEST), AI-03 (v1: PASS), VAL-01 (v1: NO TEST), VAL-02 (v1: NO TEST), VAL-03 (v1: NO TEST), VAL-05 (gxp-p0: PASS) | partial |
 | A11-5 | §5 | Built-in checks for correct and secure data exchange | technical | APP-MF-01 (foundations: PASS), APP-DT-04 (foundations: PASS), APP-TK-03 (v1: NO TEST), APP-DT-01 (v2: PASS), APP-DT-02 (v1: NO TEST) | partial |
 | A11-6 | §6 | Accuracy checks on critical data entered manually | technical | EDC-04 (v1: NO TEST) | planned |
 | A11-7 | §7 | Data storage: protection, accessibility, regular backups, restore tested | technical | NFR-04 (gxp-p0: PASS) | covered |
-| A11-8 | §8 | Printouts: clear printed copies, indication of changes | technical | CMP-11 (gxp-p0: PASS), CMP-14 (v1: NO TEST) | partial |
-| A11-9 | §9 | Audit trails: record of GMP-relevant changes and deletions with reason; available, convertible, regularly reviewed | technical | CMP-01 (foundations: PASS), CMP-04 (foundations: PASS), DM-03 (foundations: PASS), APP-AU-01 (v2: NO TEST), CMP-10 (gxp-p0: PASS), CMP-15 (gxp-p0: PASS), CMP-12 (v1: NO TEST), UX-02 (v0: PASS) | partial |
+| A11-8 | §8 | Printouts: clear printed copies, indication of changes | technical | CMP-11 (gxp-p0: PASS), CMP-14 (v1: PASS) | covered |
+| A11-9 | §9 | Audit trails: record of GMP-relevant changes and deletions with reason; available, convertible, regularly reviewed | technical | CMP-01 (foundations: PASS), CMP-04 (foundations: PASS), DM-03 (foundations: PASS), APP-AU-01 (v2: NO TEST), CMP-10 (gxp-p0: PASS), CMP-15 (gxp-p0: PASS), CMP-12 (v1: PASS), UX-02 (v0: PASS) | partial |
 | A11-10 | §10 | Change and configuration management | procedural | VAL-02 (v1: NO TEST), UX-02 (v0: PASS) | SOP |
 | A11-11 | §11 | Periodic evaluation | procedural | — | SOP |
 | A11-12 | §12 | Security: physical and logical access controls, creation/change/cancellation of access authorizations recorded | technical | IAM-02 (foundations: PASS), IAM-03 (foundations: PASS), IAM-05 (foundations: PASS), APP-MF-02 (foundations: PASS), APP-MF-04 (foundations: PASS), APP-ID-01 (v0: PASS), APP-ID-02 (v0: PASS), APP-ID-02 (foundations: PASS), IAM-01 (gxp-p0: PASS), CMP-03 (gxp-p0: PASS), IAM-06 (v2: NO TEST) | partial |
@@ -63,7 +63,7 @@ Technical clauses are covered by requirements and their tests; procedural clause
 | EMA-CS-AUDIT | audit trail | Audit trail of all changes incl. who, when, old/new value, reason; cannot be disabled | technical | CMP-01 (foundations: PASS), DM-03 (foundations: PASS), APP-AU-01 (v2: NO TEST), CMP-15 (gxp-p0: PASS) | partial |
 | EMA-CS-AUDITREVIEW | audit trail review | Audit trail available in readable form and reviewed risk-based (routine and for-cause) | technical | CMP-10 (gxp-p0: PASS) | covered |
 | EMA-CS-SIGNOFF | sign-off of data / e-signatures | Electronic signatures and sign-off of data by responsible persons | technical | CMP-02 (foundations: PASS), APP-TK-04 (foundations: PASS), EDC-06 (v2: NO TEST), EDC-07 (v2: NO TEST), CMP-11 (gxp-p0: PASS) | partial |
-| EMA-CS-CERTCOPY | copying data, certified copies | Certified copies preserving content and meaning, including metadata | technical | CMP-14 (v1: NO TEST) | planned |
+| EMA-CS-CERTCOPY | copying data, certified copies | Certified copies preserving content and meaning, including metadata | technical | CMP-14 (v1: PASS) | covered |
 | EMA-CS-INVCONTROL | control of data | Investigator keeps control of and continuous access to site-generated data; sponsor must not have exclusive control | technical | EDC-03 (v1: NO TEST) | planned |
 | EMA-CS-BACKUP | backup and restore | Backup and restore validated and periodically tested | technical | NFR-04 (gxp-p0: PASS) | covered |
 | EMA-CS-ARCHIVE | archiving | Archiving for the retention period with readability | technical | NFR-04 (gxp-p0: PASS) | covered |
@@ -71,7 +71,7 @@ Technical clauses are covered by requirements and their tests; procedural clause
 | EMA-CS-VALID | Annex 2 Computerised system validation | Risk-based validation, requirements, traceability, test evidence, change control | technical | VAL-01 (v1: NO TEST), VAL-02 (v1: NO TEST), VAL-05 (gxp-p0: PASS) | partial |
 | EMA-CS-USERMGMT | Annex 3 User management | Unique accounts, role-based access, periodic access review, timely revocation, MFA where appropriate | technical | IAM-02 (foundations: PASS), APP-ID-01 (v0: PASS), IAM-01 (gxp-p0: PASS), IAM-06 (v2: NO TEST), APP-ID-03 (v2: NO TEST) | partial |
 | EMA-CS-SECURITY | Annex 4 Security | Security: encryption, vulnerability management, penetration testing, session timeout, lockout | technical | IAM-01 (gxp-p0: PASS), CMP-03 (gxp-p0: PASS), NFR-05 (v1: NO TEST) | partial |
-| EMA-CS-IRT | Annex 5 IRT | Randomisation and IRT: protected allocation, emergency unblinding logged | technical | IAM-04 (foundations: PASS), CMP-13 (v1: NO TEST) | partial |
+| EMA-CS-IRT | Annex 5 IRT | Randomisation and IRT: protected allocation, emergency unblinding logged | technical | IAM-04 (foundations: PASS), CMP-13 (v1: PASS) | covered |
 | EMA-CS-ECONSENT | Annex 5 eConsent | eConsent: identity, approved version, copy to the subject | technical | — | GAP — no requirement |
 | EMA-CS-CLOUD | Annex 1 Agreements / cloud | Agreements with service providers; data location; exit | procedural | — | SOP |
 
@@ -79,14 +79,14 @@ Technical clauses are covered by requirements and their tests; procedural clause
 
 | Clause | Ref | Title | Control | Requirements (release: result) | Status |
 | --- | --- | --- | --- | --- | --- |
-| CTR-57 | Art. 57 | Trial master file always complete, readily available and directly accessible | technical | M09-02 (v1: NO TEST), CMP-14 (v1: NO TEST) | planned |
+| CTR-57 | Art. 57 | Trial master file always complete, readily available and directly accessible | technical | M09-02 (v1: NO TEST), CMP-14 (v1: PASS) | partial |
 | CTR-58 | Art. 58 | Archiving of the TMF for at least 25 years after the end of the trial | technical | NFR-04 (gxp-p0: PASS) | covered |
 
 ## E6R3 — ICH E6(R3) Good Clinical Practice (principles, Annex 1, Annex 2)
 
 | Clause | Ref | Title | Control | Requirements (release: result) | Status |
 | --- | --- | --- | --- | --- | --- |
-| E6R3-BLINDING | Data governance — safeguard blinding | Blinding protected in data governance and system access | technical | IAM-03 (foundations: PASS), IAM-04 (foundations: PASS), IAM-07 (foundations: PASS), AI-11 (foundations: PASS), M05-02 (foundations: PASS), APP-ID-02 (v0: PASS), APP-ID-02 (foundations: PASS), EDC-11 (v1: NO TEST), CMP-13 (v1: NO TEST) | partial |
+| E6R3-BLINDING | Data governance — safeguard blinding | Blinding protected in data governance and system access | technical | IAM-03 (foundations: PASS), IAM-04 (foundations: PASS), IAM-07 (foundations: PASS), AI-11 (foundations: PASS), M05-02 (foundations: PASS), APP-ID-02 (v0: PASS), APP-ID-02 (foundations: PASS), EDC-11 (v1: NO TEST), CMP-13 (v1: PASS) | partial |
 | E6R3-DATALIFECYCLE | Data governance — data life cycle | Data capture, metadata, review, correction, transfer, finalisation, retention, destruction | technical | CMP-04 (foundations: PASS), DM-01 (foundations: PASS), M01-04 (foundations: PASS), EDC-01 (v1: NO TEST), EDC-02 (v2: NO TEST), EDC-08 (v2: NO TEST), CMP-05 (v1: NO TEST), APP-DT-05 (v1: NO TEST) | partial |
 | E6R3-COMPSYS | Data governance — computerised systems | Fit-for-purpose systems: validation, audit trail, access control, security, backup, vendor oversight | technical | CMP-01 (foundations: PASS), IAM-02 (foundations: PASS), NFR-04 (gxp-p0: PASS), VAL-02 (v1: NO TEST) | partial |
 | E6R3-RBQM | Quality management / risk-based approach | Critical-to-quality factors, risk-based quality management and monitoring | technical | M05-02 (foundations: PASS), M11-02 (foundations: PASS), M08-02 (v1: NO TEST), EDC-12 (v1: NO TEST), EDC-06 (v2: NO TEST), CMP-05 (v1: NO TEST) | partial |
@@ -99,8 +99,8 @@ Technical clauses are covered by requirements and their tests; procedural clause
 
 | Clause | Ref | Title | Control | Requirements (release: result) | Status |
 | --- | --- | --- | --- | --- | --- |
-| JP-ERES-AUTH | Authenticity (真正性) | Records protected against falsification/erasure; responsibility clear; audit trail | technical | CMP-01 (foundations: PASS), DM-02 (foundations: PASS), DM-03 (foundations: PASS), CMP-12 (v1: NO TEST) | partial |
-| JP-ERES-LEGIB | Legibility (見読性) | Records can be displayed and printed in readable form | technical | CMP-10 (gxp-p0: PASS), CMP-14 (v1: NO TEST) | partial |
+| JP-ERES-AUTH | Authenticity (真正性) | Records protected against falsification/erasure; responsibility clear; audit trail | technical | CMP-01 (foundations: PASS), DM-02 (foundations: PASS), DM-03 (foundations: PASS), CMP-12 (v1: PASS) | covered |
+| JP-ERES-LEGIB | Legibility (見読性) | Records can be displayed and printed in readable form | technical | CMP-10 (gxp-p0: PASS), CMP-14 (v1: PASS) | covered |
 | JP-ERES-PRESERV | Preservation (保存性) | Records preserved for the retention period, backups | technical | NFR-04 (gxp-p0: PASS) | covered |
 | JP-ERES-ESIG | Electronic signatures | E-signature linked to record, signer identity, date/time, meaning | technical | CMP-02 (foundations: PASS), EDC-07 (v2: NO TEST), CMP-11 (gxp-p0: PASS) | partial |
 
@@ -131,7 +131,7 @@ Technical clauses are covered by requirements and their tests; procedural clause
 
 | Clause | Ref | Title | Control | Requirements (release: result) | Status |
 | --- | --- | --- | --- | --- | --- |
-| HIPAA-312 | 45 CFR 164.312 | Technical safeguards: access control, audit controls, integrity, authentication, transmission security | technical | CMP-01 (foundations: PASS), IAM-02 (foundations: PASS), AI-01 (v0: PASS), IAM-01 (gxp-p0: PASS), CMP-03 (gxp-p0: PASS), CMP-13 (v1: NO TEST), CMP-08 (v1: NO TEST), NFR-05 (v1: NO TEST), NFR-06 (v1: NO TEST) | partial |
+| HIPAA-312 | 45 CFR 164.312 | Technical safeguards: access control, audit controls, integrity, authentication, transmission security | technical | CMP-01 (foundations: PASS), IAM-02 (foundations: PASS), AI-01 (v0: PASS), IAM-01 (gxp-p0: PASS), CMP-03 (gxp-p0: PASS), CMP-13 (v1: PASS), CMP-08 (v1: NO TEST), NFR-05 (v1: NO TEST), NFR-06 (v1: NO TEST) | partial |
 | HIPAA-BAA | 45 CFR 164.504(e) | Business associate agreements with service providers handling PHI | procedural | — | SOP |
 
 ## APPI — JP Act on the Protection of Personal Information (Act 57/2003, rev. 2022)
@@ -154,7 +154,7 @@ Technical clauses are covered by requirements and their tests; procedural clause
 | --- | --- | --- | --- | --- | --- |
 | FDA-AI-COU | Credibility framework steps 1–3 | Question of interest, context of use, model risk (influence × decision consequence) | technical | M05-01 (v1: NO TEST), CMP-06 (v1: NO TEST), AI-02 (v1: NO TEST) | planned |
 | FDA-AI-CRED | Credibility framework steps 4–7 | Credibility assessment plan, execution, report, adequacy for the context of use | technical | CMP-06 (v1: NO TEST), CMP-07 (v1: NO TEST), AI-02 (v1: NO TEST), AI-04 (v1: NO TEST) | planned |
-| FDA-AI-LIFECYCLE | Life cycle maintenance; Good AI Practice principle 9 | Model change control, performance monitoring, drift | technical | AI-06 (foundations: PASS), AI-01 (v0: PASS), AI-09 (v1: PASS), CMP-07 (v1: NO TEST), AI-03 (v1: NO TEST), AI-10 (v1: NO TEST) | partial |
+| FDA-AI-LIFECYCLE | Life cycle maintenance; Good AI Practice principle 9 | Model change control, performance monitoring, drift | technical | AI-06 (foundations: PASS), AI-01 (v0: PASS), AI-09 (v1: PASS), CMP-07 (v1: NO TEST), AI-03 (v1: PASS), AI-10 (v1: NO TEST) | partial |
 | FDA-AI-HUMAN | Good AI Practice principles 1, 3 | Human-centric design and oversight, adherence to GxP | technical | IAM-07 (foundations: PASS), AI-05 (foundations: PASS), AI-11 (foundations: PASS), APP-TK-04 (foundations: PASS), M01-02 (v0: PASS), AI-07 (v1: NO TEST), AI-08 (v1: NO TEST), M04-02 (v1: NO TEST), M05-01 (v1: NO TEST), M08-02 (v1: NO TEST), M09-02 (v1: NO TEST), AI-09 (v1: PASS), CMP-09 (gxp-p0: PASS) | partial |
 
 ## CDISC — FDA Data Standards Catalog / PMDA electronic study data (CDISC SDTM, ADaM, Define-XML, ODM)

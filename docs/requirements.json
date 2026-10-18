@@ -962,7 +962,7 @@
   {
    "id": "AI-03",
    "release": "v1",
-   "text": "GxP task types pinned to a dated model snapshot; a model change is a change request with regression on the test dataset",
+   "text": "GxP task types pinned to an immutable model id (a dated snapshot where the provider publishes one); a model change is a change request with regression on the test dataset",
    "gxp_impact": "direct",
    "risk": "high",
    "assurance": "scripted",
