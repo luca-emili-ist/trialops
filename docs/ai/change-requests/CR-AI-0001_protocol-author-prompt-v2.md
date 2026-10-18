@@ -68,6 +68,15 @@ The citation check refuses a C06-like answer item by item (test [AI-04] "fewer s
 such an answer cannot even pass the schema. The credibility harness may retry a case once when the provider gives no
 answer (`--retry-errors 1`, attempts recorded).
 
+**Provider transport** (part of this change): the Anthropic adapter (`services/ai-runtime/src/providers/anthropic.ts`)
+streams the response (`client.messages.stream(...)`, `stream.finalMessage()`) instead of one blocking request. What is
+sent is unchanged (model, max_tokens, effort, JSON Schema output, system prompt, one user message; test [AI-04]);
+refusal, truncation, usage and the reported model come from the final message; timeout and retry settings unchanged.
+Reason: at effort high a long answer kept the connection idle and it was dropped at ~2 minutes (v2.0 C14, v2.3 C18).
+This also protects the production AI worker (Netlify background function), which uses the same adapter.
+
+- draft v2.4 (2026-10-18): v2.3 + streamed transport. **Locked as v2** if its run is accepted (§4).
+
 ## 3. Risk and controls
 
 Same risk (medium) and same GxP controls: JSON Schema, mandatory verbatim citation, human review and signature. The

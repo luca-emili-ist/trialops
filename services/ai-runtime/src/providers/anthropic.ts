@@ -10,13 +10,17 @@ export function anthropicProvider(client: Anthropic = new Anthropic()): Provider
     // STRICT_LOCAL never leaves the perimeter; the others only with a qualified contract (spec §9, decision 5).
     accepts: ['PUBLIC', 'INTERNAL', 'CONFIDENTIAL_SPONSOR', 'CLINICAL_PSEUDONYMIZED'],
     async call(c: ProviderCall): Promise<ProviderResult> {
-      const res = await client.messages.create({
+      // Streamed transport (CR-AI-0001): a long answer at high effort keeps bytes flowing, so an idle connection is not
+      // dropped before the first token (seen at ~2 min without streaming). The request is the same; only the final
+      // accumulated message is used.
+      const stream = client.messages.stream({
         model: c.model,
         max_tokens: c.max_tokens,
         system: c.system,
         messages: [{ role: 'user', content: c.user }],
         output_config: { effort: c.effort, format: { type: 'json_schema', schema: c.output_schema } },
       });
+      const res = await stream.finalMessage();
       const usage = { input_tokens: res.usage.input_tokens, output_tokens: res.usage.output_tokens };
       if (res.stop_reason === 'refusal') {
         return { output: null, model: res.model, ...usage, refusal: res.stop_details?.category ?? 'refusal' };
