@@ -1,0 +1,20 @@
+{
+  "$comment": "HARNESS FIXTURE, used only by services/ai-runtime/test/credibility.test.ts to test the scoring harness. It is NOT the CMP-06 credibility dataset of protocol.appendix.draft (that one is built by an independent person and lives in services/ai-runtime/datasets/protocol.appendix.draft/credibility/). kind harness_fixture never counts as evidence.",
+  "format": "trialops.ai-credibility-dataset/1",
+  "kind": "harness_fixture",
+  "dataset_id": "harness-sample",
+  "task_type": "protocol.appendix.draft",
+  "version": "0.1",
+  "synthetic": true,
+  "provenance": {
+    "author": "Claude Code (TrialOps development engine)",
+    "checker": "",
+    "created_on": "2026-10-18",
+    "independence": {
+      "statement": "",
+      "attested_by": "",
+      "attested_on": ""
+    }
+  },
+  "sha256": "023180a6bd7ccd544eb7491d77d2d045dc6e7e1cb771b7e4220a3bd4c0582125"
+}

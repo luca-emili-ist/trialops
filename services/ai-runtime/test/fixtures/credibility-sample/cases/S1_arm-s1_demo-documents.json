@@ -1,0 +1,172 @@
+{
+  "$comment": "HARNESS FIXTURE for services/ai-runtime/test/credibility.test.ts only. Not the CMP-06 credibility dataset.",
+  "case_id": "S1",
+  "data_class": "CONFIDENTIAL_SPONSOR",
+  "input": {
+    "master_protocol": {
+      "title": "Synthetic platform trial in Disease X",
+      "shared_control": "placebo plus standard of care",
+      "visits": [
+        "screening",
+        "day 1",
+        "week 4",
+        "week 12",
+        "week 24"
+      ]
+    },
+    "arm": {
+      "code": "ARM-S1",
+      "name": "MRD-12",
+      "intervention_type": "drug",
+      "has_prior_human_data": true,
+      "approved_any_indication": false,
+      "sponsor": "Synthetic Sponsor D"
+    },
+    "sponsor_documents": [
+      {
+        "ref": "SPONSOR-BRIEF-D",
+        "title": "Sponsor briefing document (synthetic)",
+        "text": "MRD-12 is an oral small molecule. The recommended phase 2 dose is 40 mg once daily. The proposed primary endpoint is the change in functional score at 24 weeks. Safety and tolerability will be assessed over 24 weeks, with treatment-emergent and serious adverse events followed to week 28. Trough sampling at weeks 4, 12 and 24 will support exposure-response analysis. Participants must be eligible for the platform as defined in Master Protocol section 5.1. An estimated glomerular filtration rate of at least 45 mL/min/1.73 m2 is required. Placebo tablets matching MRD-12 will be used for blinding against the shared control."
+      },
+      {
+        "ref": "IB-MRD-12",
+        "title": "Investigator brochure extract (synthetic)",
+        "text": "MRD-12 is a sensitive CYP3A4 substrate. A dose-dependent QTc prolongation was observed above 80 mg. No hepatic signal in phase 1."
+      }
+    ]
+  },
+  "reference": {
+    "synopsis": {
+      "phase": "phase2"
+    },
+    "objectives": [
+      {
+        "id": "OBJ1",
+        "level": "primary",
+        "text": "Efficacy on the functional score at week 24",
+        "keywords": [
+          "functional score",
+          "week 24"
+        ],
+        "mandatory": true
+      },
+      {
+        "id": "OBJ2",
+        "level": "secondary",
+        "text": "Safety and tolerability over 24 weeks",
+        "keywords": [
+          "safety",
+          "tolerability"
+        ],
+        "mandatory": true
+      },
+      {
+        "id": "OBJ3",
+        "level": "exploratory",
+        "text": "Plasma exposure",
+        "keywords": [
+          "exposure"
+        ],
+        "mandatory": false
+      }
+    ],
+    "endpoints": [
+      {
+        "id": "EP1",
+        "text": "Change from baseline in functional score at week 24",
+        "keywords": [
+          "functional score",
+          "week 24"
+        ],
+        "mandatory": true
+      },
+      {
+        "id": "EP2",
+        "text": "Adverse events",
+        "keywords": [
+          "adverse events"
+        ],
+        "mandatory": true
+      },
+      {
+        "id": "EP3",
+        "text": "Trough plasma concentration",
+        "keywords": [
+          "trough"
+        ],
+        "mandatory": false
+      }
+    ],
+    "criteria": [
+      {
+        "id": "IN1",
+        "kind": "inclusion",
+        "text": "Eligible per Master Protocol section 5.1",
+        "keywords": [
+          "5.1"
+        ],
+        "mandatory": true
+      },
+      {
+        "id": "IN2",
+        "kind": "inclusion",
+        "text": "eGFR at least 45",
+        "keywords": [
+          "45"
+        ],
+        "mandatory": true
+      },
+      {
+        "id": "EX1",
+        "kind": "exclusion",
+        "text": "Strong CYP3A4 inhibitors or inducers",
+        "keywords": [
+          "cyp3a4"
+        ],
+        "mandatory": true
+      },
+      {
+        "id": "EX2",
+        "kind": "exclusion",
+        "text": "QTcF above 470 ms",
+        "keywords": [
+          "qtcf"
+        ],
+        "mandatory": true
+      }
+    ],
+    "interventions": [
+      {
+        "name": "MRD-12",
+        "dose": "40 mg",
+        "mandatory": true
+      },
+      {
+        "name": "Placebo matching MRD-12",
+        "mandatory": false
+      }
+    ],
+    "visits": [
+      {
+        "name": "Week 4",
+        "day": 29,
+        "mandatory": false
+      }
+    ],
+    "quotes": [
+      {
+        "item": "OBJ1",
+        "ref": "SPONSOR-BRIEF-D",
+        "quote": "The proposed primary endpoint is the change in functional score at 24 weeks."
+      }
+    ],
+    "consistency": [
+      {
+        "check": "Shared control population",
+        "expected": "pass"
+      }
+    ],
+    "traps": [],
+    "silent": []
+  }
+}
