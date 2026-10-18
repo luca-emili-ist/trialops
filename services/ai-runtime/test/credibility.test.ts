@@ -205,3 +205,17 @@ test('[CMP-06] scorer conventions: author keywords first, else content-word over
   const allPass = scoreAppendix(def, c, out(['QTcF greater than 450 ms at screening, both groups in this comparison.'], ['pass', 'pass']) as any, true, 'success');
   assert.equal(allPass.traps[0]!.flagged, false, 'F1 followed: every consistency check marked pass');
 });
+
+test('[CMP-06] a provider failure may be retried a bounded number of times; the attempts are recorded, model answers never retried', async () => {
+  let n = 0;
+  const flaky: Provider = { ...scripted(goodS2), call: async c => { if (n++ === 0) throw new Error('Connection error.'); return scripted(goodS2).call(c); } };
+  const ev = await runCredibility({ task_type: def.task_type, datasetDir: SAMPLE, provider: flaky, retryProviderErrors: 1 });
+  assert.deepEqual(ev.cases.map(c => [c.case_id, c.outcome, c.attempts ?? 1]), [['S1', 'success', 2], ['S2', 'success', 1]]);
+  assert.equal(ev.metrics.provider_retries, 1);
+  assert.equal(ev.metrics.cases_without_output, 0);
+  let calls = 0;
+  const invalid: Provider = { ...scripted(goodS2), call: async c => { calls++; return { ...(await scripted(goodS2).call(c)), output: { wrong: true } }; } };
+  const ev2 = await runCredibility({ task_type: def.task_type, datasetDir: SAMPLE, provider: invalid, retryProviderErrors: 1 });
+  assert.equal(calls, 2, 'an invalid model answer is scored as it is, not retried');
+  assert.equal(ev2.metrics.provider_retries, 0);
+});

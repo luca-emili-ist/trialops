@@ -146,6 +146,7 @@ const listAt = (o: unknown, path: string): Record<string, unknown>[] => {
 export interface CaseScore {
   case_id: string; outcome: string; error?: string; schema_valid: boolean;
   scored_output: boolean;              // false when the call gave no schema-valid output: nothing of this case was measured
+  attempts?: number;                   // > 1 when a provider error was retried (retryProviderErrors), recorded for the report
   quotes: number; verbatim_quotes: number; unsupported: string[]; silent_violations: string[];
   recall: Record<string, { mandatory: number; found: number; missed: string[]; by_keywords?: number; by_overlap?: number }>;
   traps: { id: string; type: string; flagged: boolean }[];
@@ -281,7 +282,8 @@ const SCORERS: Record<string, { score: typeof scoreAppendix; metrics: typeof app
 };
 
 export async function runCredibility(opts: { task_type: string; datasetDir: string; provider: Provider; dryRun?: boolean;
-  registry?: Record<string, TaskTypeDef>; promptAuthors?: string[]; maxConsecutiveErrors?: number }): Promise<CredibilityEvidence> {
+  registry?: Record<string, TaskTypeDef>; promptAuthors?: string[]; maxConsecutiveErrors?: number;
+  retryProviderErrors?: number }): Promise<CredibilityEvidence> {
   const def = (opts.registry ?? REGISTRY)[opts.task_type];
   if (!def) throw new Error(`task_type ${opts.task_type} is not registered`);
   const scorer = SCORERS[opts.task_type];
@@ -304,14 +306,19 @@ export async function runCredibility(opts: { task_type: string; datasetDir: stri
   let streak = 0; let aborted = false;
   for (const { case: c } of ds.cases) {
     if (streak >= maxErrors) { aborted = true; break; }
-    raw = null;
-    const r = await rt.run({ task_type: def.task_type, data_class: c.data_class, input: c.input }, { db });
+    // A provider failure (error, timeout: no answer from the model) may be retried a bounded number of times; the case
+    // records its attempts. A model answer, valid or not, is never retried.
+    let r; let attempts = 0;
+    do {
+      raw = null; attempts++;
+      r = await rt.run({ task_type: def.task_type, data_class: c.data_class, input: c.input }, { db });
+    } while (PROVIDER_FAILURES.has(r.outcome) && attempts <= (opts.retryProviderErrors ?? 0));
     const output = raw as Out | null;
     const schemaValid = output !== null && validate(output) === true;
-    cases.push(scorer.score(def, c, schemaValid ? output : null, schemaValid, r.outcome, r.error));
+    cases.push({ ...scorer.score(def, c, schemaValid ? output : null, schemaValid, r.outcome, r.error), ...(attempts > 1 ? { attempts } : {}) });
     streak = PROVIDER_FAILURES.has(r.outcome) ? streak + 1 : 0;
   }
-  const metrics = scorer.metrics(cases);
+  const metrics = { ...scorer.metrics(cases), provider_retries: cases.reduce((a, c) => a + ((c.attempts ?? 1) - 1), 0) };
   const thresholds = checkThresholds(def.thresholds, metrics, aborted);
   const problems = provenanceProblems(ds, def, promptAuthors);
   if (aborted) problems.push(`aborted after ${maxErrors} consecutive provider errors: ${cases.length} of ${ds.cases.length} cases run (${cases.at(-1)?.error ?? ''})`.slice(0, 500));

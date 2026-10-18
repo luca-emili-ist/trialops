@@ -129,3 +129,15 @@ test('[AI-04] the Master Protocol text given in the input is citable by its ref;
   unknown.sources.push({ section: 'population', item_id: 'IN1', ref: 'MP-OTHER', quote: mpSentence });
   assert.match(checkCitations(def.citation!, withMp, unknown).errors.join('\n'), /cites MP-OTHER, which is not an input document/);
 });
+
+test('[AI-04] an answer with fewer source entries than items (one source shared by the whole draft) is refused item by item', async () => {
+  const out = clone();
+  out.sources = [{ ...out.sources[0], item_id: 'OBJ1' }];                       // the C06 pattern of the CMP-06 pilot
+  const listed = [...out.sections.objectives, ...out.sections.endpoints, ...out.sections.population.inclusion,
+    ...out.sections.population.exclusion, ...out.sections.interventions].map((i: { id: string }) => i.id).filter((id: string) => id !== 'OBJ1');
+  const rep = checkCitations(def.citation!, input, out);
+  assert.deepEqual(rep.unsupported.map(u => u.item_id).sort(), listed.sort());
+  const r = await createAiRuntime({ provider: answering(out) }).run(req, { db: fakeDb() });
+  assert.equal(r.outcome, 'validation_failed');
+  assert.equal(r.output, null);
+});

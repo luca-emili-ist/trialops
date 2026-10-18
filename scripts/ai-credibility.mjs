@@ -1,6 +1,7 @@
 // Credibility assessment of a GxP AI task type (CMP-06, CMP-07). Runs the task type on its credibility dataset, scores
 // the metrics pre-specified in the registry (= credibility plan §4) and writes the evidence to docs/ai/evidence/<task_type>/.
-// Usage: TRIALOPS_AI_MODE=live node scripts/ai-credibility.mjs <task_type> [--dataset <dir>] [--dry-run] [--max-usd <n>]
+// Usage: TRIALOPS_AI_MODE=live node scripts/ai-credibility.mjs <task_type> [--dataset <dir>] [--dry-run] [--max-usd <n>] [--retry-errors <n>]
+//   --retry-errors  retry a case up to n times when the provider gave no answer (error/timeout); attempts are recorded.
 //   --dataset  default: <registry dataset>/credibility (manifest.json + cases/*.json, format in services/ai-runtime/datasets/README.md)
 //   --dry-run  required with the replay provider; the evidence is marked dry_run and never counts.
 //   --max-usd  budget cap at list price (default 15): before each call the run stops if spend so far plus the worst case of
@@ -15,7 +16,7 @@ import { runCredibility } from '../services/ai-runtime/src/credibility.ts';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const args = process.argv.slice(2);
-const taskType = args.find((a, i) => !a.startsWith('--') && !['--dataset', '--max-usd'].includes(args[i - 1]));
+const taskType = args.find((a, i) => !a.startsWith('--') && !['--dataset', '--max-usd', '--retry-errors'].includes(args[i - 1]));
 const maxUsd = args.includes('--max-usd') ? Number(args[args.indexOf('--max-usd') + 1]) : 15;
 const dryRun = args.includes('--dry-run');
 const def = taskType ? REGISTRY[taskType] : undefined;
@@ -46,18 +47,22 @@ const metered = { ...provider, call: async c => {
     return r;
   } catch (e) { outputs.push(null); calls.push({ input_tokens: null, output_tokens: null, latency_ms: Date.now() - t0, error: e.message }); console.error(`call ${calls.length}: ${e.message}`); throw e; }
 } };
-const ev = await runCredibility({ task_type: taskType, datasetDir, provider: metered, dryRun });
+const retries = args.includes('--retry-errors') ? Number(args[args.indexOf('--retry-errors') + 1]) : 0;
+const ev = await runCredibility({ task_type: taskType, datasetDir, provider: metered, dryRun, retryProviderErrors: retries });
 const tin = calls.reduce((a, c) => a + (c.input_tokens ?? 0), 0); const tout = calls.reduce((a, c) => a + (c.output_tokens ?? 0), 0);
 ev.usage = { calls: calls.length, input_tokens: tin, output_tokens: tout, usd_list_price: Math.round(usd(tin, tout) * 1e4) / 1e4,
-  price_usd_per_mtok: price, max_usd: maxUsd, per_call: calls.map((c, i) => ({ case_id: ev.cases[i]?.case_id ?? null, ...c })) };
+  price_usd_per_mtok: price, max_usd: maxUsd, per_call: calls };
 const name = `${ev.run_at.slice(0, 10)}_${ev.dataset.dataset_id}_v${ev.dataset.version}_${ev.model}_p${ev.prompt_version}${ev.dry_run || ev.mode !== 'live' ? '_dry-run' : ''}.json`;
 const file = join(root, 'docs/ai/evidence', taskType, name);
 mkdirSync(dirname(file), { recursive: true });
 writeFileSync(file, JSON.stringify(ev, null, 2) + '\n');
 // Raw model answers next to the evidence, for the human review of failures (synthetic data only, rule 7).
 if (outputs.some(o => o !== null)) {
+  // one call per case, plus retried calls: the answer of a case is the one of its last attempt
+  let k = 0;
+  const lastOut = ev.cases.map(c => { k += c.attempts ?? 1; return outputs[k - 1] ?? null; });
   writeFileSync(file.replace(/\.json$/, '_outputs.json'), JSON.stringify(ev.cases.map((c, i) => ({ case_id: c.case_id, outcome: c.outcome,
-    ...(c.error ? { error: c.error } : {}), output: outputs[i] ?? null })), null, 2) + '\n');
+    ...(c.error ? { error: c.error } : {}), output: lastOut[i] })), null, 2) + '\n');
 }
 for (const t of ev.thresholds) console.log(`${t.pass ? "ok  " : "FAIL"} ${t.metric} ${t.op} ${t.value}: ${t.actual}${t.note ? ` (${t.note})` : ""}`);
 console.log(`outcomes: ${Object.entries(ev.metrics).filter(([k]) => k.startsWith("outcome_")).map(([k, v]) => `${k.slice(8)} ${v}`).join(", ")}; cases without output: ${ev.metrics.cases_without_output}${ev.aborted ? "; ABORTED" : ""}`);
