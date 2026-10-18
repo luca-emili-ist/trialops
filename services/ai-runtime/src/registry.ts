@@ -27,6 +27,7 @@ export interface MonitoringPolicy {
  */
 export interface CitationPolicy {
   documents: string;                   // dotted path in the input
+  master_document?: string;            // dotted path of an input object { ref, text } also citable (the Master Protocol, inherited content)
   sources: string;                     // dotted path in the output
   items: { section: string; path: string; key: string }[];
   min_quote_chars: number;
@@ -110,7 +111,7 @@ export const REGISTRY: Record<string, TaskTypeDef> = {
       drift: { window: 20, max_output_tokens_change: 0.5, max_failure_rate_change: 0.2 },
     },
     citation: {
-      documents: 'sponsor_documents', sources: 'sources', min_quote_chars: 10,
+      documents: 'sponsor_documents', master_document: 'master_protocol', sources: 'sources', min_quote_chars: 10,
       items: [
         { section: 'objectives', path: 'sections.objectives', key: 'id' },
         { section: 'endpoints', path: 'sections.endpoints', key: 'id' },

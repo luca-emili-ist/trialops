@@ -23,10 +23,13 @@ export interface CitationReport {
 export function checkCitations(policy: CitationPolicy, input: Record<string, unknown>, output: unknown): CitationReport {
   const docs = new Map<string, string>();
   const rawDocs = getPath(input, policy.documents);
-  if (Array.isArray(rawDocs)) {
-    for (const d of rawDocs as { ref?: unknown; text?: unknown }[]) {
-      if (d && typeof d.ref === 'string' && typeof d.text === 'string') docs.set(d.ref, normaliseText(d.text));
-    }
+  const citable = (Array.isArray(rawDocs) ? [...rawDocs] : []) as { ref?: unknown; text?: unknown }[];
+  // The Master Protocol is citable only when the input carries its text and ref (inherited content); a bare USDM object
+  // without text gives nothing to quote, so a citation of it is refused like any unknown document.
+  const master = policy.master_document ? getPath(input, policy.master_document) as { ref?: unknown; text?: unknown } | undefined : undefined;
+  if (master && typeof master === 'object') citable.push(master);
+  for (const d of citable) {
+    if (d && typeof d.ref === 'string' && d.ref.trim() && typeof d.text === 'string' && !docs.has(d.ref)) docs.set(d.ref, normaliseText(d.text));
   }
   const rawSources = getPath(output, policy.sources);
   const sources = (Array.isArray(rawSources) ? rawSources : []) as { section?: unknown; item_id?: unknown; ref?: unknown; quote?: unknown }[];

@@ -111,3 +111,21 @@ test('[AI-04] extraction and classification task types declare the citation they
   assert.deepEqual(def.citation!.items.map(i => i.path),
     ['sections.objectives', 'sections.endpoints', 'sections.population.inclusion', 'sections.population.exclusion', 'sections.interventions']);
 });
+
+test('[AI-04] the Master Protocol text given in the input is citable by its ref; unknown or text-less documents stay refused', () => {
+  const mpSentence = 'An arm-specific eligibility restriction may narrow its concurrent comparison only when it applies identically.';
+  const withMp = { ...input, master_protocol: { ref: 'MP-X-001', title: 'Master Protocol', text: `5 Population\n\n${mpSentence}` } };
+  const out = clone();
+  out.sources.push({ section: 'population', item_id: 'IN1', ref: 'MP-X-001', quote: mpSentence });
+  assert.deepEqual(checkCitations(def.citation!, withMp, out).errors, []);
+  // not verbatim in the Master Protocol
+  const bad = clone();
+  bad.sources.push({ section: 'population', item_id: 'IN1', ref: 'MP-X-001', quote: 'Any restriction is allowed for the arm.' });
+  assert.match(checkCitations(def.citation!, withMp, bad).errors.join('\n'), /quote not found verbatim in MP-X-001/);
+  // the same citation without the text in the input (the API passes the bare USDM object) is refused
+  assert.match(checkCitations(def.citation!, input, out).errors.join('\n'), /cites MP-X-001, which is not an input document/);
+  // an unknown ref is still refused
+  const unknown = clone();
+  unknown.sources.push({ section: 'population', item_id: 'IN1', ref: 'MP-OTHER', quote: mpSentence });
+  assert.match(checkCitations(def.citation!, withMp, unknown).errors.join('\n'), /cites MP-OTHER, which is not an input document/);
+});
