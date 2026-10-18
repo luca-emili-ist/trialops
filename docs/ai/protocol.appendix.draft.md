@@ -5,7 +5,7 @@ Version 0.1 · 2026-10-10 · status: **plan written, not executed** (CMP-06 open
 | Field | Value |
 | --- | --- |
 | Registry entry | `protocol.appendix.draft`, prompt `protocol-author` v1 |
-| Model | `claude-opus-5-5` — **to be replaced by a dated snapshot id** (AI-03); Anthropic API; data classes INTERNAL, CONFIDENTIAL_SPONSOR (never CLINICAL_PSEUDONYMIZED or STRICT_LOCAL) |
+| Model | `claude-opus-5-5` — immutable snapshot id (the Claude 5 family has no dated variant), pinned in `services/ai-runtime/model-lock.json`; drift is blocked at run time and a change needs a change request with live regression (AI-03); Anthropic API; data classes INTERNAL, CONFIDENTIAL_SPONSOR (never CLINICAL_PSEUDONYMIZED or STRICT_LOCAL) |
 | GxP | Yes: the output becomes an arm appendix version only after review and signature (AI-05, DM-02) |
 
 ## 1. Question of interest

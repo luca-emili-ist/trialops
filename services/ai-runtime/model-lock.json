@@ -1,0 +1,29 @@
+{
+  "$comment": "AI-03 model lock. Every task type is pinned to one model id. The Claude 5 family has no dated variant: the bare id (e.g. claude-opus-5-5) is the immutable snapshot published by Anthropic. The last entry of `approvals` must match the model in registry.ts. Changing the model means appending an approval with a change request and a passing regression on the task type's test dataset (scripts/ai-regression.mjs); test [AI-03] in services/ai-runtime/test/model-lock.test.ts enforces it. The first approval has nothing to regress against.",
+  "task_types": {
+    "protocol.appendix.draft": {
+      "approvals": [
+        {
+          "model": "claude-opus-5-5",
+          "approved_on": "2026-10-18",
+          "approved_by": null,
+          "change_request": null,
+          "regression_evidence": null,
+          "reason": "initial pin (no previous model)"
+        }
+      ]
+    },
+    "arm.onboarding.plan": {
+      "approvals": [
+        {
+          "model": "claude-opus-5-5",
+          "approved_on": "2026-10-18",
+          "approved_by": null,
+          "change_request": null,
+          "regression_evidence": null,
+          "reason": "initial pin (no previous model)"
+        }
+      ]
+    }
+  }
+}

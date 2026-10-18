@@ -101,6 +101,12 @@ export function createAiRuntime(opts: AiRuntimeOptions = {}) {
         return result(timeout ? 'timeout' : 'error', id, null, d.model, (e as Error).message);
       }
       const usage = { model: r.model, input_tokens: r.input_tokens, output_tokens: r.output_tokens, latency_ms: Math.round(now() - t0) };
+      // AI-03: the provider must answer with the pinned model. Any other id (alias moved, silent upgrade, fallback) is
+      // recorded and refused: a model change goes through change control, never through the provider.
+      if (r.model !== d.model) {
+        const id = await ledger(caller.db, req, d, { ...base, ...usage, outcome: 'blocked' });
+        return result('blocked', id, null, r.model, `model drift: ${d.task_type} is pinned to ${d.model}, provider answered with ${r.model} (AI-03)`);
+      }
       if (r.refusal) {
         const id = await ledger(caller.db, req, d, { ...base, ...usage, outcome: 'blocked' });
         return result('blocked', id, null, r.model, `provider declined (${r.refusal})`);

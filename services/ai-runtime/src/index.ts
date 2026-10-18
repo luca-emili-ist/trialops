@@ -4,3 +4,4 @@ export { createAiRuntime, providerFromEnv, AiRequestError, type AiRuntime } from
 export { REGISTRY, MODEL, type TaskTypeDef } from './registry.ts';
 export { replayProvider, recording, FIXTURES } from './providers/replay.ts';
 export { DATA_CLASSES, type AiTaskRequest, type AiTaskResult, type DataClass, type Provider, type ProviderCall, type ProviderResult } from './types.ts';
+export { runRegression, readModelLock, readDataset, type RegressionEvidence, type ModelLock } from './regression.ts';

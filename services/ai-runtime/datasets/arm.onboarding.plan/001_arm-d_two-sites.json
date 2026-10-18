@@ -1,0 +1,8 @@
+{
+  "data_class": "INTERNAL",
+  "input": {
+    "arm": { "code": "ARM-D", "name": "MRD-12", "intervention_type": "drug" },
+    "sites": [ { "site_number": "001", "name": "Synthetic University Hospital" }, { "site_number": "002", "name": "Synthetic Research Clinic" } ],
+    "today": "2026-10-18"
+  }
+}

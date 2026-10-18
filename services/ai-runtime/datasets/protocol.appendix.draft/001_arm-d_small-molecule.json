@@ -1,0 +1,10 @@
+{
+  "data_class": "CONFIDENTIAL_SPONSOR",
+  "input": {
+    "master_protocol": { "title": "Synthetic platform trial in Disease X", "shared_control": "placebo plus standard of care", "visits": ["screening", "day 1", "week 4", "week 12", "week 24"] },
+    "arm": { "code": "ARM-D", "name": "MRD-12", "intervention_type": "drug", "has_prior_human_data": true, "approved_any_indication": false, "sponsor": "Synthetic Sponsor D" },
+    "sponsor_documents": [
+      { "ref": "SYN-D-01", "title": "Synthetic sponsor synopsis", "text": "MRD-12 is an oral small molecule given 50 mg once daily. The primary endpoint is the Disease X functional score at week 24. Patients with severe hepatic impairment are excluded." }
+    ]
+  }
+}
