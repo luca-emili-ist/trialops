@@ -92,3 +92,6 @@ try {
 } finally {
   await server.stop();
 }
+// Exit explicitly with the result: embedded-postgres registers async-exit-hook, which otherwise ends the process with
+// code 0 and hid failing tests from npm test and CI (found 2026-10-18).
+process.exit(process.exitCode ?? 0);
