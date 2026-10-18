@@ -313,8 +313,9 @@ export async function runCredibility(opts: { task_type: string; datasetDir: stri
       raw = null; attempts++;
       r = await rt.run({ task_type: def.task_type, data_class: c.data_class, input: c.input }, { db });
     } while (PROVIDER_FAILURES.has(r.outcome) && attempts <= (opts.retryProviderErrors ?? 0));
-    const output = raw as Out | null;
-    const schemaValid = output !== null && validate(output) === true;
+    const schemaValid = raw !== null && validate(raw) === true;
+    // scored on what the platform would see: the schema-valid answer after the task type's normalisation
+    const output = (schemaValid && def.normalise ? def.normalise(raw) : raw) as Out | null;
     cases.push({ ...scorer.score(def, c, schemaValid ? output : null, schemaValid, r.outcome, r.error), ...(attempts > 1 ? { attempts } : {}) });
     streak = PROVIDER_FAILURES.has(r.outcome) ? streak + 1 : 0;
   }

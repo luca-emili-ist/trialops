@@ -121,9 +121,11 @@ export function createAiRuntime(opts: AiRuntimeOptions = {}) {
         const id = await ledger(caller.db, req, d, { ...base, ...usage, output_sha256, outcome: 'validation_failed', validation_error: `schema: ${error}` });
         return result('validation_failed', id, null, r.model, error);
       }
+      // The answer the platform sees: normalised after validation (prompt v2: per-item sources → `sources` list).
+      const output = d.normalise ? d.normalise(r.output) : r.output as Record<string, unknown>;
       // AI-04: extraction and classification outputs must cite their sources verbatim; otherwise they never reach a person.
       if (d.citation) {
-        const report = checkCitations(d.citation, req.input, r.output);
+        const report = checkCitations(d.citation, req.input, output);
         if (report.errors.length) {
           const error = citationError(report);
           const id = await ledger(caller.db, req, d, { ...base, ...usage, output_sha256, outcome: 'validation_failed', validation_error: `citation: ${error}` });
@@ -131,7 +133,7 @@ export function createAiRuntime(opts: AiRuntimeOptions = {}) {
         }
       }
       const id = await ledger(caller.db, req, d, { ...base, ...usage, output_sha256, outcome: 'success' });
-      return result('success', id, r.output as Record<string, unknown>, r.model);
+      return result('success', id, output, r.model);
     },
   };
 }

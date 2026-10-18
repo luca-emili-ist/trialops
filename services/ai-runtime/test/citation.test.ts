@@ -4,21 +4,27 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import type Anthropic from '@anthropic-ai/sdk';
-import { createAiRuntime, replayProvider, REGISTRY, DEMO_SPONSOR_DOCUMENTS, checkCitations, PROMPT_LOCK, type Provider } from '../src/index.ts';
+import { createAiRuntime, replayProvider, REGISTRY, DEMO_SPONSOR_DOCUMENTS, checkCitations, PROMPT_LOCK, perItemSourcesToList, type Provider } from '../src/index.ts';
+import { toModelShape } from './helpers/model-shape.ts';
 import { anthropicProvider } from '../src/providers/anthropic.ts';
 
 const root = join(PROMPT_LOCK, '../../..');
 const def = REGISTRY['protocol.appendix.draft']!;
-const fixture = JSON.parse(readFileSync(join(root, 'services/ai-runtime/fixtures/protocol.appendix.draft/default.json'), 'utf8'));
+// The replay fixture is the model answer (prompt v2: a source inside each item); `fixture` is the platform shape the
+// runtime derives from it (legacy `sources` list), which the citation check and the rest of the platform see.
+const modelAnswer = JSON.parse(readFileSync(join(root, 'services/ai-runtime/fixtures/protocol.appendix.draft/default.json'), 'utf8'));
+const fixture: any = perItemSourcesToList(def.citation!, modelAnswer);
 const input = { master_protocol: {}, arm: { code: 'ARM-D' }, sponsor_documents: DEMO_SPONSOR_DOCUMENTS };
 const req = { task_type: 'protocol.appendix.draft', data_class: 'CONFIDENTIAL_SPONSOR' as const, input };
 function fakeDb() {
   const rows: unknown[][] = [];
   return { rows, query: async (_s: string, p: unknown[] = []) => { rows.push(p); return { rows: [{ id: `req-${rows.length}` }] }; } };
 }
+// Tests write answers in the platform shape; the provider answers as the model does (per-item sources).
 const answering = (output: unknown): Provider => ({ name: 'anthropic', accepts: ['INTERNAL', 'CONFIDENTIAL_SPONSOR'],
-  call: async () => ({ output, model: def.model, input_tokens: 10, output_tokens: 10 }) });
-const clone = () => structuredClone(fixture);
+  call: async () => ({ output: Array.isArray((output as { sources?: unknown })?.sources) ? toModelShape(def.citation!, output) : output,
+    model: def.model, input_tokens: 10, output_tokens: 10 }) });
+const clone = (): any => structuredClone(fixture);
 
 test('[AI-04] the demo works: the replay answer cites the demo sponsor documents verbatim', async () => {
   assert.deepEqual(checkCitations(def.citation!, input, fixture).errors, []);
@@ -35,15 +41,37 @@ test('[AI-04] an objective, endpoint, criterion or intervention without a source
   for (const id of ['OBJ2', 'EP1', 'IN2', 'EX1', 'INT2']) {
     const out = clone();
     out.sources = out.sources.filter((s: { item_id: string }) => s.item_id !== id);
+    // the citation check refuses it on the platform shape …
+    assert.match(checkCitations(def.citation!, input, out).errors.join('\n'), new RegExp(`${id}: no source`));
+    // … and with prompt v2 the model answer is refused earlier, by the schema: every cited item requires its source
     const db = fakeDb();
     const r = await createAiRuntime({ provider: answering(out) }).run(req, { db });
     assert.equal(r.outcome, 'validation_failed', id);
     assert.equal(r.output, null);
-    assert.match(r.error ?? '', new RegExp(`citation check failed \\(AI-04\\).*${id}: no source`));
+    assert.match(r.error ?? '', /must have required property 'source'/);
     assert.equal(db.rows.length, 1);
     assert.equal(db.rows[0]![16], 'validation_failed');
-    assert.match(String(db.rows[0]![17]), /^citation: /);
+    assert.match(String(db.rows[0]![17]), /^schema: /);
   }
+});
+
+test('[AI-04] prompt v2: the runtime derives the legacy sources list from the per-item sources and strips them from the items', async () => {
+  const r = await createAiRuntime({ provider: answering(modelAnswer) }).run(req, { db: fakeDb() });
+  assert.equal(r.outcome, 'success', r.error);
+  const out = r.output as any;
+  assert.deepEqual(out.sources, fixture.sources);
+  assert.equal(out.sources.length, 12);
+  assert.deepEqual(out.sources.find((s: any) => s.item_id === 'INT2'),
+    { section: 'interventions', item_id: 'INT2', ref: modelAnswer.sections.interventions[1].source.ref, quote: modelAnswer.sections.interventions[1].source.quote });
+  const items = [...out.sections.objectives, ...out.sections.endpoints, ...out.sections.population.inclusion,
+    ...out.sections.population.exclusion, ...out.sections.interventions];
+  assert.ok(items.every((i: any) => !('source' in i)), 'stored sections keep the v1 shape');
+  // the citation check runs on the per-item quotes: a wrong per-item quote is refused
+  const bad = structuredClone(modelAnswer);
+  bad.sections.endpoints[0].source.quote = 'A sentence that is not in any sponsor document.';
+  const r2 = await createAiRuntime({ provider: answering(bad) }).run(req, { db: fakeDb() });
+  assert.equal(r2.outcome, 'validation_failed');
+  assert.match(r2.error ?? '', /endpoints EP1: quote not found verbatim/);
 });
 
 test('[AI-04] a quote must be verbatim in the document it cites; whitespace differences are tolerated', async () => {
@@ -66,7 +94,8 @@ test('[AI-04] a quote must be verbatim in the document it cites; whitespace diff
   const tiny = clone();
   tiny.sources[0].quote = 'MRD-12';
   r = await createAiRuntime({ provider: answering(tiny) }).run(req, { db: fakeDb() });
-  assert.match(r.error ?? '', /quote shorter than 10 characters/);
+  assert.match(r.error ?? '', /quote must NOT have fewer than 10 characters/);   // v2: refused by the schema already
+  assert.match(checkCitations(def.citation!, input, tiny).errors.join('\n'), /quote shorter than 10 characters/);
 
   const spaced = clone();
   spaced.sources[0].quote = '  The proposed primary endpoint\n is the change in   functional score at 24 weeks. ';
@@ -85,7 +114,7 @@ test('[AI-04] only registry values reach the provider: the caller cannot set mod
   const seen: unknown[] = [];
   const client = { messages: { create: async (p: unknown) => {
     seen.push(p);
-    return { model: def.model, stop_reason: 'end_turn', usage: { input_tokens: 1, output_tokens: 1 }, content: [{ type: 'text', text: JSON.stringify(fixture) }] };
+    return { model: def.model, stop_reason: 'end_turn', usage: { input_tokens: 1, output_tokens: 1 }, content: [{ type: 'text', text: JSON.stringify(modelAnswer) }] };
   } } } as unknown as Anthropic;
   const rt = createAiRuntime({ provider: anthropicProvider(client) });
   const hostile = { ...req, model: 'claude-other', max_tokens: 1, temperature: 2, effort: 'max', tools: [{ name: 'x' }],
