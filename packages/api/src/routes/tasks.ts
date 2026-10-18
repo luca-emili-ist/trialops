@@ -8,7 +8,7 @@ import { sign, signatureManifests } from '../lib/sign.ts';
 import { diffContent } from '../lib/diff.ts';
 import { createArm, newArmSchema, type NewArm } from './arms.ts';
 import { createDraft, getVersion, putSection, validateProtocolContent, PROTOCOL_KINDS, type ProtocolContent } from './protocol.ts';
-import { runnableAgentTask, AGENTS } from '../agents/index.ts';
+import { runnableAgentTask, createPlanTasks, AGENTS } from '../agents/index.ts';
 import { enqueueJob } from './jobs.ts';
 
 const OPEN = ['created', 'assigned', 'in_progress', 'waiting_review'];
@@ -84,6 +84,28 @@ async function reviewProposal(db: Db, claims: Claims, reauth: Parameters<typeof 
   return { task: await getTask(db, taskId), signature, appendix_version: await getVersion(db, PROTOCOL_KINDS.APPENDIX, appendixId) };
 }
 
+/** AI-10 suggestion-only: a person confirms (the tasks are created) or rejects the onboarding plan the agent proposed. */
+async function confirmPlan(db: Db, claims: Claims, taskId: string, decision: 'accept' | 'reject'): Promise<Row> {
+  requirePerson(claims, 'Confirming an onboarding plan');
+  requireRole(claims, ['platform_admin', 'platform_ops_manager'], 'Confirming an onboarding plan');
+  const task = await getTask(db, taskId);
+  if (!task) throw new HttpError(404, 'not_found', 'task not found');
+  if (task.type !== 'arm.onboarding.plan' || task.state !== 'waiting_review' || !task.outputs?.proposal) {
+    throw new HttpError(409, 'not_in_review', 'only an onboarding plan proposal waiting for confirmation can be confirmed');
+  }
+  const aiRequestId = task.outputs.ai_request_id as string;
+  let created: string[] = [];
+  if (decision === 'accept') created = await createPlanTasks(db, task, task.outputs.proposal, aiRequestId);
+  await db.query('update core.task set outputs = outputs || $2::jsonb, state = $3 where id = $1', [taskId, JSON.stringify({
+    decision: decision === 'accept' ? 'accepted' : 'rejected', decided_by: claims.sub, checklist: task.outputs.proposal.checklist ?? [],
+    created_task_ids: created }), decision === 'accept' ? 'completed' : 'rejected']);
+  if (aiRequestId) {
+    await db.query('update core.ai_request set review_decision = $2, reviewer_sub = $3 where id = $1',
+      [aiRequestId, decision === 'accept' ? 'accepted' : 'rejected', claims.sub]);
+  }
+  return { task: await getTask(db, taskId), tasks_created: created.length };
+}
+
 export const taskRoutes = [
   route<WizardBody>({ method: 'post', path: '/v1/platforms/:id/arm-wizard', status: 201, tag: 'wizard', reqs: ['M01-02', 'M01-04'],
     summary: 'New-arm wizard: draft arm, draft appendix and the tasks for the Protocol author and Onboarding planner agents',
@@ -136,6 +158,7 @@ export const taskRoutes = [
         [t.outputs.ai_request_id])).rows[0] : undefined;
       return { task_id: t.id, appendix_version_id: draft?.id ?? null, sections: diffContent(draft?.usdm ?? {}, proposal.sections),
         sources: proposal.sources ?? [], consistency_checks: proposal.consistency_checks ?? [],
+        monitoring_mode: t.outputs?.monitoring_mode ?? 'normal',
         ai_generated: { ai_request_id: ai?.id ?? t.outputs?.ai_request_id ?? null, agent: String(t.assignee).replace(/^agent:/, ''),
           model: ai?.model ?? null, model_version: ai?.model_version ?? null } };
     } }),
@@ -146,6 +169,11 @@ export const taskRoutes = [
     body: { type: 'object', additionalProperties: false, required: ['decision'],
       properties: { decision: { enum: ['accept', 'edit', 'reject'] }, sections: { type: 'object' }, password: { type: 'string' }, totp: { type: 'string', maxLength: 16 } } },
     handler: async ({ db, claims, params, body, services }) => reviewProposal(db, claims, services.reauth, params.id!, body) }),
+
+  route<{ decision: 'accept' | 'reject' }>({ method: 'post', path: '/v1/tasks/:id/confirm-plan', needsReason: true, tag: 'tasks',
+    reqs: ['AI-10', 'AI-05'], summary: 'Confirm or reject an onboarding plan left as a proposal while the planner is suggestion-only',
+    body: { type: 'object', additionalProperties: false, required: ['decision'], properties: { decision: { enum: ['accept', 'reject'] } } },
+    handler: async ({ db, claims, params, body }) => confirmPlan(db, claims, params.id!, body.decision) }),
 
   route({ method: 'get', path: '/v1/platforms/:id/ai-review-stats', summary: 'Acceptance and edit rate of AI proposals per task type',
     tag: 'ai', reqs: ['AI-05'],

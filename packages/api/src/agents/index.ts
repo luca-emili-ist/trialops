@@ -1,10 +1,13 @@
 // Demo agents (spec §9 catalogue): Protocol author (CONFIRM, GxP proposal) and Onboarding planner (AUTO, non-GxP tasks).
 // An agent works only on a task assigned to it, through the AI runtime, and leaves GxP outcomes in waiting_review.
+// AI-10: when monitoring has sent a task type to suggestion-only, the agent never acts on its output by itself: the
+// Onboarding planner leaves its plan as a proposal for a person to confirm (POST /v1/tasks/{id}/confirm-plan).
 import type { Db, Row } from '../db.ts';
 import type { Services } from '../route.ts';
 import { HttpError } from '../errors.ts';
 import { agentClaims, asActor } from './identity.ts';
 import { getVersion, approvedVersion, PROTOCOL_KINDS } from '../routes/protocol.ts';
+import { taskTypeMode } from '../lib/ai-monitoring.ts';
 
 export const AGENTS = { protocolAuthor: 'protocol-author', onboardingPlanner: 'onboarding-planner' } as const;
 
@@ -28,8 +31,10 @@ async function protocolAuthor(db: Db, services: Services, task: Row): Promise<Ro
     await setState(db, task.id, 'in_progress', { outputs: { ai_request_id: r.ai_request_id, outcome: r.outcome, error: r.error ?? null } });
     return { outcome: r.outcome, ai_request_id: r.ai_request_id, error: r.error };
   }
-  // GxP: the draft is a proposal. It stays in the task until a person accepts it (AI-05, APP-TK-04).
-  await setState(db, task.id, 'waiting_review', { outputs: { ai_request_id: r.ai_request_id, proposal: r.output } });
+  // GxP: the draft is a proposal. It stays in the task until a person accepts it (AI-05, APP-TK-04). In suggestion-only
+  // mode (AI-10) the reviewer is told the task type is under closer watch.
+  const mode = await taskTypeMode(db, task.platform_id, 'protocol.appendix.draft');
+  await setState(db, task.id, 'waiting_review', { outputs: { ai_request_id: r.ai_request_id, proposal: r.output, monitoring_mode: mode } });
   return { outcome: r.outcome, ai_request_id: r.ai_request_id };
 }
 
@@ -45,19 +50,30 @@ async function onboardingPlanner(db: Db, services: Services, task: Row): Promise
     return { outcome: r.outcome, ai_request_id: r.ai_request_id, error: r.error };
   }
   const plan = r.output as { tasks: Row[]; checklist: Row[] };
+  if (await taskTypeMode(db, task.platform_id, 'arm.onboarding.plan') === 'suggestion_only') {
+    // AI-10 fallback: nothing is created; a person confirms or rejects the plan.
+    await setState(db, task.id, 'waiting_review', { outputs: { ai_request_id: r.ai_request_id, proposal: plan, monitoring_mode: 'suggestion_only' } });
+    return { outcome: r.outcome, ai_request_id: r.ai_request_id, tasks_created: 0, suggestion_only: true };
+  }
+  const created = await createPlanTasks(db, task, plan, r.ai_request_id);
+  await setState(db, task.id, 'completed', { outputs: { ai_request_id: r.ai_request_id, checklist: plan.checklist, created_task_ids: created } });
+  return { outcome: r.outcome, ai_request_id: r.ai_request_id, tasks_created: created.length };
+}
+
+/** Creates the operational tasks of an onboarding plan, assigned to roles; GxP ones are done and signed by people. */
+export async function createPlanTasks(db: Db, task: Row, plan: { tasks: Row[] }, aiRequestId: string): Promise<string[]> {
+  const sites = (await db.query("select id, site_number from core.site where platform_id = $1 and status = 'active'", [task.platform_id])).rows;
   const siteBy = new Map(sites.map(s => [s.site_number, s.id]));
   const created: string[] = [];
   for (const t of plan.tasks) {
-    // AUTO mode: operational tasks are created directly, assigned to roles; GxP ones are done and signed by people.
     created.push((await db.query(`insert into core.task(platform_id, arm_id, site_id, type, title, subject_ref, assignee_kind, assignee,
         gxp_impact, requires_signature, inputs, state, due_at, priority)
       values ($1,$2,$3,$4,$5,$6,'role',$7,$8,$8,$9,'assigned', clock_timestamp() + make_interval(days => $10), 'normal') returning id`,
       [task.platform_id, task.arm_id, siteBy.get(t.site_number) ?? null, t.type, t.title, `arm/${task.arm_id}`, t.assignee_role,
        t.gxp_impact, JSON.stringify({ source: 'agent:onboarding-planner', plan_task_id: task.id, key: t.key, area: t.area,
-         depends_on: t.depends_on, ai_request_id: r.ai_request_id }), t.due_in_days])).rows[0].id);
+         depends_on: t.depends_on, ai_request_id: aiRequestId, assignee_role: t.assignee_role }), t.due_in_days])).rows[0].id);
   }
-  await setState(db, task.id, 'completed', { outputs: { ai_request_id: r.ai_request_id, checklist: plan.checklist, created_task_ids: created } });
-  return { outcome: r.outcome, ai_request_id: r.ai_request_id, tasks_created: created.length };
+  return created;
 }
 
 const RUNNERS = { [AGENTS.protocolAuthor]: protocolAuthor, [AGENTS.onboardingPlanner]: onboardingPlanner } as Record<string,
