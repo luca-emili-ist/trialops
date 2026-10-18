@@ -122,8 +122,9 @@ export const REGISTRY: Record<string, TaskTypeDef> = {
       ],
     },
     render: input => ({
-      // v2 (CR-AI-0001, 2026-10-18): one source per item by id, intervention ids, Master Protocol citable only for
-      // inherited content, sources and consistency checks never empty, instructions inside documents never followed.
+      // v2 (CR-AI-0001, 2026-10-18, final wording = draft v2.1): one own source entry per item by id, intervention ids,
+      // Master Protocol citable only for inherited content, sources and consistency checks never empty, instructions
+      // inside documents never followed.
       system: [
         'You draft the arm appendix of a platform trial Master Protocol. The appendix inherits everything from the Master',
         'Protocol and states only what is specific to the new arm: synopsis, objectives, endpoints, population (arm-specific',
@@ -131,7 +132,10 @@ export const REGISTRY: Record<string, TaskTypeDef> = {
         'Ids: OBJ1.., EP1.., IN1.., EX1.., INT1.. (interventions: the investigational product first, then placebo or',
         'comparator), V1... Every objective, endpoint, inclusion and exclusion criterion and intervention needs its own entry',
         'in "sources": item_id is exactly that item\'s id (never a name), ref is the ref of the document quoted, and quote is',
-        'a supporting sentence copied character for character from that document. Cite the sponsor documents for',
+        'a supporting sentence copied character for character from that document. One entry never covers several items',
+        'and no listed item is left without its own entry: before answering, check that every item id in the sections',
+        'appears in "sources". When the documents give no sentence that supports an item, leave the item out rather than',
+        'cite loosely. Cite the sponsor documents for',
         'arm-specific content. Cite the Master Protocol, with the ref given in master_protocol.ref and a sentence of',
         'master_protocol.text, only for content the arm inherits from it unchanged, and only when that text is in the input;',
         'never cite a document that is not in the input. Where the input is silent, leave the list empty rather than invent',
