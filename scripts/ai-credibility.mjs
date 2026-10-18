@@ -33,7 +33,7 @@ if (provider.name === 'replay' && !dryRun) {
 // could take the spend above --max-usd. It changes nothing of what reaches the model.
 const price = PRICE_USD_PER_MTOK[def.model] ?? { in: 0, out: 0 };
 const usd = (i, o) => (i * price.in + o * price.out) / 1e6;
-const calls = []; let spent = 0;
+const calls = []; const outputs = []; let spent = 0;
 const metered = { ...provider, call: async c => {
   const worst = usd(Math.ceil((c.system.length + c.user.length) / 3), c.max_tokens);
   if (spent + worst > maxUsd) throw new Error(`budget cap: spent ${spent.toFixed(2)} USD, next call up to ${worst.toFixed(2)} USD > --max-usd ${maxUsd}`);
@@ -41,10 +41,10 @@ const metered = { ...provider, call: async c => {
   try {
     const r = await provider.call(c);
     const u = { input_tokens: r.input_tokens ?? 0, output_tokens: r.output_tokens ?? 0, latency_ms: Date.now() - t0 };
-    spent += usd(u.input_tokens, u.output_tokens); calls.push(u);
+    spent += usd(u.input_tokens, u.output_tokens); calls.push(u); outputs.push(r.output ?? null);
     console.error(`call ${calls.length}: ${u.input_tokens} in / ${u.output_tokens} out, ${(u.latency_ms / 1000).toFixed(0)} s, total ${spent.toFixed(2)} USD`);
     return r;
-  } catch (e) { calls.push({ input_tokens: null, output_tokens: null, latency_ms: Date.now() - t0, error: e.message }); console.error(`call ${calls.length}: ${e.message}`); throw e; }
+  } catch (e) { outputs.push(null); calls.push({ input_tokens: null, output_tokens: null, latency_ms: Date.now() - t0, error: e.message }); console.error(`call ${calls.length}: ${e.message}`); throw e; }
 } };
 const ev = await runCredibility({ task_type: taskType, datasetDir, provider: metered, dryRun });
 const tin = calls.reduce((a, c) => a + (c.input_tokens ?? 0), 0); const tout = calls.reduce((a, c) => a + (c.output_tokens ?? 0), 0);
@@ -54,7 +54,13 @@ const name = `${ev.run_at.slice(0, 10)}_${ev.dataset.dataset_id}_v${ev.dataset.v
 const file = join(root, 'docs/ai/evidence', taskType, name);
 mkdirSync(dirname(file), { recursive: true });
 writeFileSync(file, JSON.stringify(ev, null, 2) + '\n');
-for (const t of ev.thresholds) console.log(`${t.pass ? 'ok  ' : 'FAIL'} ${t.metric} ${t.op} ${t.value}: ${t.actual}`);
+// Raw model answers next to the evidence, for the human review of failures (synthetic data only, rule 7).
+if (outputs.some(o => o !== null)) {
+  writeFileSync(file.replace(/\.json$/, '_outputs.json'), JSON.stringify(ev.cases.map((c, i) => ({ case_id: c.case_id, outcome: c.outcome,
+    ...(c.error ? { error: c.error } : {}), output: outputs[i] ?? null })), null, 2) + '\n');
+}
+for (const t of ev.thresholds) console.log(`${t.pass ? "ok  " : "FAIL"} ${t.metric} ${t.op} ${t.value}: ${t.actual}${t.note ? ` (${t.note})` : ""}`);
+console.log(`outcomes: ${Object.entries(ev.metrics).filter(([k]) => k.startsWith("outcome_")).map(([k, v]) => `${k.slice(8)} ${v}`).join(", ")}; cases without output: ${ev.metrics.cases_without_output}${ev.aborted ? "; ABORTED" : ""}`);
 for (const p of ev.evidence_problems) console.log(`not evidence: ${p}`);
 console.log(`usage: ${ev.usage.calls} calls, ${tin} input + ${tout} output tokens, ${ev.usage.usd_list_price} USD at list price`);
 console.log(`${ev.passed ? 'PASSED' : 'NOT PASSED'} ${taskType} on ${ev.model} (${ev.mode}${ev.dry_run ? ', dry run' : ''}): ${ev.cases.length} cases → ${file}`);

@@ -145,3 +145,31 @@ test('[CMP-06][CMP-07] the harness script refuses a replay run unless it is decl
   assert.equal(r.status, 2, r.stderr);
   assert.match(r.stderr, /use --dry-run/);
 });
+
+test('[CMP-06] provider errors never pass a ceiling threshold, are counted by outcome and stop the run when repeated', async () => {
+  const failing: Provider = { name: 'anthropic', accepts: ['INTERNAL', 'CONFIDENTIAL_SPONSOR'], call: async () => { throw new Error('401 invalid x-api-key'); } };
+  const all = await runCredibility({ task_type: def.task_type, datasetDir: SAMPLE, provider: failing });
+  assert.equal(all.aborted, false);
+  assert.equal(all.metrics.outcome_error, 2);
+  assert.equal(all.metrics.cases_without_output, 2);
+  assert.equal(all.metrics.unsupported_items, 0, 'nothing was measured');
+  const ceiling = all.thresholds.find(t => t.metric === 'unsupported_items')!;
+  assert.equal(ceiling.pass, false, 'no output is not the absence of unsupported items');
+  assert.match(ceiling.note ?? '', /2 case\(s\) without output/);
+  assert.equal(all.thresholds_met, false);
+
+  // One case without output is enough to block the ceiling, even if the other one is perfect.
+  let n = 0;
+  const half: Provider = { ...scripted(goodS2), call: async c => { if (n++ === 0) throw new Error('timeout-free failure'); return scripted(goodS2).call(c); } };
+  const mixed = await runCredibility({ task_type: def.task_type, datasetDir: SAMPLE, provider: half });
+  assert.deepEqual([mixed.metrics.outcome_error, mixed.metrics.outcome_success, mixed.metrics.cases_without_output], [1, 1, 1]);
+  assert.equal(mixed.thresholds.find(t => t.metric === 'unsupported_items')!.pass, false);
+
+  // Repeated provider errors stop the run: the remaining cases are not sent and the run cannot pass.
+  const stopped = await runCredibility({ task_type: def.task_type, datasetDir: SAMPLE, provider: failing, maxConsecutiveErrors: 1 });
+  assert.equal(stopped.aborted, true);
+  assert.equal(stopped.cases.length, 1);
+  assert.ok(stopped.thresholds.every(t => !t.pass && t.note === 'run aborted'));
+  assert.match(stopped.evidence_problems.join('\n'), /aborted after 1 consecutive provider errors: 1 of 2 cases run \(401 invalid x-api-key\)/);
+  assert.equal(stopped.passed, false);
+});

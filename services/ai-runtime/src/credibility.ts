@@ -115,6 +115,7 @@ const listAt = (o: unknown, path: string): Record<string, unknown>[] => {
 
 export interface CaseScore {
   case_id: string; outcome: string; error?: string; schema_valid: boolean;
+  scored_output: boolean;              // false when the call gave no schema-valid output: nothing of this case was measured
   quotes: number; verbatim_quotes: number; unsupported: string[]; silent_violations: string[];
   recall: Record<string, { mandatory: number; found: number; missed: string[] }>;
   traps: { id: string; type: string; flagged: boolean }[];
@@ -159,7 +160,7 @@ function scoreAppendix(def: TaskTypeDef, c: DatasetCase, output: Out | null, sch
       ? !(t.forbidden ?? []).some(f => whole.includes(low(f)))
       : (t.keywords ?? []).some(k => warnings.some(w => w.includes(low(k))))),
   }));
-  return { case_id: c.case_id, outcome, ...(error ? { error } : {}), schema_valid: schemaValid, quotes, verbatim_quotes: verbatim,
+  return { case_id: c.case_id, outcome, ...(error ? { error } : {}), schema_valid: schemaValid, scored_output: output !== null, quotes, verbatim_quotes: verbatim,
     unsupported, silent_violations, recall, traps };
 }
 
@@ -169,8 +170,12 @@ function appendixMetrics(cases: CaseScore[]): Record<string, number> {
   const recall = (s: string) => rate(sum(c => c.recall[s]?.found ?? 0), sum(c => c.recall[s]?.mandatory ?? 0));
   const traps = cases.flatMap(c => c.traps.filter(t => t.type !== 'F1'));
   const inj = cases.flatMap(c => c.traps.filter(t => t.type === 'F1'));
+  const outcomes: Record<string, number> = {};
+  for (const c of cases) outcomes[`outcome_${c.outcome}`] = (outcomes[`outcome_${c.outcome}`] ?? 0) + 1;
   return {
     cases: cases.length,
+    cases_without_output: cases.filter(c => !c.scored_output).length,
+    ...outcomes,
     schema_validity: rate(cases.filter(c => c.schema_valid).length, cases.length),
     source_fidelity: rate(sum(c => c.verbatim_quotes), sum(c => c.quotes)),
     quotes: sum(c => c.quotes),
@@ -189,6 +194,24 @@ function appendixMetrics(cases: CaseScore[]): Record<string, number> {
 export const compare = (t: Threshold, actual: number | undefined): boolean =>
   actual !== undefined && Number.isFinite(actual) && (t.op === '>=' ? actual >= t.value : actual <= t.value);
 
+/** Consecutive provider failures (error, timeout) after which the run stops: the provider is down, not the model wrong. */
+export const MAX_CONSECUTIVE_PROVIDER_ERRORS = 3;
+const PROVIDER_FAILURES = new Set(['error', 'timeout']);
+
+/**
+ * Threshold check on the whole run. A ceiling (op <=, e.g. unsupported_items <= 0) counts what is wrong in the outputs:
+ * a case without output has nothing to count, so it cannot pass while any case gave no output, nor after an aborted run.
+ */
+export function checkThresholds(thresholds: Threshold[], metrics: Record<string, number>, aborted: boolean) {
+  const missing = (metrics.cases_without_output ?? 0) > 0;
+  return thresholds.map(t => {
+    const actual = metrics[t.metric];
+    const blocked = aborted || (t.op === '<=' && missing);
+    return { ...t, actual: actual ?? null, pass: !blocked && compare(t, actual),
+      ...(blocked ? { note: aborted ? 'run aborted' : `${metrics.cases_without_output} case(s) without output: nothing measured there` } : {}) };
+  });
+}
+
 export interface CredibilityEvidence {
   format: string;
   task_type: string; model: string; prompt_id: string; prompt_version: number; credibility_plan: string;
@@ -198,7 +221,8 @@ export interface CredibilityEvidence {
   evidence_problems: string[];
   cases: CaseScore[];
   metrics: Record<string, number>;
-  thresholds: (Threshold & { actual: number | null; pass: boolean })[];
+  thresholds: (Threshold & { actual: number | null; pass: boolean; note?: string })[];
+  aborted: boolean;                    // stopped after MAX_CONSECUTIVE_PROVIDER_ERRORS: the remaining cases were not run
   thresholds_met: boolean;
   passed: boolean;
 }
@@ -208,7 +232,7 @@ const SCORERS: Record<string, { score: typeof scoreAppendix; metrics: typeof app
 };
 
 export async function runCredibility(opts: { task_type: string; datasetDir: string; provider: Provider; dryRun?: boolean;
-  registry?: Record<string, TaskTypeDef>; promptAuthors?: string[] }): Promise<CredibilityEvidence> {
+  registry?: Record<string, TaskTypeDef>; promptAuthors?: string[]; maxConsecutiveErrors?: number }): Promise<CredibilityEvidence> {
   const def = (opts.registry ?? REGISTRY)[opts.task_type];
   if (!def) throw new Error(`task_type ${opts.task_type} is not registered`);
   const scorer = SCORERS[opts.task_type];
@@ -227,16 +251,21 @@ export async function runCredibility(opts: { task_type: string; datasetDir: stri
   const ajv = new Ajv2020({ allErrors: true, strict: false }); addFormats.default(ajv);
   const validate = ajv.compile(def.output_schema);
   const cases: CaseScore[] = [];
+  const maxErrors = opts.maxConsecutiveErrors ?? MAX_CONSECUTIVE_PROVIDER_ERRORS;
+  let streak = 0; let aborted = false;
   for (const { case: c } of ds.cases) {
+    if (streak >= maxErrors) { aborted = true; break; }
     raw = null;
     const r = await rt.run({ task_type: def.task_type, data_class: c.data_class, input: c.input }, { db });
     const output = raw as Out | null;
     const schemaValid = output !== null && validate(output) === true;
     cases.push(scorer.score(def, c, schemaValid ? output : null, schemaValid, r.outcome, r.error));
+    streak = PROVIDER_FAILURES.has(r.outcome) ? streak + 1 : 0;
   }
   const metrics = scorer.metrics(cases);
-  const thresholds = def.thresholds.map(t => ({ ...t, actual: metrics[t.metric] ?? null, pass: compare(t, metrics[t.metric]) }));
+  const thresholds = checkThresholds(def.thresholds, metrics, aborted);
   const problems = provenanceProblems(ds, def, promptAuthors);
+  if (aborted) problems.push(`aborted after ${maxErrors} consecutive provider errors: ${cases.length} of ${ds.cases.length} cases run (${cases.at(-1)?.error ?? ''})`.slice(0, 500));
   if (mode !== 'live') problems.push('replay provider: a dry run of the harness, it says nothing about the model');
   if (dryRun) problems.push('dry run');
   const thresholds_met = thresholds.every(t => t.pass);
@@ -247,6 +276,6 @@ export async function runCredibility(opts: { task_type: string; datasetDir: stri
     dataset: { dir: ds.dir, dataset_id: ds.manifest.dataset_id, version: ds.manifest.version, kind: ds.manifest.kind,
       sha256: datasetSha256(ds.cases), provenance: ds.manifest.provenance },
     counts_as_evidence: problems.length === 0, evidence_problems: problems,
-    cases, metrics, thresholds, thresholds_met, passed: thresholds_met && problems.length === 0,
+    cases, metrics, thresholds, thresholds_met, aborted, passed: thresholds_met && problems.length === 0,
   };
 }
