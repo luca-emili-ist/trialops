@@ -17,12 +17,15 @@ export function dbRole(claims: Claims): 'authenticated' | 'app_service' | 'anon'
 }
 export const ANONYMOUS: Claims = { sub: 'anonymous', actor_type: 'anon' };
 
-export async function withClaims<T>(pool: pg.Pool, claims: Claims, reason: string | undefined, fn: (db: Db) => Promise<T>): Promise<T> {
+/** settings: further transaction-local settings, e.g. trialops.provenance of an app write (APP-DT-05). */
+export async function withClaims<T>(pool: pg.Pool, claims: Claims, reason: string | undefined, fn: (db: Db) => Promise<T>,
+  settings: Record<string, string> = {}): Promise<T> {
   const client = await pool.connect();
   try {
     await client.query('begin');
     await client.query("select set_config('request.jwt.claims', $1, true)", [JSON.stringify(claims)]);
     if (reason) await client.query("select set_config('trialops.change_reason', $1, true)", [reason]);
+    for (const [k, v] of Object.entries(settings)) await client.query('select set_config($1, $2, true)', [k, v]);
     await client.query(`set local role ${dbRole(claims)}`);
     const out = await fn(client);
     await client.query('commit');

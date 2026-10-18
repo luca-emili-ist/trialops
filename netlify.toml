@@ -15,3 +15,4 @@
     X-Robots-Tag = "noindex"
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
+    Strict-Transport-Security = "max-age=31536000"   # NFR-05: HTTPS only (TLS 1.2+), never downgraded

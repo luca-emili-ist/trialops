@@ -19,7 +19,32 @@ const NOT_AUDITED = {
   'core.audit_anchor': { immutable: true, reason: 'external copies of the seals (CMP-12): append-only' },
   'core.ddl_event': { immutable: true, reason: 'DDL log written by the event trigger (CMP-12): append-only' },
   'core.oidc_code': { reason: 'single-use authorization codes valid 60 s; stored only as hashes; not a record' },
+  'core.idempotency_record': { reason: 'replay cache of API writes (APP-DT-02), kept 24 h, never updated; the write it replays is audited by its own table' },
 };
+
+// Audited tables an app can insert into whose rows are not app data (APP-DT-05): their provenance is recorded otherwise.
+const NO_APP_PROVENANCE = {
+  'core.ai_request': 'AI ledger: provenance is the model, prompt version and input hash (AI-06)',
+  'core.agent_decision_record': 'agent decision ledger: provenance is the agent and its AI request (AI-06)',
+  'core.signature': 'signatures are made by people only (AI-05); the requesting app is in requested_by_app',
+};
+
+test('[APP-DT-05] every audited table an app can write carries provenance columns stamped by the database', async () => {
+  const r = await c.query(`
+    select n.nspname || '.' || cl.relname as t,
+           (select count(*)::int from pg_attribute a where a.attrelid = cl.oid and not a.attisdropped
+              and a.attname in ('source_app', 'source_record_id', 'source_version', 'transformation_id')) as cols,
+           exists (select 1 from pg_trigger tg join pg_proc p on p.oid = tg.tgfoid
+                    where tg.tgrelid = cl.oid and p.proname = 'stamp_provenance' and tg.tgenabled <> 'D') as stamped
+      from pg_class cl join pg_namespace n on n.oid = cl.relnamespace
+     where cl.relkind in ('r', 'p') and n.nspname in ('core', 'sac_enclave')
+       and has_any_column_privilege('app_service', cl.oid, 'INSERT')
+       and exists (select 1 from pg_trigger tg join pg_proc p on p.oid = tg.tgfoid where tg.tgrelid = cl.oid and p.proname = 'audit_row')
+     order by 1`);
+  const missing = r.rows.filter(x => !NO_APP_PROVENANCE[x.t] && (x.cols !== 4 || !x.stamped)).map(x => x.t);
+  assert.deepEqual(missing, [], `app-writable tables without provenance: ${missing.join(', ')}`);
+  assert.ok(r.rows.length >= 20, 'the app-writable tables are found');
+});
 
 test('[CMP-15] every core and sac_enclave table is audited or listed with a justified exception', async () => {
   const r = await c.query(`

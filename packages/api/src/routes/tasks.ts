@@ -134,7 +134,7 @@ export const taskRoutes = [
         [params.id, query.state === 'all', OPEN, query.arm_id ?? null, query.mine === 'true', claims.roles ?? [], claims.person_id ?? ''])).rows,
     }) }),
 
-  route({ method: 'get', path: '/v1/tasks/:id', summary: 'Task with inputs, outputs, state history and review signature manifestation', tag: 'tasks',
+  route({ method: 'get', path: '/v1/tasks/:id', versioned: { table: 'task', param: 'id' }, summary: 'Task with inputs, outputs, state history and review signature manifestation', tag: 'tasks',
     reqs: ['APP-TK-02', 'CMP-11'],
     handler: async ({ db, params }) => {
       const t = await getTask(db, params.id!);
@@ -164,7 +164,7 @@ export const taskRoutes = [
     } }),
 
   route<{ decision: keyof typeof REVIEW_DECISION; sections?: ProtocolContent; password?: string; totp?: string }>({
-    method: 'post', path: '/v1/tasks/:id/review', needsReason: true, tag: 'tasks', reqs: ['AI-05', 'APP-TK-04', 'M01-02', 'CMP-02', 'CMP-09', 'CMP-11'],
+    method: 'post', path: '/v1/tasks/:id/review', versioned: { table: 'task', param: 'id' }, needsReason: true, tag: 'tasks', reqs: ['AI-05', 'APP-TK-04', 'M01-02', 'CMP-02', 'CMP-09', 'CMP-11'],
     summary: 'Accept, edit or reject an agent proposal with a signature',
     body: { type: 'object', additionalProperties: false, required: ['decision'],
       properties: { decision: { enum: ['accept', 'edit', 'reject'] }, sections: { type: 'object' }, password: { type: 'string' }, totp: { type: 'string', maxLength: 16 } } },

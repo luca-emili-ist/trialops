@@ -176,8 +176,8 @@ Fonte: inventario del codice al commit `45bc4e2` e `docs/SPEC.md` §9–§11. Le
 | --- | --- | --- |
 | Versioni immutabili, `void` al posto della cancellazione, macchine a stati nel database | ✅ | 0003, 0005, 0010 |
 | Hash delle versioni dei documenti | ✅ | `document_version.sha256` |
-| Concorrenza ottimistica (`If-Match`), idempotenza (APP-DT-02) | ❌ | `row_version` viene solo mostrato |
-| Provenienza del dato (`source_app`, `transformation_id`, APP-DT-05) | ❌ | Non presente |
+| Concorrenza ottimistica (`If-Match`), idempotenza (APP-DT-02) | ✅ | Migration 0024 e `packages/api/src/lib/write-controls.ts`: `Idempotency-Key` obbligatoria per le app (risposta conservata 24 h, 422 se riusata con un'altra richiesta), `ETag` = `row_version` sulle letture, `If-Match` con 412 (428 per le app senza) |
+| Provenienza del dato (`source_app`, `transformation_id`, APP-DT-05) | ✅ | Migration 0024: `source_app`, `source_record_id`, `source_version`, `transformation_id` sulle 21 tabelle scrivibili dalle app, timbrate da `core.stamp_provenance()`; scrittura di un'app senza provenienza rifiutata; visibile nell'audit trail |
 | Blocco dei dati, data freeze (EDC-08) | ❌ | Non presente |
 | **Backup, PITR, test di restore, retention di 25 anni, archivio** | 🟡 | NFR-04: retention per piattaforma (0016), test di restore con evidenza (`BACKUP_RESTORE.md`), backup giornalieri Supabase; PITR e archivio WORM rimandati al primo trial reale (decisione 2026-10-10) |
 | **Copie certificate ed export leggibile** dell'intero record con audit e firme | ❌ | Non presente |
@@ -195,7 +195,7 @@ Fonte: inventario del codice al commit `45bc4e2` e `docs/SPEC.md` §9–§11. Le
 | Change control, release note, tag di versione, evidenze CI firmate | ❌ | Non presenti |
 | Promozione dev → test → prod con approvazione (VAL-02) | ❌ | Il deploy è manuale da CLI |
 | Revisione umana del codice e branch protetto | ❌ | Il codice è scritto da Claude e da Local Dev; serve una revisione umana documentata |
-| SAST, scansione delle dipendenze, SBOM, penetration test | ❌ | Non presenti |
+| SAST, scansione delle dipendenze, SBOM, penetration test | 🟡 | NFR-05: Semgrep, OSV-Scanner e gitleaks (`security.yml`, ancora in modalità report), `npm audit --audit-level=high` e SBOM CycloneDX in `ci.yml`; penetration test **non fatto** (prima della produzione). Vedi `SECURITY_CONTROLS.md` |
 | Qualifica dei fornitori (Supabase, Netlify, Anthropic, GitHub) | ❌ | Non presente; la spec prevede Azure, il demo gira su Supabase e Netlify |
 | QMS del fornitore (SOP, formazione, QA indipendente) | ❌ | Non presente |
 

@@ -50,7 +50,7 @@ export const changeRoutes = [
       return { items };
     } }),
 
-  route<TriageBody>({ method: 'patch', path: '/v1/change-requests/:id', tag: 'change-requests', reqs,
+  route<TriageBody>({ method: 'patch', path: '/v1/change-requests/:id', versioned: { table: 'change_request', param: 'id' }, tag: 'change-requests', reqs,
     summary: 'Triage a change request (platform admin): status and/or triage note; audited',
     body: { type: 'object', additionalProperties: false, minProperties: 1, properties: {
       status: { enum: [...CHANGE_STATUSES] }, triage_note: { type: 'string', maxLength: 2000 } } },
@@ -62,7 +62,7 @@ export const changeRoutes = [
       return rows[0];
     } }),
 
-  route({ method: 'post', path: '/v1/change-requests/:id/void', needsReason: true, tag: 'change-requests', reqs,
+  route({ method: 'post', path: '/v1/change-requests/:id/void', versioned: { table: 'change_request', param: 'id' }, needsReason: true, tag: 'change-requests', reqs,
     summary: 'Remove a change request from the lists (platform admin): status void with the reason, never a physical delete (DM-03)',
     handler: async ({ db, claims, params }) => {
       requirePerson(claims, 'Removing a change request');

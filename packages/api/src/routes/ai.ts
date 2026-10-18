@@ -24,7 +24,7 @@ function registryOf(ctx: Ctx<unknown>): Record<string, TaskTypeDef> {
 const monitoringReaders = ['qa_auditor', 'platform_admin'] as const;
 
 export const aiRoutes = [
-  route<AiTaskRequest>({ method: 'post', path: '/api/ai/tasks', raw: true, tag: 'ai', reqs: ['AI-01', 'AI-06', 'AI-09'],
+  route<AiTaskRequest>({ method: 'post', path: '/api/ai/tasks', raw: true, provenance: false, tag: 'ai', reqs: ['AI-01', 'AI-06', 'AI-09'],
     summary: 'Queue an AI task for the AI runtime: 202 with the job, poll GET /v1/ai/jobs/{id} for the outcome',
     body: { type: 'object', additionalProperties: false, required: ['task_type', 'data_class', 'input'],
       properties: { task_type: { type: 'string' }, data_class: { enum: DATA_CLASSES }, input: { type: 'object' },

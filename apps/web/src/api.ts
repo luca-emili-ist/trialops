@@ -12,10 +12,21 @@ const SESSION_END_CODES = ['session_idle', 'session_ended', 'account_locked'];
 let onSessionEnd: ((e: ApiError) => void) | null = null;
 export const setSessionEndHandler = (fn: ((e: ApiError) => void) | null) => { onSessionEnd = fn; };
 
+/** UUID v4 for the Idempotency-Key (crypto.randomUUID needs a secure context: HTTPS or localhost). */
+export function newIdempotencyKey(): string {
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') return crypto.randomUUID();
+  const b = crypto.getRandomValues(new Uint8Array(16));
+  b[6] = (b[6]! & 0x0f) | 0x40; b[8] = (b[8]! & 0x3f) | 0x80;
+  const h = [...b].map(x => x.toString(16).padStart(2, '0')).join('');
+  return `${h.slice(0, 8)}-${h.slice(8, 12)}-${h.slice(12, 16)}-${h.slice(16, 20)}-${h.slice(20)}`;
+}
+
 export async function api<T = any>(method: string, path: string, opts: { body?: unknown; reason?: string } = {}): Promise<T> { // eslint-disable-line @typescript-eslint/no-explicit-any
   const headers: Record<string, string> = { 'content-type': 'application/json' };
   if (token) headers.authorization = `Bearer ${token}`;
   if (opts.reason) headers['x-change-reason'] = opts.reason;
+  // APP-DT-02: every write carries a fresh Idempotency-Key, so a retried request cannot be applied twice
+  if (method.toUpperCase() !== 'GET') headers['idempotency-key'] = newIdempotencyKey();
   const res = await fetch(path, { method, headers, body: opts.body === undefined ? undefined : JSON.stringify(opts.body) });
   const text = await res.text();
   const data = text ? JSON.parse(text) : null;

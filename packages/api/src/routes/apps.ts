@@ -71,7 +71,7 @@ export const appRoutes = [
       return getInstallation(db, id);
     } }),
 
-  route({ method: 'post', path: '/v1/app-installations/:id/approve', tag: 'apps', reqs: ['APP-MF-02'],
+  route({ method: 'post', path: '/v1/app-installations/:id/approve', versioned: { table: 'app_installation', param: 'id' }, tag: 'apps', reqs: ['APP-MF-02'],
     summary: 'Approve the scopes requested by an app (the app becomes active)',
     handler: async ({ db, claims, params }) => {
       requirePerson(claims, 'Approving app scopes');
@@ -84,7 +84,7 @@ export const appRoutes = [
       return getInstallation(db, i.id);
     } }),
 
-  route({ method: 'post', path: '/v1/app-installations/:id/uninstall', tag: 'apps', reqs: ['APP-MF-04'],
+  route({ method: 'post', path: '/v1/app-installations/:id/uninstall', versioned: { table: 'app_installation', param: 'id' }, tag: 'apps', reqs: ['APP-MF-04'],
     summary: 'Uninstall an app: scopes and sign-in are revoked at once, data already written stays in the core',
     handler: async ({ db, claims, params }) => {
       requireRole(claims, [...ADMIN], 'Uninstalling an app');
@@ -114,7 +114,7 @@ export const appRoutes = [
 
   route<{ client_id: string; platform_id: string; redirect_uri: string; code_challenge: string; code_challenge_method: 'S256'; state?: string;
     nonce?: string; scope?: string }>({
-    method: 'post', path: '/v1/oidc/authorize', tag: 'oidc', reqs: ['APP-ID-01'],
+    method: 'post', path: '/v1/oidc/authorize', idempotent: false, tag: 'oidc', reqs: ['APP-ID-01'],
     summary: 'Called by the web shell for the signed-in user: issues a code for the app (no new login)',
     body: { type: 'object', additionalProperties: false, required: ['client_id', 'platform_id', 'redirect_uri', 'code_challenge', 'code_challenge_method'],
       properties: { client_id: { type: 'string' }, platform_id: uuid, redirect_uri: { type: 'string', format: 'uri' },
