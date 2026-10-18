@@ -6,49 +6,232 @@
       "phase": "phase2"
     },
     "objectives": [
-      { "id": "OBJ1", "level": "primary", "text": "Evaluate the efficacy of MRD-12 versus shared control on the Disease X functional score at week 24.", "endpoint_ids": ["EP1"] },
-      { "id": "OBJ2", "level": "secondary", "text": "Evaluate the safety and tolerability of MRD-12 over 24 weeks.", "endpoint_ids": ["EP2"] },
-      { "id": "OBJ3", "level": "exploratory", "text": "Characterize MRD-12 plasma exposure in the platform population.", "endpoint_ids": ["EP3"] }
+      {
+        "id": "OBJ1",
+        "level": "primary",
+        "text": "Evaluate the efficacy of MRD-12 versus shared control on the Disease X functional score at week 24.",
+        "endpoint_ids": [
+          "EP1"
+        ]
+      },
+      {
+        "id": "OBJ2",
+        "level": "secondary",
+        "text": "Evaluate the safety and tolerability of MRD-12 over 24 weeks.",
+        "endpoint_ids": [
+          "EP2"
+        ]
+      },
+      {
+        "id": "OBJ3",
+        "level": "exploratory",
+        "text": "Characterize MRD-12 plasma exposure in the platform population.",
+        "endpoint_ids": [
+          "EP3"
+        ]
+      }
     ],
     "endpoints": [
-      { "id": "EP1", "text": "Change from baseline in Disease X functional score at week 24", "type": "efficacy", "timeframe": "Baseline to week 24" },
-      { "id": "EP2", "text": "Incidence of treatment-emergent adverse events and serious adverse events", "type": "safety", "timeframe": "Baseline to week 28" },
-      { "id": "EP3", "text": "Trough plasma concentration of MRD-12", "type": "pharmacokinetic", "timeframe": "Weeks 4, 12 and 24" }
+      {
+        "id": "EP1",
+        "text": "Change from baseline in Disease X functional score at week 24",
+        "type": "efficacy",
+        "timeframe": "Baseline to week 24"
+      },
+      {
+        "id": "EP2",
+        "text": "Incidence of treatment-emergent adverse events and serious adverse events",
+        "type": "safety",
+        "timeframe": "Baseline to week 28"
+      },
+      {
+        "id": "EP3",
+        "text": "Trough plasma concentration of MRD-12",
+        "type": "pharmacokinetic",
+        "timeframe": "Weeks 4, 12 and 24"
+      }
     ],
     "population": {
       "description": "Platform population as defined in Master Protocol section 5, with the arm-specific criteria below.",
       "inclusion": [
-        { "id": "IN1", "text": "Eligible for the platform per Master Protocol section 5.1" },
-        { "id": "IN2", "text": "Estimated glomerular filtration rate of at least 45 mL/min/1.73 m2" }
+        {
+          "id": "IN1",
+          "text": "Eligible for the platform per Master Protocol section 5.1"
+        },
+        {
+          "id": "IN2",
+          "text": "Estimated glomerular filtration rate of at least 45 mL/min/1.73 m2"
+        }
       ],
       "exclusion": [
-        { "id": "EX1", "text": "Concomitant use of strong CYP3A4 inhibitors or inducers within 14 days of randomization" },
-        { "id": "EX2", "text": "QTcF above 470 ms at screening" }
+        {
+          "id": "EX1",
+          "text": "Concomitant use of strong CYP3A4 inhibitors or inducers within 14 days of randomization"
+        },
+        {
+          "id": "EX2",
+          "text": "QTcF above 470 ms at screening"
+        }
       ]
     },
     "interventions": [
-      { "name": "MRD-12", "type": "drug", "dose": "40 mg", "route": "oral", "frequency": "once daily" },
-      { "name": "Placebo matching MRD-12", "type": "placebo", "dose": "1 tablet", "route": "oral", "frequency": "once daily" }
+      {
+        "name": "MRD-12",
+        "type": "drug",
+        "dose": "40 mg",
+        "route": "oral",
+        "frequency": "once daily"
+      },
+      {
+        "name": "Placebo matching MRD-12",
+        "type": "placebo",
+        "dose": "1 tablet",
+        "route": "oral",
+        "frequency": "once daily"
+      }
     ],
     "schedule": {
       "visits": [
-        { "id": "V1", "name": "Screening", "day": -28, "window_days": 0, "activities": ["Arm-specific eligibility", "ECG", "eGFR"] },
-        { "id": "V2", "name": "Randomization", "day": 1, "window_days": 0, "activities": ["Functional score", "First dose"] },
-        { "id": "V3", "name": "Week 4", "day": 29, "window_days": 3, "activities": ["Functional score", "PK sample", "ECG"] },
-        { "id": "V4", "name": "Week 12", "day": 85, "window_days": 5, "activities": ["Functional score", "PK sample"] },
-        { "id": "V5", "name": "Week 24", "day": 169, "window_days": 7, "activities": ["Functional score", "PK sample", "ECG"] }
+        {
+          "id": "V1",
+          "name": "Screening",
+          "day": -28,
+          "window_days": 0,
+          "activities": [
+            "Arm-specific eligibility",
+            "ECG",
+            "eGFR"
+          ]
+        },
+        {
+          "id": "V2",
+          "name": "Randomization",
+          "day": 1,
+          "window_days": 0,
+          "activities": [
+            "Functional score",
+            "First dose"
+          ]
+        },
+        {
+          "id": "V3",
+          "name": "Week 4",
+          "day": 29,
+          "window_days": 3,
+          "activities": [
+            "Functional score",
+            "PK sample",
+            "ECG"
+          ]
+        },
+        {
+          "id": "V4",
+          "name": "Week 12",
+          "day": 85,
+          "window_days": 5,
+          "activities": [
+            "Functional score",
+            "PK sample"
+          ]
+        },
+        {
+          "id": "V5",
+          "name": "Week 24",
+          "day": 169,
+          "window_days": 7,
+          "activities": [
+            "Functional score",
+            "PK sample",
+            "ECG"
+          ]
+        }
       ]
     }
   },
   "sources": [
-    { "section": "objectives", "item_id": "OBJ1", "ref": "SPONSOR-BRIEF-D", "quote": "The proposed primary endpoint is the change in functional score at 24 weeks." },
-    { "section": "endpoints", "item_id": "EP3", "ref": "SPONSOR-BRIEF-D", "quote": "Trough sampling at weeks 4, 12 and 24 will support exposure-response analysis." },
-    { "section": "population", "item_id": "EX1", "ref": "IB-MRD-12", "quote": "MRD-12 is a sensitive CYP3A4 substrate." },
-    { "section": "population", "item_id": "EX2", "ref": "IB-MRD-12", "quote": "A dose-dependent QTc prolongation was observed above 80 mg." },
-    { "section": "interventions", "item_id": "MRD-12", "ref": "SPONSOR-BRIEF-D", "quote": "The recommended phase 2 dose is 40 mg once daily." }
+    {
+      "section": "objectives",
+      "item_id": "OBJ1",
+      "ref": "SPONSOR-BRIEF-D",
+      "quote": "The proposed primary endpoint is the change in functional score at 24 weeks."
+    },
+    {
+      "section": "objectives",
+      "item_id": "OBJ2",
+      "ref": "SPONSOR-BRIEF-D",
+      "quote": "Safety and tolerability will be assessed over 24 weeks, with treatment-emergent and serious adverse events followed to week 28."
+    },
+    {
+      "section": "objectives",
+      "item_id": "OBJ3",
+      "ref": "SPONSOR-BRIEF-D",
+      "quote": "Trough sampling at weeks 4, 12 and 24 will support exposure-response analysis."
+    },
+    {
+      "section": "endpoints",
+      "item_id": "EP1",
+      "ref": "SPONSOR-BRIEF-D",
+      "quote": "The proposed primary endpoint is the change in functional score at 24 weeks."
+    },
+    {
+      "section": "endpoints",
+      "item_id": "EP2",
+      "ref": "SPONSOR-BRIEF-D",
+      "quote": "Safety and tolerability will be assessed over 24 weeks, with treatment-emergent and serious adverse events followed to week 28."
+    },
+    {
+      "section": "endpoints",
+      "item_id": "EP3",
+      "ref": "SPONSOR-BRIEF-D",
+      "quote": "Trough sampling at weeks 4, 12 and 24 will support exposure-response analysis."
+    },
+    {
+      "section": "population",
+      "item_id": "IN1",
+      "ref": "SPONSOR-BRIEF-D",
+      "quote": "Participants must be eligible for the platform as defined in Master Protocol section 5.1."
+    },
+    {
+      "section": "population",
+      "item_id": "IN2",
+      "ref": "SPONSOR-BRIEF-D",
+      "quote": "An estimated glomerular filtration rate of at least 45 mL/min/1.73 m2 is required."
+    },
+    {
+      "section": "population",
+      "item_id": "EX1",
+      "ref": "IB-MRD-12",
+      "quote": "MRD-12 is a sensitive CYP3A4 substrate."
+    },
+    {
+      "section": "population",
+      "item_id": "EX2",
+      "ref": "IB-MRD-12",
+      "quote": "A dose-dependent QTc prolongation was observed above 80 mg."
+    },
+    {
+      "section": "interventions",
+      "item_id": "MRD-12",
+      "ref": "SPONSOR-BRIEF-D",
+      "quote": "The recommended phase 2 dose is 40 mg once daily."
+    },
+    {
+      "section": "interventions",
+      "item_id": "Placebo matching MRD-12",
+      "ref": "SPONSOR-BRIEF-D",
+      "quote": "Placebo tablets matching MRD-12 will be used for blinding against the shared control."
+    }
   ],
   "consistency_checks": [
-    { "check": "Shared control population", "result": "pass", "detail": "Arm-specific criteria narrow but do not contradict the platform population; control participants remain eligible for comparison." },
-    { "check": "Visit schedule alignment", "result": "warning", "detail": "Week 4 ECG is not in the Master Protocol schedule; it adds a visit activity at shared visits for this arm only." }
+    {
+      "check": "Shared control population",
+      "result": "pass",
+      "detail": "Arm-specific criteria narrow but do not contradict the platform population; control participants remain eligible for comparison."
+    },
+    {
+      "check": "Visit schedule alignment",
+      "result": "warning",
+      "detail": "Week 4 ECG is not in the Master Protocol schedule; it adds a visit activity at shared visits for this arm only."
+    }
   ]
 }

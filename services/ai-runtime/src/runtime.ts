@@ -1,10 +1,12 @@
 // AI runtime (ARC-10): POST /api/ai/tasks. Resolves the task type, applies the data-class policy, calls the pinned
-// model through a provider, validates the structured output and writes one ledger row per call (AI-06).
+// model through a provider with the fixed generation parameters of the registry (AI-04), validates the structured output
+// against the JSON Schema and the mandatory source citation (AI-04) and writes one ledger row per call (AI-06).
 import { Ajv2020, type ValidateFunction } from 'ajv/dist/2020.js';
 import addFormats from 'ajv-formats';
 import Anthropic from '@anthropic-ai/sdk';
 import { REGISTRY, type TaskTypeDef } from './registry.ts';
 import { canonical, sha256 } from './canonical.ts';
+import { checkCitations, citationError } from './citation.ts';
 import { anthropicProvider } from './providers/anthropic.ts';
 import { replayProvider, recording } from './providers/replay.ts';
 import type { AiTaskRequest, AiTaskResult, LedgerDb, Outcome, Provider } from './types.ts';
@@ -49,17 +51,17 @@ export function createAiRuntime(opts: AiRuntimeOptions = {}) {
 
   async function ledger(db: LedgerDb, req: AiTaskRequest, d: TaskTypeDef, row: {
     model: string; input_sha256: string; output_sha256: string | null; input_tokens: number | null; output_tokens: number | null;
-    latency_ms: number | null; outcome: Outcome;
+    latency_ms: number | null; outcome: Outcome; validation_error?: string;
   }): Promise<string> {
     const price = PRICE_USD_PER_MTOK[row.model];
     const cost = price && row.input_tokens !== null && row.output_tokens !== null
       ? ((row.input_tokens * price.in + row.output_tokens * price.out) / 1e6) * usdToEur : 0;
     const r = await db.query(`insert into core.ai_request(platform_id, arm_id, task_id, task_type, data_class, provider, model, model_version,
-        prompt_id, prompt_version, input_sha256, output_sha256, input_tokens, output_tokens, cost_eur, latency_ms, outcome)
-      values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17) returning id`,
+        prompt_id, prompt_version, input_sha256, output_sha256, input_tokens, output_tokens, cost_eur, latency_ms, outcome, validation_error)
+      values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18) returning id`,
       [req.platform_id ?? null, req.arm_id ?? null, req.task_id ?? null, d.task_type, req.data_class, provider.name, d.model, row.model,
        d.prompt_id, d.prompt_version, row.input_sha256, row.output_sha256, row.input_tokens, row.output_tokens,
-       Math.round(cost * 1e6) / 1e6, row.latency_ms, row.outcome]);
+       Math.round(cost * 1e6) / 1e6, row.latency_ms, row.outcome, row.validation_error?.slice(0, 2000) ?? null]);
     return String(r.rows[0]!.id);
   }
 
@@ -93,6 +95,7 @@ export function createAiRuntime(opts: AiRuntimeOptions = {}) {
       const t0 = now();
       let r;
       try {
+        // AI-04: only registry values and the rendered prompt reach the provider; nothing of the request chooses parameters.
         r = await provider.call({ task_type: d.task_type, model: d.model, effort: d.effort, max_tokens: d.max_tokens, system: prompt.system,
           user: prompt.user, output_schema: d.output_schema, input_sha256 });
       } catch (e) {
@@ -114,8 +117,18 @@ export function createAiRuntime(opts: AiRuntimeOptions = {}) {
       const output_sha256 = sha256(canonical(r.output));
       const validate = validatorFor(d);
       if (!validate(r.output)) {
-        const id = await ledger(caller.db, req, d, { ...base, ...usage, output_sha256, outcome: 'validation_failed' });
-        return result('validation_failed', id, null, r.model, ajv.errorsText(validate.errors));
+        const error = ajv.errorsText(validate.errors);
+        const id = await ledger(caller.db, req, d, { ...base, ...usage, output_sha256, outcome: 'validation_failed', validation_error: `schema: ${error}` });
+        return result('validation_failed', id, null, r.model, error);
+      }
+      // AI-04: extraction and classification outputs must cite their sources verbatim; otherwise they never reach a person.
+      if (d.citation) {
+        const report = checkCitations(d.citation, req.input, r.output);
+        if (report.errors.length) {
+          const error = citationError(report);
+          const id = await ledger(caller.db, req, d, { ...base, ...usage, output_sha256, outcome: 'validation_failed', validation_error: `citation: ${error}` });
+          return result('validation_failed', id, null, r.model, error);
+        }
       }
       const id = await ledger(caller.db, req, d, { ...base, ...usage, output_sha256, outcome: 'success' });
       return result('success', id, r.output as Record<string, unknown>, r.model);

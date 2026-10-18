@@ -18,6 +18,18 @@ Rule 12 of CLAUDE.md; CMP-06, AI-02. Structure: FDA draft guidance on AI for reg
 - Metrics and pre-specified acceptance thresholds (with confidence intervals where meaningful)
 - Human review sample and acceptance/edit/reject rate targets
 - Failure modes tested (hallucinated sources, missing items, wrong data class, blinding leak, prompt injection in inputs)
+- Machine-checked table, identical to `thresholds` in the registry (test [CMP-07]):
+
+| Metric | Op | Value |
+| --- | --- | --- |
+| <metric> | >= | <value> |
 ## 5. Execution — results (link to evidence)
 ## 6. Report — deviations from the plan
 ## 7. Adequacy decision and life-cycle monitoring (AI-10: drift, rejection rate, fallback to suggestion-only; change control on model or prompt change)
+Point to the AI-10 monitoring (`GET /v1/ai/monitoring`) and give the rules, identical to `monitoring` in the registry:
+
+| Monitoring rule (AI-10) | Max | Min sample |
+| --- | --- | --- |
+| <metric> | <max> | <min sample> |
+
+Window: <N>

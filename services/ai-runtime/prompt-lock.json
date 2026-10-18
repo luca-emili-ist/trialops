@@ -1,0 +1,37 @@
+{
+  "$comment": "AI-02 prompt lock. Every (prompt_id, prompt_version) of the registry is pinned by the SHA-256 of its rendered system prompt and of its output schema (the validator). Editing the prompt text or the schema means a new prompt_version in registry.ts and a new entry here with a change request, an approver and a passing live regression on the task type's test dataset (scripts/ai-regression.mjs), as for a model change (AI-03). authored_by lists who wrote or tuned the prompt: they may not author or check its credibility dataset (CMP-07). Test [AI-02] in services/ai-runtime/test/registry.test.ts enforces it. Version 1 locks the prompts in use since demo v0: nothing to regress against.",
+  "prompts": {
+    "protocol-author": {
+      "task_type": "protocol.appendix.draft",
+      "versions": [
+        {
+          "version": 1,
+          "system_sha256": "5a43e853b410dec0ba6d62d28439907902a423955bc5ea2dd3bc0b901f6998d4",
+          "output_schema_sha256": "6b324e6ec3e6843fd328136b85b947660b34e8460a3e2caf4092e35b9ccf0cf8",
+          "approved_on": "2026-10-18",
+          "authored_by": ["Luca Emili", "Claude Code (TrialOps development engine)"],
+          "approved_by": null,
+          "change_request": null,
+          "regression_evidence": null,
+          "reason": "initial lock of the prompt in use since demo v0 (no previous version)"
+        }
+      ]
+    },
+    "onboarding-planner": {
+      "task_type": "arm.onboarding.plan",
+      "versions": [
+        {
+          "version": 1,
+          "system_sha256": "34a19286e45f37e48fd39bbb120d1400c144bee7e1c07f1414bf056769537f46",
+          "output_schema_sha256": "668d07445e802f3e25e43d59ebf5ab790bcebf850c955a0f03252ea2dc49d797",
+          "approved_on": "2026-10-18",
+          "authored_by": ["Luca Emili", "Claude Code (TrialOps development engine)"],
+          "approved_by": null,
+          "change_request": null,
+          "regression_evidence": null,
+          "reason": "initial lock of the prompt in use since demo v0 (no previous version)"
+        }
+      ]
+    }
+  }
+}

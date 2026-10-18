@@ -1,6 +1,6 @@
 import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
-import { createAiRuntime, replayProvider } from '@trialops/ai-runtime';
+import { createAiRuntime, replayProvider, DEMO_SPONSOR_DOCUMENTS } from '@trialops/ai-runtime';
 import { startApi, sign, platformId, SIGN, type Api } from './_helpers.ts';
 
 let api: Api; let plat: string; let merid: string;
@@ -12,7 +12,7 @@ before(async () => {
 });
 after(async () => api.close());
 
-const docs = [{ ref: 'SPONSOR-BRIEF-D', title: 'Sponsor briefing (synthetic)', text: 'The recommended phase 2 dose is 40 mg once daily.' }];
+const docs = DEMO_SPONSOR_DOCUMENTS;   // the replay answer cites them verbatim (AI-04)
 const wizard = (code: string) => api.call('POST', `/v1/platforms/${plat}/arm-wizard`, { as: 'demo|ops',
   body: { arm: { code, name: `MRD-12 (${code})`, sponsor_org_id: merid, intervention_type: 'drug', has_prior_human_data: true }, sponsor_documents: docs } });
 

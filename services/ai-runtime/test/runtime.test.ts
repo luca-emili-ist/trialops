@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { Ajv2020 } from 'ajv/dist/2020.js';
 import addFormats from 'ajv-formats';
 import sectionsSchema from '@trialops/schemas/protocol-sections.schema.json' with { type: 'json' };
-import { createAiRuntime, replayProvider, REGISTRY, type Provider, type ProviderResult } from '../src/index.ts';
+import { createAiRuntime, replayProvider, REGISTRY, DEMO_SPONSOR_DOCUMENTS, type Provider, type ProviderResult } from '../src/index.ts';
 
 /** In-memory ledger standing in for core.ai_request. */
 function fakeDb() {
@@ -64,11 +64,11 @@ test('[AI-01] replay mode answers from recorded responses that satisfy the regis
   const db = fakeDb();
   const rt = createAiRuntime({ provider: replayProvider() });
   for (const task_type of Object.keys(REGISTRY)) {
-    const r = await rt.run({ task_type, data_class: 'CONFIDENTIAL_SPONSOR', input: {} }, { db });
+    const r = await rt.run({ task_type, data_class: 'CONFIDENTIAL_SPONSOR', input: { sponsor_documents: DEMO_SPONSOR_DOCUMENTS } }, { db });
     assert.equal(r.outcome, 'success', `${task_type}: ${r.error}`);
     assert.equal(r.provider, 'replay');
   }
-  const draft = await rt.run({ task_type: 'protocol.appendix.draft', data_class: 'CONFIDENTIAL_SPONSOR', input: {} }, { db });
+  const draft = await rt.run({ task_type: 'protocol.appendix.draft', data_class: 'CONFIDENTIAL_SPONSOR', input: { sponsor_documents: DEMO_SPONSOR_DOCUMENTS } }, { db });
   const validSections = ajv.compile(sectionsSchema);
   assert.ok(validSections((draft.output as { sections: unknown }).sections), ajv.errorsText(validSections.errors));
 });

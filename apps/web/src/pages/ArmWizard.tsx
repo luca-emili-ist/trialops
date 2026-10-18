@@ -13,8 +13,10 @@ interface Doc { ref: string; title: string; text: string }
 interface Diff { appendix_version_id: string; sections: SectionDiff[]; sources: { section: string; item_id: string; ref: string; quote: string }[];
   consistency_checks: { check: string; result: string; detail: string }[]; ai_generated?: AiProvenanceLike }
 
+// Same text as services/ai-runtime/fixtures/protocol.appendix.draft/demo-sponsor-documents.json: the replay answer quotes
+// these sentences verbatim, as the AI-04 citation check requires (test [AI-04] in services/ai-runtime/test/citation.test.ts).
 const EXAMPLE_DOCS: Doc[] = [
-  { ref: 'SPONSOR-BRIEF-D', title: 'Sponsor briefing document (synthetic)', text: 'MRD-12 is an oral small molecule. The recommended phase 2 dose is 40 mg once daily. The proposed primary endpoint is the change in functional score at 24 weeks. Trough sampling at weeks 4, 12 and 24 will support exposure-response analysis.' },
+  { ref: 'SPONSOR-BRIEF-D', title: 'Sponsor briefing document (synthetic)', text: 'MRD-12 is an oral small molecule. The recommended phase 2 dose is 40 mg once daily. The proposed primary endpoint is the change in functional score at 24 weeks. Safety and tolerability will be assessed over 24 weeks, with treatment-emergent and serious adverse events followed to week 28. Trough sampling at weeks 4, 12 and 24 will support exposure-response analysis. Participants must be eligible for the platform as defined in Master Protocol section 5.1. An estimated glomerular filtration rate of at least 45 mL/min/1.73 m2 is required. Placebo tablets matching MRD-12 will be used for blinding against the shared control.' },
   { ref: 'IB-MRD-12', title: 'Investigator brochure extract (synthetic)', text: 'MRD-12 is a sensitive CYP3A4 substrate. A dose-dependent QTc prolongation was observed above 80 mg. No hepatic signal in phase 1.' },
 ];
 const armFromHash = () => new URLSearchParams(window.location.hash.split('?')[1] ?? '').get('arm');

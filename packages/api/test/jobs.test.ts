@@ -2,7 +2,7 @@
 // by calling POST /v1/ai/jobs/{id}/execute exactly as netlify/functions/ai-worker-background.mts does.
 import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
-import { createAiRuntime, replayProvider } from '@trialops/ai-runtime';
+import { createAiRuntime, replayProvider, DEMO_SPONSOR_DOCUMENTS } from '@trialops/ai-runtime';
 import { startApi, platformId, type Api } from './_helpers.ts';
 
 let api: Api; let plat: string; let merid: string; let task: any; let job: any;
@@ -17,7 +17,7 @@ before(async () => {
   merid = (await api.admin.query("select id from core.organization where name = 'Meridian Pharma'")).rows[0].id;
   const w = await api.call('POST', `/v1/platforms/${plat}/arm-wizard`, { as: 'demo|ops',
     body: { arm: { code: 'ARM-J', name: 'MRD-12 (ARM-J)', sponsor_org_id: merid, intervention_type: 'drug', has_prior_human_data: true },
-      sponsor_documents: [{ ref: 'SPONSOR-BRIEF-D', title: 'Sponsor briefing (synthetic)', text: 'The dose is 40 mg once daily.' }] } });
+      sponsor_documents: DEMO_SPONSOR_DOCUMENTS } });
   assert.equal(w.status, 201, JSON.stringify(w.body));
   task = w.body.agent_tasks[0];
 });

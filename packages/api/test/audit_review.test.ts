@@ -1,7 +1,7 @@
 // CMP-10 audit trail review API, CMP-11 signature manifestation, CMP-09 AI provenance of accepted content.
 import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
-import { createAiRuntime, replayProvider } from '@trialops/ai-runtime';
+import { createAiRuntime, replayProvider, DEMO_SPONSOR_DOCUMENTS } from '@trialops/ai-runtime';
 import { startApi, platformId, SIGN, type Api } from './_helpers.ts';
 
 let api: Api; let plat: string; let siteId: string; let oldCapacity: number;
@@ -127,7 +127,7 @@ test('[CMP-09][CMP-11] accepted AI content keeps its provenance marker; the prop
   const merid = (await api.admin.query("select id from core.organization where name = 'Meridian Pharma'")).rows[0].id;
   const w = await api.call('POST', `/v1/platforms/${plat}/arm-wizard`, { as: 'demo|ops', body: {
     arm: { code: 'ARM-P', name: 'MRD-12 (provenance)', sponsor_org_id: merid, intervention_type: 'drug', has_prior_human_data: true },
-    sponsor_documents: [{ ref: 'SPONSOR-BRIEF-D', title: 'Sponsor briefing (synthetic)', text: 'The recommended phase 2 dose is 40 mg once daily.' }] } });
+    sponsor_documents: DEMO_SPONSOR_DOCUMENTS } });
   assert.equal(w.status, 201, JSON.stringify(w.body));
   const draftTask = w.body.agent_tasks[0];
   const { job } = await api.job('POST', `/v1/tasks/${draftTask.id}/run-agent`, { as: 'demo|ops' });

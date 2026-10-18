@@ -1,19 +1,55 @@
 // Task type registry (AI-02): every task type declares its intended use, risk, the exact model approved for it, a
-// versioned prompt, the JSON Schema its output must satisfy and the data classes it may process.
+// versioned prompt (its text is locked in prompt-lock.json), the JSON Schema its output must satisfy (validator), the
+// data classes it may process, its credibility plan with the pre-specified thresholds, its test dataset, the source
+// citation it must give (AI-04) and the monitoring rules that send it back to suggestion-only (AI-10).
 import type { DataClass } from './types.ts';
+
+/** Pre-specified acceptance threshold of the credibility plan (§4 of docs/ai/<task_type>.md, CMP-06/CMP-07). */
+export interface Threshold { metric: string; op: '>=' | '<='; value: number }
+
+/** Metrics the monitoring computes from the ledger and from the human review of the proposals (AI-10). */
+export type MonitoringMetric = 'edit_rate' | 'rejection_rate' | 'validation_failure_rate' | 'unsupported_items'
+  | 'generated_tasks_cancelled_or_reassigned_rate';
+
+/** A breach (value > max on at least min_sample observations) sends the task type to suggestion-only (AI-10, plan §7). */
+export interface MonitoringRule { metric: MonitoringMetric; max: number; min_sample: number }
+
+export interface MonitoringPolicy {
+  window: number;                      // last N reviews / generated tasks the rates are computed on
+  rules: MonitoringRule[];
+  drift: { window: number; max_output_tokens_change: number; max_failure_rate_change: number };
+}
+
+/**
+ * Mandatory source citation (AI-04): every item at `items[].path` (identified by `key`) needs an entry in the output
+ * `sources` array (matched on item_id) whose quote appears verbatim (whitespace-normalised) in the input document it
+ * names (`documents`: array of { ref, text } in the input).
+ */
+export interface CitationPolicy {
+  documents: string;                   // dotted path in the input
+  sources: string;                     // dotted path in the output
+  items: { section: string; path: string; key: string }[];
+  min_quote_chars: number;
+}
 
 export interface TaskTypeDef {
   task_type: string;
   intended_use: string;
+  category: 'extraction' | 'classification' | 'generation' | 'planning';
   risk: 'low' | 'medium' | 'high';
   gxp: boolean;                        // output is a proposal that a person must sign (AI-05)
   model: string;                       // pinned, no automatic escalation (AI-03)
-  effort: 'low' | 'medium' | 'high';
+  effort: 'low' | 'medium' | 'high';   // fixed generation parameters (AI-04): only these reach the provider
   max_tokens: number;
   prompt_id: string;
-  prompt_version: number;
+  prompt_version: number;              // the rendered system prompt is locked per version in prompt-lock.json (AI-02)
   data_classes: DataClass[];
   output_schema: Record<string, unknown>;
+  credibility_plan: string;            // repo-relative path of the plan (rule 12, CMP-06)
+  dataset: string;                     // repo-relative folder of the test dataset (AI-03 smoke cases, CMP-06 credibility set)
+  thresholds: Threshold[];             // pre-specified, identical to the table in the plan §4 (CMP-07)
+  monitoring: MonitoringPolicy;        // identical to the table in the plan §7 (AI-10)
+  citation?: CitationPolicy;           // mandatory for extraction and classification (AI-04)
   render(input: Record<string, unknown>): { system: string; user: string };
 }
 
@@ -52,10 +88,37 @@ export const REGISTRY: Record<string, TaskTypeDef> = {
   'protocol.appendix.draft': {
     task_type: 'protocol.appendix.draft',
     intended_use: 'Protocol author agent: draft the arm appendix (ICH M11 / USDM sections) from the Master Protocol and sponsor documents. Proposal only; a person reviews the diff and signs.',
+    category: 'extraction',
     risk: 'medium', gxp: true, model: MODEL, effort: 'medium', max_tokens: 16000,
     prompt_id: 'protocol-author', prompt_version: 1,
     data_classes: ['INTERNAL', 'CONFIDENTIAL_SPONSOR'],
     output_schema: appendixSchema,
+    credibility_plan: 'docs/ai/protocol.appendix.draft.md',
+    dataset: 'services/ai-runtime/datasets/protocol.appendix.draft',
+    thresholds: [
+      { metric: 'source_fidelity', op: '>=', value: 0.99 },
+      { metric: 'unsupported_items', op: '<=', value: 0 },
+      { metric: 'recall_objectives', op: '>=', value: 0.9 },
+      { metric: 'recall_endpoints', op: '>=', value: 0.9 },
+      { metric: 'recall_criteria', op: '>=', value: 0.9 },
+      { metric: 'traps_flagged', op: '>=', value: 0.8 },
+      { metric: 'schema_validity', op: '>=', value: 1 },
+    ],
+    monitoring: {
+      window: 20,
+      rules: [{ metric: 'edit_rate', max: 0.5, min_sample: 20 }, { metric: 'unsupported_items', max: 0, min_sample: 1 }],
+      drift: { window: 20, max_output_tokens_change: 0.5, max_failure_rate_change: 0.2 },
+    },
+    citation: {
+      documents: 'sponsor_documents', sources: 'sources', min_quote_chars: 10,
+      items: [
+        { section: 'objectives', path: 'sections.objectives', key: 'id' },
+        { section: 'endpoints', path: 'sections.endpoints', key: 'id' },
+        { section: 'population', path: 'sections.population.inclusion', key: 'id' },
+        { section: 'population', path: 'sections.population.exclusion', key: 'id' },
+        { section: 'interventions', path: 'sections.interventions', key: 'name' },
+      ],
+    },
     render: input => ({
       system: [
         'You draft the arm appendix of a platform trial Master Protocol. The appendix inherits everything from the Master',
@@ -72,10 +135,24 @@ export const REGISTRY: Record<string, TaskTypeDef> = {
   'arm.onboarding.plan': {
     task_type: 'arm.onboarding.plan',
     intended_use: 'Onboarding planner agent: generate the onboarding task plan and checklist for a new arm (regulatory, contracts, sites, supply, data management). Non-GxP operational tasks are created automatically.',
+    category: 'planning',
     risk: 'low', gxp: false, model: MODEL, effort: 'low', max_tokens: 8000,
     prompt_id: 'onboarding-planner', prompt_version: 1,
     data_classes: ['INTERNAL', 'CONFIDENTIAL_SPONSOR'],
     output_schema: onboardingSchema,
+    credibility_plan: 'docs/ai/arm.onboarding.plan.md',
+    dataset: 'services/ai-runtime/datasets/arm.onboarding.plan',
+    thresholds: [
+      { metric: 'recall_mandatory_task_types', op: '>=', value: 1 },
+      { metric: 'assignee_role_correct', op: '>=', value: 0.9 },
+      { metric: 'gxp_impact_correct', op: '>=', value: 1 },
+      { metric: 'dependency_graph_acyclic', op: '>=', value: 1 },
+    ],
+    monitoring: {
+      window: 50,
+      rules: [{ metric: 'generated_tasks_cancelled_or_reassigned_rate', max: 0.3, min_sample: 10 }],
+      drift: { window: 20, max_output_tokens_change: 0.5, max_failure_rate_change: 0.2 },
+    },
     render: input => ({
       system: [
         'You plan the onboarding of a new arm into an existing platform trial. Produce the tasks needed to reach',
