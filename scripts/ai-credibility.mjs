@@ -50,7 +50,7 @@ const ev = await runCredibility({ task_type: taskType, datasetDir, provider: met
 const tin = calls.reduce((a, c) => a + (c.input_tokens ?? 0), 0); const tout = calls.reduce((a, c) => a + (c.output_tokens ?? 0), 0);
 ev.usage = { calls: calls.length, input_tokens: tin, output_tokens: tout, usd_list_price: Math.round(usd(tin, tout) * 1e4) / 1e4,
   price_usd_per_mtok: price, max_usd: maxUsd, per_call: calls.map((c, i) => ({ case_id: ev.cases[i]?.case_id ?? null, ...c })) };
-const name = `${ev.run_at.slice(0, 10)}_${ev.dataset.dataset_id}_v${ev.dataset.version}_${ev.model}${ev.dry_run || ev.mode !== 'live' ? '_dry-run' : ''}.json`;
+const name = `${ev.run_at.slice(0, 10)}_${ev.dataset.dataset_id}_v${ev.dataset.version}_${ev.model}_p${ev.prompt_version}${ev.dry_run || ev.mode !== 'live' ? '_dry-run' : ''}.json`;
 const file = join(root, 'docs/ai/evidence', taskType, name);
 mkdirSync(dirname(file), { recursive: true });
 writeFileSync(file, JSON.stringify(ev, null, 2) + '\n');

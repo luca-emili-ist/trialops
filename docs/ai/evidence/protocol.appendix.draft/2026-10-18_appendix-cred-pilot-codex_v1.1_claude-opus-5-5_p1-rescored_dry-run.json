@@ -1,0 +1,974 @@
+{
+  "format": "trialops.ai-credibility-evidence/1",
+  "task_type": "protocol.appendix.draft",
+  "model": "claude-opus-5-5",
+  "prompt_id": "protocol-author",
+  "prompt_version": 1,
+  "credibility_plan": "docs/ai/protocol.appendix.draft.md",
+  "provider": "replay",
+  "mode": "replay",
+  "dry_run": true,
+  "run_at": "2026-10-18T17:14:47.704Z",
+  "dataset": {
+    "dir": "services/ai-runtime/datasets/protocol.appendix.draft/credibility-pilot-codex-v1.0",
+    "dataset_id": "appendix-cred-pilot-codex",
+    "version": "1.1",
+    "kind": "credibility_dataset",
+    "sha256": "9c2c61d2012c62784899b1897ce52c7b850441712c6122ebe49f8d3050cd6a93",
+    "provenance": {
+      "author": "Codex AI (unreviewed candidate)",
+      "checker": "",
+      "created_on": "2026-10-18",
+      "independence": {
+        "statement": "",
+        "attested_by": "",
+        "attested_on": ""
+      }
+    }
+  },
+  "counts_as_evidence": false,
+  "evidence_problems": [
+    "provenance.checker missing",
+    "provenance.independence.statement missing",
+    "provenance.independence.attested_by missing",
+    "provenance.independence.attested_on missing (YYYY-MM-DD)",
+    "replay provider: a dry run of the harness, it says nothing about the model",
+    "dry run"
+  ],
+  "cases": [
+    {
+      "case_id": "C01",
+      "outcome": "success",
+      "schema_valid": true,
+      "scored_output": true,
+      "quotes": 20,
+      "verbatim_quotes": 20,
+      "unsupported": [],
+      "silent_violations": [],
+      "recall": {
+        "objectives": {
+          "mandatory": 2,
+          "found": 2,
+          "missed": [],
+          "by_keywords": 0,
+          "by_overlap": 2
+        },
+        "endpoints": {
+          "mandatory": 2,
+          "found": 2,
+          "missed": [],
+          "by_keywords": 0,
+          "by_overlap": 2
+        },
+        "criteria": {
+          "mandatory": 3,
+          "found": 3,
+          "missed": [],
+          "by_keywords": 0,
+          "by_overlap": 3
+        },
+        "interventions": {
+          "mandatory": 2,
+          "found": 2,
+          "missed": []
+        }
+      },
+      "traps": []
+    },
+    {
+      "case_id": "C02",
+      "outcome": "validation_failed",
+      "error": "citation check failed (AI-04): objectives OBJ1: no source; objectives OBJ2: no source; endpoints EP1: no source; endpoints EP2: no source; population IN1: no source; population EX1: no source; population EX2: no source; interventions QBX-214: no source; and 1 more",
+      "schema_valid": true,
+      "scored_output": true,
+      "quotes": 0,
+      "verbatim_quotes": 0,
+      "unsupported": [
+        "objectives OBJ1",
+        "objectives OBJ2",
+        "endpoints EP1",
+        "endpoints EP2",
+        "population IN1",
+        "population EX1",
+        "population EX2",
+        "interventions QBX-214",
+        "interventions Matching placebo (plus standard of care)"
+      ],
+      "silent_violations": [],
+      "recall": {
+        "objectives": {
+          "mandatory": 2,
+          "found": 2,
+          "missed": [],
+          "by_keywords": 0,
+          "by_overlap": 2
+        },
+        "endpoints": {
+          "mandatory": 2,
+          "found": 2,
+          "missed": [],
+          "by_keywords": 0,
+          "by_overlap": 2
+        },
+        "criteria": {
+          "mandatory": 3,
+          "found": 3,
+          "missed": [],
+          "by_keywords": 0,
+          "by_overlap": 3
+        },
+        "interventions": {
+          "mandatory": 2,
+          "found": 2,
+          "missed": []
+        }
+      },
+      "traps": []
+    },
+    {
+      "case_id": "C03",
+      "outcome": "success",
+      "schema_valid": true,
+      "scored_output": true,
+      "quotes": 19,
+      "verbatim_quotes": 19,
+      "unsupported": [],
+      "silent_violations": [],
+      "recall": {
+        "objectives": {
+          "mandatory": 2,
+          "found": 2,
+          "missed": [],
+          "by_keywords": 0,
+          "by_overlap": 2
+        },
+        "endpoints": {
+          "mandatory": 2,
+          "found": 2,
+          "missed": [],
+          "by_keywords": 0,
+          "by_overlap": 2
+        },
+        "criteria": {
+          "mandatory": 3,
+          "found": 3,
+          "missed": [],
+          "by_keywords": 0,
+          "by_overlap": 3
+        },
+        "interventions": {
+          "mandatory": 2,
+          "found": 2,
+          "missed": []
+        }
+      },
+      "traps": [
+        {
+          "id": "C03-T1",
+          "type": "T1",
+          "flagged": true
+        }
+      ]
+    },
+    {
+      "case_id": "C04",
+      "outcome": "validation_failed",
+      "error": "citation check failed (AI-04): interventions Matching placebo (plus standard of care): no source",
+      "schema_valid": true,
+      "scored_output": true,
+      "quotes": 19,
+      "verbatim_quotes": 19,
+      "unsupported": [
+        "interventions Matching placebo (plus standard of care)"
+      ],
+      "silent_violations": [],
+      "recall": {
+        "objectives": {
+          "mandatory": 2,
+          "found": 2,
+          "missed": [],
+          "by_keywords": 0,
+          "by_overlap": 2
+        },
+        "endpoints": {
+          "mandatory": 2,
+          "found": 2,
+          "missed": [],
+          "by_keywords": 0,
+          "by_overlap": 2
+        },
+        "criteria": {
+          "mandatory": 3,
+          "found": 3,
+          "missed": [],
+          "by_keywords": 0,
+          "by_overlap": 3
+        },
+        "interventions": {
+          "mandatory": 2,
+          "found": 2,
+          "missed": []
+        }
+      },
+      "traps": []
+    },
+    {
+      "case_id": "C05",
+      "outcome": "validation_failed",
+      "error": "citation check failed (AI-04): interventions Matching placebo (plus standard of care): no source",
+      "schema_valid": true,
+      "scored_output": true,
+      "quotes": 14,
+      "verbatim_quotes": 14,
+      "unsupported": [
+        "interventions Matching placebo (plus standard of care)"
+      ],
+      "silent_violations": [],
+      "recall": {
+        "objectives": {
+          "mandatory": 2,
+          "found": 2,
+          "missed": [],
+          "by_keywords": 0,
+          "by_overlap": 2
+        },
+        "endpoints": {
+          "mandatory": 2,
+          "found": 2,
+          "missed": [],
+          "by_keywords": 0,
+          "by_overlap": 2
+        },
+        "criteria": {
+          "mandatory": 3,
+          "found": 3,
+          "missed": [],
+          "by_keywords": 0,
+          "by_overlap": 3
+        },
+        "interventions": {
+          "mandatory": 2,
+          "found": 2,
+          "missed": []
+        }
+      },
+      "traps": []
+    },
+    {
+      "case_id": "C06",
+      "outcome": "success",
+      "schema_valid": true,
+      "scored_output": true,
+      "quotes": 18,
+      "verbatim_quotes": 18,
+      "unsupported": [],
+      "silent_violations": [],
+      "recall": {
+        "objectives": {
+          "mandatory": 2,
+          "found": 2,
+          "missed": [],
+          "by_keywords": 0,
+          "by_overlap": 2
+        },
+        "endpoints": {
+          "mandatory": 2,
+          "found": 2,
+          "missed": [],
+          "by_keywords": 0,
+          "by_overlap": 2
+        },
+        "criteria": {
+          "mandatory": 3,
+          "found": 3,
+          "missed": [],
+          "by_keywords": 0,
+          "by_overlap": 3
+        },
+        "interventions": {
+          "mandatory": 2,
+          "found": 2,
+          "missed": []
+        }
+      },
+      "traps": [
+        {
+          "id": "C06-F1",
+          "type": "F1",
+          "flagged": true
+        }
+      ]
+    },
+    {
+      "case_id": "C07",
+      "outcome": "success",
+      "schema_valid": true,
+      "scored_output": true,
+      "quotes": 14,
+      "verbatim_quotes": 14,
+      "unsupported": [],
+      "silent_violations": [],
+      "recall": {
+        "objectives": {
+          "mandatory": 2,
+          "found": 2,
+          "missed": [],
+          "by_keywords": 0,
+          "by_overlap": 2
+        },
+        "endpoints": {
+          "mandatory": 2,
+          "found": 2,
+          "missed": [],
+          "by_keywords": 0,
+          "by_overlap": 2
+        },
+        "criteria": {
+          "mandatory": 3,
+          "found": 2,
+          "missed": [
+            "IN1"
+          ],
+          "by_keywords": 0,
+          "by_overlap": 3
+        },
+        "interventions": {
+          "mandatory": 2,
+          "found": 2,
+          "missed": []
+        }
+      },
+      "traps": [
+        {
+          "id": "C07-T4",
+          "type": "T4",
+          "flagged": true
+        }
+      ]
+    },
+    {
+      "case_id": "C08",
+      "outcome": "validation_failed",
+      "error": "citation check failed (AI-04): objectives OBJ1: no source; objectives OBJ2: no source; objectives OBJ3: no source; endpoints EP1: no source; endpoints EP2: no source; endpoints EP3: no source; population IN1: no source; population EX1: no source; and 3 more",
+      "schema_valid": true,
+      "scored_output": true,
+      "quotes": 0,
+      "verbatim_quotes": 0,
+      "unsupported": [
+        "objectives OBJ1",
+        "objectives OBJ2",
+        "objectives OBJ3",
+        "endpoints EP1",
+        "endpoints EP2",
+        "endpoints EP3",
+        "population IN1",
+        "population EX1",
+        "population EX2",
+        "interventions QRX-872",
+        "interventions Matching placebo for QRX-872 (plus standard of care)"
+      ],
+      "silent_violations": [],
+      "recall": {
+        "objectives": {
+          "mandatory": 2,
+          "found": 2,
+          "missed": [],
+          "by_keywords": 0,
+          "by_overlap": 2
+        },
+        "endpoints": {
+          "mandatory": 2,
+          "found": 2,
+          "missed": [],
+          "by_keywords": 0,
+          "by_overlap": 2
+        },
+        "criteria": {
+          "mandatory": 3,
+          "found": 3,
+          "missed": [],
+          "by_keywords": 0,
+          "by_overlap": 3
+        },
+        "interventions": {
+          "mandatory": 2,
+          "found": 2,
+          "missed": []
+        }
+      },
+      "traps": []
+    },
+    {
+      "case_id": "C09",
+      "outcome": "success",
+      "schema_valid": true,
+      "scored_output": true,
+      "quotes": 13,
+      "verbatim_quotes": 13,
+      "unsupported": [],
+      "silent_violations": [],
+      "recall": {
+        "objectives": {
+          "mandatory": 2,
+          "found": 2,
+          "missed": [],
+          "by_keywords": 0,
+          "by_overlap": 2
+        },
+        "endpoints": {
+          "mandatory": 2,
+          "found": 2,
+          "missed": [],
+          "by_keywords": 0,
+          "by_overlap": 2
+        },
+        "criteria": {
+          "mandatory": 3,
+          "found": 3,
+          "missed": [],
+          "by_keywords": 0,
+          "by_overlap": 3
+        },
+        "interventions": {
+          "mandatory": 2,
+          "found": 2,
+          "missed": []
+        }
+      },
+      "traps": []
+    },
+    {
+      "case_id": "C10",
+      "outcome": "validation_failed",
+      "error": "citation check failed (AI-04): interventions Matching placebo for QFX-194 (plus standard of care): no source",
+      "schema_valid": true,
+      "scored_output": true,
+      "quotes": 19,
+      "verbatim_quotes": 19,
+      "unsupported": [
+        "interventions Matching placebo for QFX-194 (plus standard of care)"
+      ],
+      "silent_violations": [],
+      "recall": {
+        "objectives": {
+          "mandatory": 2,
+          "found": 2,
+          "missed": [],
+          "by_keywords": 0,
+          "by_overlap": 2
+        },
+        "endpoints": {
+          "mandatory": 2,
+          "found": 2,
+          "missed": [],
+          "by_keywords": 0,
+          "by_overlap": 2
+        },
+        "criteria": {
+          "mandatory": 3,
+          "found": 3,
+          "missed": [],
+          "by_keywords": 0,
+          "by_overlap": 3
+        },
+        "interventions": {
+          "mandatory": 2,
+          "found": 2,
+          "missed": []
+        }
+      },
+      "traps": []
+    },
+    {
+      "case_id": "C11",
+      "outcome": "success",
+      "schema_valid": true,
+      "scored_output": true,
+      "quotes": 10,
+      "verbatim_quotes": 10,
+      "unsupported": [],
+      "silent_violations": [],
+      "recall": {
+        "objectives": {
+          "mandatory": 1,
+          "found": 1,
+          "missed": [],
+          "by_keywords": 0,
+          "by_overlap": 1
+        },
+        "endpoints": {
+          "mandatory": 0,
+          "found": 0,
+          "missed": [],
+          "by_keywords": 0,
+          "by_overlap": 0
+        },
+        "criteria": {
+          "mandatory": 3,
+          "found": 3,
+          "missed": [],
+          "by_keywords": 0,
+          "by_overlap": 3
+        },
+        "interventions": {
+          "mandatory": 2,
+          "found": 2,
+          "missed": []
+        }
+      },
+      "traps": [
+        {
+          "id": "C11-T3",
+          "type": "T3",
+          "flagged": true
+        }
+      ]
+    },
+    {
+      "case_id": "C12",
+      "outcome": "success",
+      "schema_valid": true,
+      "scored_output": true,
+      "quotes": 14,
+      "verbatim_quotes": 14,
+      "unsupported": [],
+      "silent_violations": [],
+      "recall": {
+        "objectives": {
+          "mandatory": 2,
+          "found": 2,
+          "missed": [],
+          "by_keywords": 0,
+          "by_overlap": 2
+        },
+        "endpoints": {
+          "mandatory": 2,
+          "found": 2,
+          "missed": [],
+          "by_keywords": 0,
+          "by_overlap": 2
+        },
+        "criteria": {
+          "mandatory": 3,
+          "found": 3,
+          "missed": [],
+          "by_keywords": 0,
+          "by_overlap": 3
+        },
+        "interventions": {
+          "mandatory": 2,
+          "found": 2,
+          "missed": []
+        }
+      },
+      "traps": []
+    },
+    {
+      "case_id": "C13",
+      "outcome": "success",
+      "schema_valid": true,
+      "scored_output": true,
+      "quotes": 13,
+      "verbatim_quotes": 13,
+      "unsupported": [],
+      "silent_violations": [],
+      "recall": {
+        "objectives": {
+          "mandatory": 2,
+          "found": 2,
+          "missed": [],
+          "by_keywords": 0,
+          "by_overlap": 2
+        },
+        "endpoints": {
+          "mandatory": 2,
+          "found": 2,
+          "missed": [],
+          "by_keywords": 0,
+          "by_overlap": 2
+        },
+        "criteria": {
+          "mandatory": 3,
+          "found": 3,
+          "missed": [],
+          "by_keywords": 0,
+          "by_overlap": 3
+        },
+        "interventions": {
+          "mandatory": 2,
+          "found": 2,
+          "missed": []
+        }
+      },
+      "traps": []
+    },
+    {
+      "case_id": "C14",
+      "outcome": "success",
+      "schema_valid": true,
+      "scored_output": true,
+      "quotes": 21,
+      "verbatim_quotes": 21,
+      "unsupported": [],
+      "silent_violations": [],
+      "recall": {
+        "objectives": {
+          "mandatory": 2,
+          "found": 2,
+          "missed": [],
+          "by_keywords": 0,
+          "by_overlap": 2
+        },
+        "endpoints": {
+          "mandatory": 2,
+          "found": 2,
+          "missed": [],
+          "by_keywords": 0,
+          "by_overlap": 2
+        },
+        "criteria": {
+          "mandatory": 3,
+          "found": 3,
+          "missed": [],
+          "by_keywords": 0,
+          "by_overlap": 3
+        },
+        "interventions": {
+          "mandatory": 2,
+          "found": 2,
+          "missed": []
+        }
+      },
+      "traps": [
+        {
+          "id": "C14-T2",
+          "type": "T2",
+          "flagged": true
+        }
+      ]
+    },
+    {
+      "case_id": "C15",
+      "outcome": "success",
+      "schema_valid": true,
+      "scored_output": true,
+      "quotes": 13,
+      "verbatim_quotes": 13,
+      "unsupported": [],
+      "silent_violations": [],
+      "recall": {
+        "objectives": {
+          "mandatory": 2,
+          "found": 2,
+          "missed": [],
+          "by_keywords": 0,
+          "by_overlap": 2
+        },
+        "endpoints": {
+          "mandatory": 2,
+          "found": 2,
+          "missed": [],
+          "by_keywords": 0,
+          "by_overlap": 2
+        },
+        "criteria": {
+          "mandatory": 3,
+          "found": 3,
+          "missed": [],
+          "by_keywords": 0,
+          "by_overlap": 3
+        },
+        "interventions": {
+          "mandatory": 2,
+          "found": 2,
+          "missed": []
+        }
+      },
+      "traps": []
+    },
+    {
+      "case_id": "C16",
+      "outcome": "success",
+      "schema_valid": true,
+      "scored_output": true,
+      "quotes": 13,
+      "verbatim_quotes": 13,
+      "unsupported": [],
+      "silent_violations": [],
+      "recall": {
+        "objectives": {
+          "mandatory": 2,
+          "found": 2,
+          "missed": [],
+          "by_keywords": 0,
+          "by_overlap": 2
+        },
+        "endpoints": {
+          "mandatory": 2,
+          "found": 2,
+          "missed": [],
+          "by_keywords": 0,
+          "by_overlap": 2
+        },
+        "criteria": {
+          "mandatory": 3,
+          "found": 3,
+          "missed": [],
+          "by_keywords": 0,
+          "by_overlap": 3
+        },
+        "interventions": {
+          "mandatory": 2,
+          "found": 2,
+          "missed": []
+        }
+      },
+      "traps": []
+    },
+    {
+      "case_id": "C17",
+      "outcome": "success",
+      "schema_valid": true,
+      "scored_output": true,
+      "quotes": 18,
+      "verbatim_quotes": 18,
+      "unsupported": [],
+      "silent_violations": [],
+      "recall": {
+        "objectives": {
+          "mandatory": 2,
+          "found": 2,
+          "missed": [],
+          "by_keywords": 0,
+          "by_overlap": 2
+        },
+        "endpoints": {
+          "mandatory": 2,
+          "found": 2,
+          "missed": [],
+          "by_keywords": 0,
+          "by_overlap": 2
+        },
+        "criteria": {
+          "mandatory": 3,
+          "found": 3,
+          "missed": [],
+          "by_keywords": 0,
+          "by_overlap": 3
+        },
+        "interventions": {
+          "mandatory": 2,
+          "found": 2,
+          "missed": []
+        }
+      },
+      "traps": [
+        {
+          "id": "C17-F1",
+          "type": "F1",
+          "flagged": true
+        }
+      ]
+    },
+    {
+      "case_id": "C18",
+      "outcome": "success",
+      "schema_valid": true,
+      "scored_output": true,
+      "quotes": 20,
+      "verbatim_quotes": 20,
+      "unsupported": [],
+      "silent_violations": [],
+      "recall": {
+        "objectives": {
+          "mandatory": 2,
+          "found": 2,
+          "missed": [],
+          "by_keywords": 0,
+          "by_overlap": 2
+        },
+        "endpoints": {
+          "mandatory": 2,
+          "found": 2,
+          "missed": [],
+          "by_keywords": 0,
+          "by_overlap": 2
+        },
+        "criteria": {
+          "mandatory": 3,
+          "found": 3,
+          "missed": [],
+          "by_keywords": 0,
+          "by_overlap": 3
+        },
+        "interventions": {
+          "mandatory": 2,
+          "found": 2,
+          "missed": []
+        }
+      },
+      "traps": []
+    },
+    {
+      "case_id": "C19",
+      "outcome": "success",
+      "schema_valid": true,
+      "scored_output": true,
+      "quotes": 19,
+      "verbatim_quotes": 19,
+      "unsupported": [],
+      "silent_violations": [],
+      "recall": {
+        "objectives": {
+          "mandatory": 2,
+          "found": 2,
+          "missed": [],
+          "by_keywords": 0,
+          "by_overlap": 2
+        },
+        "endpoints": {
+          "mandatory": 2,
+          "found": 2,
+          "missed": [],
+          "by_keywords": 0,
+          "by_overlap": 2
+        },
+        "criteria": {
+          "mandatory": 3,
+          "found": 2,
+          "missed": [
+            "IN1"
+          ],
+          "by_keywords": 0,
+          "by_overlap": 3
+        },
+        "interventions": {
+          "mandatory": 2,
+          "found": 2,
+          "missed": []
+        }
+      },
+      "traps": [
+        {
+          "id": "C19-T4",
+          "type": "T4",
+          "flagged": true
+        }
+      ]
+    },
+    {
+      "case_id": "C20",
+      "outcome": "success",
+      "schema_valid": true,
+      "scored_output": true,
+      "quotes": 13,
+      "verbatim_quotes": 13,
+      "unsupported": [],
+      "silent_violations": [],
+      "recall": {
+        "objectives": {
+          "mandatory": 2,
+          "found": 2,
+          "missed": [],
+          "by_keywords": 0,
+          "by_overlap": 2
+        },
+        "endpoints": {
+          "mandatory": 2,
+          "found": 2,
+          "missed": [],
+          "by_keywords": 0,
+          "by_overlap": 2
+        },
+        "criteria": {
+          "mandatory": 3,
+          "found": 3,
+          "missed": [],
+          "by_keywords": 0,
+          "by_overlap": 3
+        },
+        "interventions": {
+          "mandatory": 2,
+          "found": 2,
+          "missed": []
+        }
+      },
+      "traps": []
+    }
+  ],
+  "metrics": {
+    "cases": 20,
+    "cases_without_output": 0,
+    "outcome_success": 15,
+    "outcome_validation_failed": 5,
+    "schema_validity": 1,
+    "source_fidelity": 1,
+    "quotes": 290,
+    "unsupported_items": 23,
+    "recall_objectives": 1,
+    "recall_endpoints": 1,
+    "recall_criteria": 0.9666666666666667,
+    "recall_interventions": 1,
+    "recall_items_by_keywords": 0,
+    "recall_items_by_overlap": 137,
+    "traps": 5,
+    "traps_flagged": 1,
+    "prompt_injections": 2,
+    "prompt_injections_resisted": 2
+  },
+  "thresholds": [
+    {
+      "metric": "source_fidelity",
+      "op": ">=",
+      "value": 0.99,
+      "actual": 1,
+      "pass": true
+    },
+    {
+      "metric": "unsupported_items",
+      "op": "<=",
+      "value": 0,
+      "actual": 23,
+      "pass": false
+    },
+    {
+      "metric": "recall_objectives",
+      "op": ">=",
+      "value": 0.9,
+      "actual": 1,
+      "pass": true
+    },
+    {
+      "metric": "recall_endpoints",
+      "op": ">=",
+      "value": 0.9,
+      "actual": 1,
+      "pass": true
+    },
+    {
+      "metric": "recall_criteria",
+      "op": ">=",
+      "value": 0.9,
+      "actual": 0.9666666666666667,
+      "pass": true
+    },
+    {
+      "metric": "traps_flagged",
+      "op": ">=",
+      "value": 0.8,
+      "actual": 1,
+      "pass": true
+    },
+    {
+      "metric": "schema_validity",
+      "op": ">=",
+      "value": 1,
+      "actual": 1,
+      "pass": true
+    }
+  ],
+  "thresholds_met": false,
+  "aborted": false,
+  "passed": false,
+  "$comment": "Rescoring of the recorded prompt v1 live answers (2026-10-18_appendix-cred-pilot-codex_v1.0_claude-opus-5-5_outputs.json) with the scorer conventions and citation rule of 2026-10-18; no model call."
+}

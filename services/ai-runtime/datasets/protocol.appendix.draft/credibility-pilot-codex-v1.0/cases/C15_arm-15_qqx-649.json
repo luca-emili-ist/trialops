@@ -90,12 +90,16 @@
     ],
     "interventions": [
       {
+        "id": "INT1",
         "name": "QQX-649",
+        "role": "active",
         "dose": "190 mg",
         "mandatory": true
       },
       {
+        "id": "INT2",
         "name": "QQX-649 matching placebo",
+        "role": "placebo",
         "dose": "Matching nominal administration amount for QQX-649",
         "mandatory": true
       }

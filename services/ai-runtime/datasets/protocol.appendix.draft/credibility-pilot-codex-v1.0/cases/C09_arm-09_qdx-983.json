@@ -95,12 +95,16 @@
     ],
     "interventions": [
       {
+        "id": "INT1",
         "name": "QDX-983",
+        "role": "active",
         "dose": "55 mg",
         "mandatory": true
       },
       {
+        "id": "INT2",
         "name": "QDX-983 matching placebo",
+        "role": "placebo",
         "dose": "Matching nominal administration amount for QDX-983",
         "mandatory": true
       }

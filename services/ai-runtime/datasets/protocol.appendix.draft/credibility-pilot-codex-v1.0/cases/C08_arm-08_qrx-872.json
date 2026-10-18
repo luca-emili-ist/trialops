@@ -99,12 +99,16 @@
     ],
     "interventions": [
       {
+        "id": "INT1",
         "name": "QRX-872",
+        "role": "active",
         "dose": "50 mg",
         "mandatory": true
       },
       {
+        "id": "INT2",
         "name": "QRX-872 matching placebo",
+        "role": "placebo",
         "dose": "Matching nominal administration amount for QRX-872",
         "mandatory": true
       }

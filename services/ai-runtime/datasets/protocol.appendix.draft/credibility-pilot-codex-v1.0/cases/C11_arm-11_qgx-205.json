@@ -68,12 +68,16 @@
     ],
     "interventions": [
       {
+        "id": "INT1",
         "name": "QGX-205",
+        "role": "active",
         "dose": "65 mg",
         "mandatory": true
       },
       {
+        "id": "INT2",
         "name": "QGX-205 matching placebo",
+        "role": "placebo",
         "dose": "Matching nominal administration amount for QGX-205",
         "mandatory": true
       }
@@ -163,7 +167,13 @@
           "no endpoint",
           "endpoint is missing",
           "missing endpoint",
-          "no endpoints"
+          "no endpoints",
+          "endpoint not defined",
+          "no defined endpoint",
+          "no sponsor-defined endpoint",
+          "without an endpoint",
+          "endpoint or timeframe",
+          "no endpoint or timeframe"
         ],
         "forbidden": []
       }

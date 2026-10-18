@@ -90,12 +90,16 @@
     ],
     "interventions": [
       {
+        "id": "INT1",
         "name": "QJX-427",
+        "role": "active",
         "dose": "75 mg",
         "mandatory": true
       },
       {
+        "id": "INT2",
         "name": "QJX-427 matching placebo",
+        "role": "placebo",
         "dose": "Matching nominal administration amount for QJX-427",
         "mandatory": true
       }

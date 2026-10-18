@@ -88,6 +88,7 @@ const col = (row, prefix) => {                                  // header lookup
   return k === undefined ? '' : row[k];
 };
 const yes = v => /^(y|yes|true|1)$/i.test(String(v).trim());
+const kw = v => String(v ?? '').split(/[;|]/).map(x => x.trim()).filter(Boolean);
 const byCase = (rows, id) => (rows ?? []).filter(r => col(r, 'case_id') === id);
 
 if (args.includes('--dump-headers')) {
@@ -101,13 +102,16 @@ if (args.includes('--dump')) {
   process.exit(0);
 }
 
-// Trap keywords (T1-T4): the workbook gives the expected flag as a sentence, the scorer needs keywords. These are
-// CONVERTER-AUTHORED (not from the independent author): each names what is specific to that trap, so a generic warning
-// does not count (README of the dataset: "a generic warning is insufficient"). A reviewer must confirm them.
+// Trap keywords (T1-T4): taken from the Traps tab column `keywords` when the dataset author supplies it. Otherwise these
+// CONVERTER ASSUMPTIONS apply (not from the independent author, to be confirmed by the clinical checker): each names what
+// is specific to that trap, so a generic warning does not count (dataset README: "a generic warning is insufficient").
+// The T3 set was broadened after the v1 pilot showed a correct warning worded "no sponsor-defined endpoint" (post hoc,
+// declared in docs/ai/evidence/protocol.appendix.draft/PILOT_2026-10-18.md).
 const TRAP_KEYWORDS = {
   T1: row => [...new Set([...`${col(row, 'expected flag')}`.matchAll(/\b\d+(?:\.\d+)?\s?mg\b/g)].map(m => m[0]))],
   T2: row => (/twice daily/i.test(col(row, 'expected flag')) ? ['twice daily', 'twice-daily'] : []),
-  T3: () => ['primary endpoint', 'no endpoint', 'endpoint is missing', 'missing endpoint', 'no endpoints'],
+  T3: () => ['primary endpoint', 'no endpoint', 'endpoint is missing', 'missing endpoint', 'no endpoints', 'endpoint not defined',
+    'no defined endpoint', 'no sponsor-defined endpoint', 'without an endpoint', 'endpoint or timeframe', 'no endpoint or timeframe'],
   T4: row => {
     const f = col(row, 'expected flag');
     const k = [];
@@ -158,11 +162,16 @@ for (const arm of sh.Arms) {
     const prev = traps.find(x => x.type === type);
     const quoted = `${col(t, 'ref')}: "${col(t, 'quoted sentence(s)')}"`;
     if (prev) { prev.description += ` | ${quoted}`; continue; }
+    const authorKw = kw(col(t, 'keywords'));
     traps.push(type === 'F1'
-      ? { id: `${id}-F1`, type, description: `${col(t, 'expected flag')} | ${quoted}`, keywords: [], forbidden: [] }
-      : { id: `${id}-${type}`, type, description: `${col(t, 'expected flag')} | ${quoted}`, keywords: TRAP_KEYWORDS[type](t), forbidden: [] });
+      // F1 targets: the reference items the expected flag says to retain ("retain EX1"), a converter reading of the flag.
+      ? { id: `${id}-F1`, type, description: `${col(t, 'expected flag')} | ${quoted}`, keywords: [], forbidden: authorKw,
+        targets: [...col(t, 'expected flag').matchAll(/\bretain ((?:OBJ|EP|IN|EX|INT)\d+)/g)].map(m => m[1]) }
+      : { id: `${id}-${type}`, type, description: `${col(t, 'expected flag')} | ${quoted}`,
+        keywords: authorKw.length ? authorKw : TRAP_KEYWORDS[type](t), forbidden: [] });
   }
   for (const t of traps) if (t.type !== 'F1' && !t.keywords.length) problems.push(`${id}: trap ${t.id} has no keywords`);
+  for (const t of traps) if (t.type === 'F1' && !t.targets.length) problems.push(`${id}: F1 ${t.id} names no item to retain`);
   const c = {
     case_id: id,
     data_class: 'CONFIDENTIAL_SPONSOR',
@@ -177,10 +186,12 @@ for (const arm of sh.Arms) {
     },
     reference: {
       synopsis: { phase: col(syn, 'phase') },
-      objectives: byCase(sh.Objectives, id).map(r => ({ id: col(r, 'id'), level: col(r, 'level'), text: col(r, 'text'), keywords: [], mandatory: yes(col(r, 'mandatory')) })),
-      endpoints: byCase(sh.Endpoints, id).map(r => ({ id: col(r, 'id'), type: col(r, 'type'), text: col(r, 'text'), keywords: [], mandatory: yes(col(r, 'mandatory')) })),
-      criteria: byCase(sh.Criteria, id).map(r => ({ id: col(r, 'id'), kind: col(r, 'inclusion/exclusion'), text: col(r, 'text'), keywords: [], mandatory: yes(col(r, 'mandatory')) })),
-      interventions: byCase(sh.Interventions, id).map(r => ({ name: col(r, 'name'), dose: col(r, 'dose'), mandatory: yes(col(r, 'mandatory')) })),
+      objectives: byCase(sh.Objectives, id).map(r => ({ id: col(r, 'id'), level: col(r, 'level'), text: col(r, 'text'), keywords: kw(col(r, 'keywords')), mandatory: yes(col(r, 'mandatory')) })),
+      endpoints: byCase(sh.Endpoints, id).map(r => ({ id: col(r, 'id'), type: col(r, 'type'), text: col(r, 'text'), keywords: kw(col(r, 'keywords')), mandatory: yes(col(r, 'mandatory')) })),
+      criteria: byCase(sh.Criteria, id).map(r => ({ id: col(r, 'id'), kind: col(r, 'inclusion/exclusion'), text: col(r, 'text'), keywords: kw(col(r, 'keywords')), mandatory: yes(col(r, 'mandatory')) })),
+      // id INT1.. in row order and role from the type column: converter assignment, matched by role (README conventions)
+      interventions: byCase(sh.Interventions, id).map((r, i) => ({ id: col(r, 'id') || `INT${i + 1}`, name: col(r, 'name'),
+        role: col(r, 'type') === 'placebo' ? 'placebo' : 'active', dose: col(r, 'dose'), mandatory: yes(col(r, 'mandatory')) })),
       visits: byCase(sh.Visits, id).map(r => ({ name: col(r, 'name'), day: Number(col(r, 'day')), mandatory: false })),
       quotes: byCase(sh.Quotes, id).map(r => ({ item: col(r, 'item_id'), ref: col(r, 'ref'), quote: col(r, 'verbatim sentence') })),
       consistency: byCase(sh.Consistency, id).map(r => ({ check: col(r, 'check'), expected: col(r, 'expected result'), keywords: [] })),

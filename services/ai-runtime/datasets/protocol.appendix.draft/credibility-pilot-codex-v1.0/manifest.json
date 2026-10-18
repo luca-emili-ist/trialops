@@ -4,7 +4,7 @@
   "kind": "credibility_dataset",
   "dataset_id": "appendix-cred-pilot-codex",
   "task_type": "protocol.appendix.draft",
-  "version": "1.0",
+  "version": "1.1",
   "synthetic": true,
   "source_workbook": "reference-and-traps_v1.0.xlsx",
   "provenance": {
@@ -17,5 +17,5 @@
       "attested_on": ""
     }
   },
-  "sha256": "1a32bd58b79932c4e044f2df6be11e4e7d5cc01b100f8f16a91d4478f66c75b0"
+  "sha256": "9c2c61d2012c62784899b1897ce52c7b850441712c6122ebe49f8d3050cd6a93"
 }

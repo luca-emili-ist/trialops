@@ -85,12 +85,16 @@
     ],
     "interventions": [
       {
+        "id": "INT1",
         "name": "QBX-214",
+        "role": "active",
         "dose": "20 mg",
         "mandatory": true
       },
       {
+        "id": "INT2",
         "name": "QBX-214 matching placebo",
+        "role": "placebo",
         "dose": "Matching nominal administration amount for QBX-214",
         "mandatory": true
       }

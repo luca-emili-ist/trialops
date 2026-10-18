@@ -90,12 +90,16 @@
     ],
     "interventions": [
       {
+        "id": "INT1",
         "name": "QLX-766",
+        "role": "active",
         "dose": "45 mg",
         "mandatory": true
       },
       {
+        "id": "INT2",
         "name": "QLX-766 matching placebo",
+        "role": "placebo",
         "dose": "Matching nominal administration amount for QLX-766",
         "mandatory": true
       }

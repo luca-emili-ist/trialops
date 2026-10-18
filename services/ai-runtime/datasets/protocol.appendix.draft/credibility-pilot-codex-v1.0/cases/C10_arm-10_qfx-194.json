@@ -118,12 +118,16 @@
     ],
     "interventions": [
       {
+        "id": "INT1",
         "name": "QFX-194",
+        "role": "active",
         "dose": "60 mg",
         "mandatory": true
       },
       {
+        "id": "INT2",
         "name": "QFX-194 matching placebo",
+        "role": "placebo",
         "dose": "Matching nominal administration amount for QFX-194",
         "mandatory": true
       }

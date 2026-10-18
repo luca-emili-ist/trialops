@@ -104,12 +104,16 @@
     ],
     "interventions": [
       {
+        "id": "INT1",
         "name": "QMX-327",
+        "role": "active",
         "dose": "Unresolved: 25 mg versus 45 mg; clarification required",
         "mandatory": true
       },
       {
+        "id": "INT2",
         "name": "QMX-327 matching placebo",
+        "role": "placebo",
         "dose": "Matching nominal administration amount for QMX-327",
         "mandatory": true
       }

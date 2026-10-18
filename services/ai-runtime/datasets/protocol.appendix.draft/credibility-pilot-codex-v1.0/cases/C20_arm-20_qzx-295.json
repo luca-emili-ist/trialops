@@ -85,12 +85,16 @@
     ],
     "interventions": [
       {
+        "id": "INT1",
         "name": "QZX-295",
+        "role": "active",
         "dose": "240 mg",
         "mandatory": true
       },
       {
+        "id": "INT2",
         "name": "QZX-295 matching placebo",
+        "role": "placebo",
         "dose": "Matching nominal administration amount for QZX-295",
         "mandatory": true
       }
