@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import type Anthropic from '@anthropic-ai/sdk';
-import { createAiRuntime, replayProvider, REGISTRY, DEMO_SPONSOR_DOCUMENTS, checkCitations, PROMPT_LOCK, perItemSourcesToList, type Provider } from '../src/index.ts';
+import { createAiRuntime, replayProvider, REGISTRY, DEMO_SPONSOR_DOCUMENTS, checkCitations, PROMPT_LOCK, appendixPlaceholderProblems, type Provider } from '../src/index.ts';
 import { toModelShape } from './helpers/model-shape.ts';
 import { anthropicProvider } from '../src/providers/anthropic.ts';
 
@@ -13,7 +13,7 @@ const def = REGISTRY['protocol.appendix.draft']!;
 // The replay fixture is the model answer (prompt v2: a source inside each item); `fixture` is the platform shape the
 // runtime derives from it (legacy `sources` list), which the citation check and the rest of the platform see.
 const modelAnswer = JSON.parse(readFileSync(join(root, 'services/ai-runtime/fixtures/protocol.appendix.draft/default.json'), 'utf8'));
-const fixture: any = perItemSourcesToList(def.citation!, modelAnswer);
+const fixture: any = def.finalise!(def.normalise!(modelAnswer));
 const input = { master_protocol: {}, arm: { code: 'ARM-D' }, sponsor_documents: DEMO_SPONSOR_DOCUMENTS };
 const req = { task_type: 'protocol.appendix.draft', data_class: 'CONFIDENTIAL_SPONSOR' as const, input };
 function fakeDb() {
@@ -22,7 +22,7 @@ function fakeDb() {
 }
 // Tests write answers in the platform shape; the provider answers as the model does (per-item sources).
 const answering = (output: unknown): Provider => ({ name: 'anthropic', accepts: ['INTERNAL', 'CONFIDENTIAL_SPONSOR'],
-  call: async () => ({ output: Array.isArray((output as { sources?: unknown })?.sources) ? toModelShape(def.citation!, output) : output,
+  call: async () => ({ output: Array.isArray((output as { sources?: unknown })?.sources) || Array.isArray((output as { consistency_checks?: unknown })?.consistency_checks) ? toModelShape(def.citation!, output) : output,
     model: def.model, input_tokens: 10, output_tokens: 10 }) });
 const clone = (): any => structuredClone(fixture);
 
@@ -94,7 +94,7 @@ test('[AI-04] a quote must be verbatim in the document it cites; whitespace diff
   const tiny = clone();
   tiny.sources[0].quote = 'MRD-12';
   r = await createAiRuntime({ provider: answering(tiny) }).run(req, { db: fakeDb() });
-  assert.match(r.error ?? '', /quote must NOT have fewer than 10 characters/);   // v2: refused by the schema already
+  assert.match(r.error ?? '', /quote is a placeholder|quote shorter than 10 characters/);
   assert.match(checkCitations(def.citation!, input, tiny).errors.join('\n'), /quote shorter than 10 characters/);
 
   const spaced = clone();
@@ -169,4 +169,41 @@ test('[AI-04] an answer with fewer source entries than items (one source shared 
   const r = await createAiRuntime({ provider: answering(out) }).run(req, { db: fakeDb() });
   assert.equal(r.outcome, 'validation_failed');
   assert.equal(r.output, null);
+});
+
+test('[AI-04] prompt v2: topic-tagged consistency checks become the legacy list (population, schedule, then conflicts)', async () => {
+  const answer = structuredClone(modelAnswer);
+  answer.consistency_checks.unshift({ topic: 'dose', check: 'Dose differs between documents', result: 'warning',
+    detail: 'The sponsor brief gives 40 mg once daily while the brochure used 50 mg (INT1); dose left for clarification.' });
+  const r = await createAiRuntime({ provider: answering(answer) }).run(req, { db: fakeDb() });
+  assert.equal(r.outcome, 'success', r.error);
+  const out = r.output as any;
+  assert.equal(out.consistency_topics, undefined, 'working fields do not leave the runtime');
+  assert.deepEqual(out.consistency_checks.map((c: any) => Object.keys(c)), [['check', 'result', 'detail'], ['check', 'result', 'detail'], ['check', 'result', 'detail']]);
+  assert.deepEqual(out.consistency_checks.map((c: any) => c.check), ['Shared control population', 'Visit schedule alignment', 'Dose differs between documents']);
+});
+
+test('[AI-04] a collapsed answer with placeholders or without the required topics is refused visibly, never passed', async () => {
+  const cc = (a: any, topic: string) => a.consistency_checks.find((c: any) => c.topic === topic);
+  const cases: [(a: any) => void, RegExp][] = [
+    [a => { a.consistency_checks = [{ topic: 'other', check: 'invalid', result: 'warning', detail: 'invalid' }]; }, /no shared_population check/],
+    [a => { a.consistency_checks = a.consistency_checks.filter((c: any) => c.topic !== 'visit_schedule'); }, /no visit_schedule check \(required topic\)/],
+    [a => { cc(a, 'shared_population').detail = 'n/a'; }, /detail is a placeholder or too short/],
+    [a => { cc(a, 'visit_schedule').detail = 'TBD'; }, /detail is a placeholder/],
+    [a => { cc(a, 'shared_population').detail = 'Same filler sentence for all.'; cc(a, 'visit_schedule').detail = 'Same filler sentence for all.'; },
+      /every detail is the same text/],
+    [a => { a.sections.objectives[0].source.quote = 'xxxxxxxxxxxx'; }, /objectives OBJ1: source quote is a placeholder/],
+    [a => { a.sections.objectives[0].source.quote = 'x'; }, /objectives OBJ1: source quote is a placeholder/],
+  ];
+  for (const [edit, reason] of cases) {
+    const answer = structuredClone(modelAnswer); edit(answer);
+    const db = fakeDb();
+    const r = await createAiRuntime({ provider: answering(answer) }).run(req, { db });
+    assert.equal(r.outcome, 'validation_failed', String(reason));
+    assert.equal(r.output, null);
+    assert.match(r.error ?? '', reason);
+    assert.match(String(db.rows[0]![17]), /^placeholder: /);
+  }
+  // the demo answer itself has no placeholder
+  assert.deepEqual(appendixPlaceholderProblems(def.normalise!(modelAnswer)), []);
 });

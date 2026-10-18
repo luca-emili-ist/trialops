@@ -222,5 +222,9 @@ test('[CMP-06] a provider failure may be retried a bounded number of times; the 
   const invalid: Provider = { ...scripted(goodS2), call: async c => { calls++; return { ...(await scripted(goodS2).call(c)), output: { wrong: true } }; } };
   const ev2 = await runCredibility({ task_type: def.task_type, datasetDir: SAMPLE, provider: invalid, retryProviderErrors: 1 });
   assert.equal(calls, 2, 'an invalid model answer is scored as it is, not retried');
+  let rejected = 0;
+  const bad400: Provider = { ...scripted(goodS2), call: async () => { rejected++; throw new Error('400 invalid_request_error: compiled grammar is too large'); } };
+  await runCredibility({ task_type: def.task_type, datasetDir: SAMPLE, provider: bad400, retryProviderErrors: 1 });
+  assert.equal(rejected, 2, 'a request the provider rejects (4xx) is not retried');
   assert.equal(ev2.metrics.provider_retries, 0);
 });

@@ -200,11 +200,13 @@
   },
   "consistency_checks": [
     {
+      "topic": "shared_population",
       "check": "Shared control population",
       "result": "pass",
       "detail": "Arm-specific criteria narrow but do not contradict the platform population; control participants remain eligible for comparison."
     },
     {
+      "topic": "visit_schedule",
       "check": "Visit schedule alignment",
       "result": "warning",
       "detail": "Week 4 ECG is not in the Master Protocol schedule; it adds a visit activity at shared visits for this arm only."

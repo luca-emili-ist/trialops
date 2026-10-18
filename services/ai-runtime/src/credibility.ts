@@ -307,12 +307,12 @@ export async function runCredibility(opts: { task_type: string; datasetDir: stri
   for (const { case: c } of ds.cases) {
     if (streak >= maxErrors) { aborted = true; break; }
     // A provider failure (error, timeout: no answer from the model) may be retried a bounded number of times; the case
-    // records its attempts. A model answer, valid or not, is never retried.
+    // records its attempts. A model answer, valid or not, is never retried, nor a request the provider rejects (4xx).
     let r; let attempts = 0;
     do {
       raw = null; attempts++;
       r = await rt.run({ task_type: def.task_type, data_class: c.data_class, input: c.input }, { db });
-    } while (PROVIDER_FAILURES.has(r.outcome) && attempts <= (opts.retryProviderErrors ?? 0));
+    } while (PROVIDER_FAILURES.has(r.outcome) && !/^4\d\d\b/.test(r.error ?? '') && attempts <= (opts.retryProviderErrors ?? 0));
     const schemaValid = raw !== null && validate(raw) === true;
     // scored on what the platform would see: the schema-valid answer after the task type's normalisation
     const output = (schemaValid && def.normalise ? def.normalise(raw) : raw) as Out | null;

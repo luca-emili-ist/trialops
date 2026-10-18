@@ -123,6 +123,13 @@ export function createAiRuntime(opts: AiRuntimeOptions = {}) {
       }
       // The answer the platform sees: normalised after validation (prompt v2: per-item sources → `sources` list).
       const output = d.normalise ? d.normalise(r.output) : r.output as Record<string, unknown>;
+      // A collapsed answer (placeholders instead of content) is refused visibly, never passed on (CR-AI-0001).
+      const fillers = d.placeholders ? d.placeholders(output) : [];
+      if (fillers.length) {
+        const error = `placeholder answer refused: ${fillers.slice(0, 6).join('; ')}${fillers.length > 6 ? `; and ${fillers.length - 6} more` : ''}`;
+        const id = await ledger(caller.db, req, d, { ...base, ...usage, output_sha256, outcome: 'validation_failed', validation_error: `placeholder: ${error}` });
+        return result('validation_failed', id, null, r.model, error);
+      }
       // AI-04: extraction and classification outputs must cite their sources verbatim; otherwise they never reach a person.
       if (d.citation) {
         const report = checkCitations(d.citation, req.input, output);
@@ -133,7 +140,7 @@ export function createAiRuntime(opts: AiRuntimeOptions = {}) {
         }
       }
       const id = await ledger(caller.db, req, d, { ...base, ...usage, output_sha256, outcome: 'success' });
-      return result('success', id, output, r.model);
+      return result('success', id, d.finalise ? d.finalise(output) : output, r.model);
     },
   };
 }
