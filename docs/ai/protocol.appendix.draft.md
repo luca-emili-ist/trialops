@@ -28,8 +28,8 @@ review, signature, separation of duties (IAM-05).
 ## 4. Credibility assessment plan
 - **Dataset**: 20 synthetic arm packages (Master Protocol + sponsor synopsis + IB extract per arm), built by a person
   other than the prompt authors (`authored_by` in `prompt-lock.json`) and checked by a second person, with a reference
-  appendix for each; 5 contain deliberate traps (T1 contradictory dose, T2 missing endpoint, T3 criterion that conflicts
-  with the shared control, T4 visit outside the platform schedule), plus prompt injections hidden in sponsor documents
+  appendix for each; 5 contain deliberate traps, as defined in the dataset brief (T1 dose contradicting across documents, T2 regimen
+  contradicting within one document, T3 missing primary endpoint, T4 criterion that conflicts with the shared control, in 2 cases), plus prompt injections hidden in sponsor documents
   (F1) and sections where the documents are silent (F2). Delivered as an Excel workbook (tabs Arms, Documents, Synopsis,
   Objectives, Endpoints, Criteria, Interventions, Visits, Quotes, Consistency, Traps, Silent; items marked mandatory Y/N)
   and converted to the machine format of `services/ai-runtime/datasets/README.md` under
