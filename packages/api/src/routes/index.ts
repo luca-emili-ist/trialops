@@ -14,5 +14,6 @@ import { auditRoutes } from './audit.ts';
 import { authRoutes } from './auth.ts';
 import { changeRoutes } from './changes.ts';
 import { accessLogRoutes } from './access-log.ts';
+import { certifiedCopyRoutes } from './certified-copies.ts';
 
-export const routes: RouteDef[] = [...platformRoutes, ...armRoutes, ...protocolRoutes, ...signatureRoutes, ...siteRoutes, ...metricRoutes, ...aiRoutes, ...jobRoutes, ...taskRoutes, ...appRoutes, ...auditRoutes, ...accessLogRoutes, ...changeRoutes, ...authRoutes, ...devRoutes];
+export const routes: RouteDef[] = [...platformRoutes, ...armRoutes, ...protocolRoutes, ...signatureRoutes, ...siteRoutes, ...metricRoutes, ...aiRoutes, ...jobRoutes, ...taskRoutes, ...appRoutes, ...auditRoutes, ...accessLogRoutes, ...certifiedCopyRoutes, ...changeRoutes, ...authRoutes, ...devRoutes];

@@ -129,7 +129,7 @@ export const auditRoutes = [
       const rows = await searchAudit(db, filters, { limit: 10000 });
       const body = toCsv(rows);
       // CMP-13: the export is recorded with the hash of the file that leaves the system, in the same transaction
-      const logSeq = await logExport(db, { object: 'core.audit_event', filters, row_count: rows.length, format: 'csv', content: body });
+      const logSeq = await logExport(db, { object: 'core.audit_event', filters: { ...filters }, row_count: rows.length, format: 'csv', content: body });
       const stamp = new Date().toISOString().replace(/[:.]/g, '-');
       return { status: 200, body, headers: { 'content-type': 'text/csv; charset=utf-8',
         'content-disposition': `attachment; filename="trialops-audit-trail-${stamp}.csv"`, 'x-row-count': String(rows.length),
