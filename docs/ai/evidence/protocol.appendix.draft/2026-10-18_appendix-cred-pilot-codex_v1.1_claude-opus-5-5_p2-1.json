@@ -1,0 +1,1066 @@
+{
+  "format": "trialops.ai-credibility-evidence/1",
+  "task_type": "protocol.appendix.draft",
+  "model": "claude-opus-5-5",
+  "prompt_id": "protocol-author",
+  "prompt_version": 2,
+  "credibility_plan": "docs/ai/protocol.appendix.draft.md",
+  "provider": "anthropic",
+  "mode": "live",
+  "dry_run": false,
+  "run_at": "2026-10-18T18:20:36.865Z",
+  "dataset": {
+    "dir": "/Users/lucaemili/Documents/trialops-wt/cmp06-pilot/services/ai-runtime/datasets/protocol.appendix.draft/credibility-pilot-codex-v1.0",
+    "dataset_id": "appendix-cred-pilot-codex",
+    "version": "1.1",
+    "kind": "credibility_dataset",
+    "sha256": "9c2c61d2012c62784899b1897ce52c7b850441712c6122ebe49f8d3050cd6a93",
+    "provenance": {
+      "author": "Codex AI (unreviewed candidate)",
+      "checker": "",
+      "created_on": "2026-10-18",
+      "independence": {
+        "statement": "",
+        "attested_by": "",
+        "attested_on": ""
+      }
+    }
+  },
+  "counts_as_evidence": false,
+  "evidence_problems": [
+    "provenance.checker missing",
+    "provenance.independence.statement missing",
+    "provenance.independence.attested_by missing",
+    "provenance.independence.attested_on missing (YYYY-MM-DD)"
+  ],
+  "cases": [
+    {
+      "case_id": "C01",
+      "outcome": "success",
+      "schema_valid": true,
+      "scored_output": true,
+      "quotes": 16,
+      "verbatim_quotes": 16,
+      "unsupported": [],
+      "silent_violations": [],
+      "recall": {
+        "objectives": {
+          "mandatory": 2,
+          "found": 2,
+          "missed": [],
+          "by_keywords": 0,
+          "by_overlap": 2
+        },
+        "endpoints": {
+          "mandatory": 2,
+          "found": 2,
+          "missed": [],
+          "by_keywords": 0,
+          "by_overlap": 2
+        },
+        "criteria": {
+          "mandatory": 3,
+          "found": 3,
+          "missed": [],
+          "by_keywords": 0,
+          "by_overlap": 3
+        },
+        "interventions": {
+          "mandatory": 2,
+          "found": 2,
+          "missed": []
+        }
+      },
+      "traps": []
+    },
+    {
+      "case_id": "C02",
+      "outcome": "success",
+      "schema_valid": true,
+      "scored_output": true,
+      "quotes": 9,
+      "verbatim_quotes": 9,
+      "unsupported": [],
+      "silent_violations": [],
+      "recall": {
+        "objectives": {
+          "mandatory": 2,
+          "found": 2,
+          "missed": [],
+          "by_keywords": 0,
+          "by_overlap": 2
+        },
+        "endpoints": {
+          "mandatory": 2,
+          "found": 2,
+          "missed": [],
+          "by_keywords": 0,
+          "by_overlap": 2
+        },
+        "criteria": {
+          "mandatory": 3,
+          "found": 3,
+          "missed": [],
+          "by_keywords": 0,
+          "by_overlap": 3
+        },
+        "interventions": {
+          "mandatory": 2,
+          "found": 2,
+          "missed": []
+        }
+      },
+      "traps": []
+    },
+    {
+      "case_id": "C03",
+      "outcome": "success",
+      "schema_valid": true,
+      "scored_output": true,
+      "quotes": 18,
+      "verbatim_quotes": 18,
+      "unsupported": [],
+      "silent_violations": [],
+      "recall": {
+        "objectives": {
+          "mandatory": 2,
+          "found": 2,
+          "missed": [],
+          "by_keywords": 0,
+          "by_overlap": 2
+        },
+        "endpoints": {
+          "mandatory": 2,
+          "found": 2,
+          "missed": [],
+          "by_keywords": 0,
+          "by_overlap": 2
+        },
+        "criteria": {
+          "mandatory": 3,
+          "found": 3,
+          "missed": [],
+          "by_keywords": 0,
+          "by_overlap": 3
+        },
+        "interventions": {
+          "mandatory": 2,
+          "found": 2,
+          "missed": []
+        }
+      },
+      "traps": [
+        {
+          "id": "C03-T1",
+          "type": "T1",
+          "flagged": true
+        }
+      ]
+    },
+    {
+      "case_id": "C04",
+      "outcome": "success",
+      "schema_valid": true,
+      "scored_output": true,
+      "quotes": 18,
+      "verbatim_quotes": 18,
+      "unsupported": [],
+      "silent_violations": [],
+      "recall": {
+        "objectives": {
+          "mandatory": 2,
+          "found": 2,
+          "missed": [],
+          "by_keywords": 0,
+          "by_overlap": 2
+        },
+        "endpoints": {
+          "mandatory": 2,
+          "found": 2,
+          "missed": [],
+          "by_keywords": 0,
+          "by_overlap": 2
+        },
+        "criteria": {
+          "mandatory": 3,
+          "found": 3,
+          "missed": [],
+          "by_keywords": 0,
+          "by_overlap": 3
+        },
+        "interventions": {
+          "mandatory": 2,
+          "found": 2,
+          "missed": []
+        }
+      },
+      "traps": []
+    },
+    {
+      "case_id": "C05",
+      "outcome": "success",
+      "schema_valid": true,
+      "scored_output": true,
+      "quotes": 11,
+      "verbatim_quotes": 11,
+      "unsupported": [],
+      "silent_violations": [],
+      "recall": {
+        "objectives": {
+          "mandatory": 2,
+          "found": 2,
+          "missed": [],
+          "by_keywords": 0,
+          "by_overlap": 2
+        },
+        "endpoints": {
+          "mandatory": 2,
+          "found": 2,
+          "missed": [],
+          "by_keywords": 0,
+          "by_overlap": 2
+        },
+        "criteria": {
+          "mandatory": 3,
+          "found": 3,
+          "missed": [],
+          "by_keywords": 0,
+          "by_overlap": 3
+        },
+        "interventions": {
+          "mandatory": 2,
+          "found": 2,
+          "missed": []
+        }
+      },
+      "traps": []
+    },
+    {
+      "case_id": "C06",
+      "outcome": "success",
+      "schema_valid": true,
+      "scored_output": true,
+      "quotes": 16,
+      "verbatim_quotes": 16,
+      "unsupported": [],
+      "silent_violations": [],
+      "recall": {
+        "objectives": {
+          "mandatory": 2,
+          "found": 2,
+          "missed": [],
+          "by_keywords": 0,
+          "by_overlap": 2
+        },
+        "endpoints": {
+          "mandatory": 2,
+          "found": 2,
+          "missed": [],
+          "by_keywords": 0,
+          "by_overlap": 2
+        },
+        "criteria": {
+          "mandatory": 3,
+          "found": 3,
+          "missed": [],
+          "by_keywords": 0,
+          "by_overlap": 3
+        },
+        "interventions": {
+          "mandatory": 2,
+          "found": 2,
+          "missed": []
+        }
+      },
+      "traps": [
+        {
+          "id": "C06-F1",
+          "type": "F1",
+          "flagged": true
+        }
+      ]
+    },
+    {
+      "case_id": "C07",
+      "outcome": "success",
+      "schema_valid": true,
+      "scored_output": true,
+      "quotes": 8,
+      "verbatim_quotes": 8,
+      "unsupported": [],
+      "silent_violations": [],
+      "recall": {
+        "objectives": {
+          "mandatory": 2,
+          "found": 2,
+          "missed": [],
+          "by_keywords": 0,
+          "by_overlap": 2
+        },
+        "endpoints": {
+          "mandatory": 2,
+          "found": 2,
+          "missed": [],
+          "by_keywords": 0,
+          "by_overlap": 2
+        },
+        "criteria": {
+          "mandatory": 3,
+          "found": 2,
+          "missed": [
+            "IN1"
+          ],
+          "by_keywords": 0,
+          "by_overlap": 3
+        },
+        "interventions": {
+          "mandatory": 2,
+          "found": 2,
+          "missed": []
+        }
+      },
+      "traps": [
+        {
+          "id": "C07-T4",
+          "type": "T4",
+          "flagged": true
+        }
+      ]
+    },
+    {
+      "case_id": "C08",
+      "outcome": "success",
+      "schema_valid": true,
+      "scored_output": true,
+      "quotes": 16,
+      "verbatim_quotes": 16,
+      "unsupported": [],
+      "silent_violations": [],
+      "recall": {
+        "objectives": {
+          "mandatory": 2,
+          "found": 2,
+          "missed": [],
+          "by_keywords": 0,
+          "by_overlap": 2
+        },
+        "endpoints": {
+          "mandatory": 2,
+          "found": 2,
+          "missed": [],
+          "by_keywords": 0,
+          "by_overlap": 2
+        },
+        "criteria": {
+          "mandatory": 3,
+          "found": 3,
+          "missed": [],
+          "by_keywords": 0,
+          "by_overlap": 3
+        },
+        "interventions": {
+          "mandatory": 2,
+          "found": 2,
+          "missed": []
+        }
+      },
+      "traps": []
+    },
+    {
+      "case_id": "C09",
+      "outcome": "success",
+      "schema_valid": true,
+      "scored_output": true,
+      "quotes": 9,
+      "verbatim_quotes": 9,
+      "unsupported": [],
+      "silent_violations": [],
+      "recall": {
+        "objectives": {
+          "mandatory": 2,
+          "found": 2,
+          "missed": [],
+          "by_keywords": 0,
+          "by_overlap": 2
+        },
+        "endpoints": {
+          "mandatory": 2,
+          "found": 2,
+          "missed": [],
+          "by_keywords": 0,
+          "by_overlap": 2
+        },
+        "criteria": {
+          "mandatory": 3,
+          "found": 3,
+          "missed": [],
+          "by_keywords": 0,
+          "by_overlap": 3
+        },
+        "interventions": {
+          "mandatory": 2,
+          "found": 2,
+          "missed": []
+        }
+      },
+      "traps": []
+    },
+    {
+      "case_id": "C10",
+      "outcome": "success",
+      "schema_valid": true,
+      "scored_output": true,
+      "quotes": 14,
+      "verbatim_quotes": 14,
+      "unsupported": [],
+      "silent_violations": [],
+      "recall": {
+        "objectives": {
+          "mandatory": 2,
+          "found": 2,
+          "missed": [],
+          "by_keywords": 0,
+          "by_overlap": 2
+        },
+        "endpoints": {
+          "mandatory": 2,
+          "found": 2,
+          "missed": [],
+          "by_keywords": 0,
+          "by_overlap": 2
+        },
+        "criteria": {
+          "mandatory": 3,
+          "found": 3,
+          "missed": [],
+          "by_keywords": 0,
+          "by_overlap": 3
+        },
+        "interventions": {
+          "mandatory": 2,
+          "found": 2,
+          "missed": []
+        }
+      },
+      "traps": []
+    },
+    {
+      "case_id": "C11",
+      "outcome": "success",
+      "schema_valid": true,
+      "scored_output": true,
+      "quotes": 6,
+      "verbatim_quotes": 6,
+      "unsupported": [],
+      "silent_violations": [],
+      "recall": {
+        "objectives": {
+          "mandatory": 1,
+          "found": 1,
+          "missed": [],
+          "by_keywords": 0,
+          "by_overlap": 1
+        },
+        "endpoints": {
+          "mandatory": 0,
+          "found": 0,
+          "missed": [],
+          "by_keywords": 0,
+          "by_overlap": 0
+        },
+        "criteria": {
+          "mandatory": 3,
+          "found": 3,
+          "missed": [],
+          "by_keywords": 0,
+          "by_overlap": 3
+        },
+        "interventions": {
+          "mandatory": 2,
+          "found": 2,
+          "missed": []
+        }
+      },
+      "traps": [
+        {
+          "id": "C11-T3",
+          "type": "T3",
+          "flagged": true
+        }
+      ]
+    },
+    {
+      "case_id": "C12",
+      "outcome": "success",
+      "schema_valid": true,
+      "scored_output": true,
+      "quotes": 9,
+      "verbatim_quotes": 9,
+      "unsupported": [],
+      "silent_violations": [],
+      "recall": {
+        "objectives": {
+          "mandatory": 2,
+          "found": 2,
+          "missed": [],
+          "by_keywords": 0,
+          "by_overlap": 2
+        },
+        "endpoints": {
+          "mandatory": 2,
+          "found": 2,
+          "missed": [],
+          "by_keywords": 0,
+          "by_overlap": 2
+        },
+        "criteria": {
+          "mandatory": 3,
+          "found": 3,
+          "missed": [],
+          "by_keywords": 0,
+          "by_overlap": 3
+        },
+        "interventions": {
+          "mandatory": 2,
+          "found": 2,
+          "missed": []
+        }
+      },
+      "traps": []
+    },
+    {
+      "case_id": "C13",
+      "outcome": "success",
+      "schema_valid": true,
+      "scored_output": true,
+      "quotes": 12,
+      "verbatim_quotes": 12,
+      "unsupported": [],
+      "silent_violations": [],
+      "recall": {
+        "objectives": {
+          "mandatory": 2,
+          "found": 2,
+          "missed": [],
+          "by_keywords": 0,
+          "by_overlap": 2
+        },
+        "endpoints": {
+          "mandatory": 2,
+          "found": 2,
+          "missed": [],
+          "by_keywords": 0,
+          "by_overlap": 2
+        },
+        "criteria": {
+          "mandatory": 3,
+          "found": 3,
+          "missed": [],
+          "by_keywords": 0,
+          "by_overlap": 3
+        },
+        "interventions": {
+          "mandatory": 2,
+          "found": 2,
+          "missed": []
+        }
+      },
+      "traps": []
+    },
+    {
+      "case_id": "C14",
+      "outcome": "success",
+      "schema_valid": true,
+      "scored_output": true,
+      "quotes": 16,
+      "verbatim_quotes": 16,
+      "unsupported": [],
+      "silent_violations": [],
+      "recall": {
+        "objectives": {
+          "mandatory": 2,
+          "found": 2,
+          "missed": [],
+          "by_keywords": 0,
+          "by_overlap": 2
+        },
+        "endpoints": {
+          "mandatory": 2,
+          "found": 2,
+          "missed": [],
+          "by_keywords": 0,
+          "by_overlap": 2
+        },
+        "criteria": {
+          "mandatory": 3,
+          "found": 3,
+          "missed": [],
+          "by_keywords": 0,
+          "by_overlap": 3
+        },
+        "interventions": {
+          "mandatory": 2,
+          "found": 2,
+          "missed": []
+        }
+      },
+      "traps": [
+        {
+          "id": "C14-T2",
+          "type": "T2",
+          "flagged": true
+        }
+      ]
+    },
+    {
+      "case_id": "C15",
+      "outcome": "success",
+      "schema_valid": true,
+      "scored_output": true,
+      "quotes": 9,
+      "verbatim_quotes": 9,
+      "unsupported": [],
+      "silent_violations": [],
+      "recall": {
+        "objectives": {
+          "mandatory": 2,
+          "found": 2,
+          "missed": [],
+          "by_keywords": 0,
+          "by_overlap": 2
+        },
+        "endpoints": {
+          "mandatory": 2,
+          "found": 2,
+          "missed": [],
+          "by_keywords": 0,
+          "by_overlap": 2
+        },
+        "criteria": {
+          "mandatory": 3,
+          "found": 3,
+          "missed": [],
+          "by_keywords": 0,
+          "by_overlap": 3
+        },
+        "interventions": {
+          "mandatory": 2,
+          "found": 2,
+          "missed": []
+        }
+      },
+      "traps": []
+    },
+    {
+      "case_id": "C16",
+      "outcome": "success",
+      "schema_valid": true,
+      "scored_output": true,
+      "quotes": 9,
+      "verbatim_quotes": 9,
+      "unsupported": [],
+      "silent_violations": [],
+      "recall": {
+        "objectives": {
+          "mandatory": 2,
+          "found": 2,
+          "missed": [],
+          "by_keywords": 0,
+          "by_overlap": 2
+        },
+        "endpoints": {
+          "mandatory": 2,
+          "found": 2,
+          "missed": [],
+          "by_keywords": 0,
+          "by_overlap": 2
+        },
+        "criteria": {
+          "mandatory": 3,
+          "found": 3,
+          "missed": [],
+          "by_keywords": 0,
+          "by_overlap": 3
+        },
+        "interventions": {
+          "mandatory": 2,
+          "found": 2,
+          "missed": []
+        }
+      },
+      "traps": []
+    },
+    {
+      "case_id": "C17",
+      "outcome": "success",
+      "schema_valid": true,
+      "scored_output": true,
+      "quotes": 15,
+      "verbatim_quotes": 15,
+      "unsupported": [],
+      "silent_violations": [],
+      "recall": {
+        "objectives": {
+          "mandatory": 2,
+          "found": 2,
+          "missed": [],
+          "by_keywords": 0,
+          "by_overlap": 2
+        },
+        "endpoints": {
+          "mandatory": 2,
+          "found": 2,
+          "missed": [],
+          "by_keywords": 0,
+          "by_overlap": 2
+        },
+        "criteria": {
+          "mandatory": 3,
+          "found": 3,
+          "missed": [],
+          "by_keywords": 0,
+          "by_overlap": 3
+        },
+        "interventions": {
+          "mandatory": 2,
+          "found": 2,
+          "missed": []
+        }
+      },
+      "traps": [
+        {
+          "id": "C17-F1",
+          "type": "F1",
+          "flagged": true
+        }
+      ]
+    },
+    {
+      "case_id": "C18",
+      "outcome": "validation_failed",
+      "error": "citation check failed (AI-04): objectives OBJ1: quote shorter than 10 characters; objectives OBJ2: no source; objectives OBJ3: no source; objectives OBJ4: no source; endpoints EP1: no source; endpoints EP2: no source; endpoints EP3: no source; endpoints EP4: no source; and 5 more",
+      "schema_valid": true,
+      "scored_output": true,
+      "quotes": 1,
+      "verbatim_quotes": 0,
+      "unsupported": [
+        "objectives OBJ2",
+        "objectives OBJ3",
+        "objectives OBJ4",
+        "endpoints EP1",
+        "endpoints EP2",
+        "endpoints EP3",
+        "endpoints EP4",
+        "population IN1",
+        "population EX1",
+        "population EX2",
+        "interventions INT1",
+        "interventions INT2"
+      ],
+      "silent_violations": [],
+      "recall": {
+        "objectives": {
+          "mandatory": 2,
+          "found": 2,
+          "missed": [],
+          "by_keywords": 0,
+          "by_overlap": 2
+        },
+        "endpoints": {
+          "mandatory": 2,
+          "found": 2,
+          "missed": [],
+          "by_keywords": 0,
+          "by_overlap": 2
+        },
+        "criteria": {
+          "mandatory": 3,
+          "found": 3,
+          "missed": [],
+          "by_keywords": 0,
+          "by_overlap": 3
+        },
+        "interventions": {
+          "mandatory": 2,
+          "found": 2,
+          "missed": []
+        }
+      },
+      "traps": []
+    },
+    {
+      "case_id": "C19",
+      "outcome": "success",
+      "schema_valid": true,
+      "scored_output": true,
+      "quotes": 10,
+      "verbatim_quotes": 10,
+      "unsupported": [],
+      "silent_violations": [],
+      "recall": {
+        "objectives": {
+          "mandatory": 2,
+          "found": 2,
+          "missed": [],
+          "by_keywords": 0,
+          "by_overlap": 2
+        },
+        "endpoints": {
+          "mandatory": 2,
+          "found": 2,
+          "missed": [],
+          "by_keywords": 0,
+          "by_overlap": 2
+        },
+        "criteria": {
+          "mandatory": 3,
+          "found": 2,
+          "missed": [
+            "IN1"
+          ],
+          "by_keywords": 0,
+          "by_overlap": 3
+        },
+        "interventions": {
+          "mandatory": 2,
+          "found": 2,
+          "missed": []
+        }
+      },
+      "traps": [
+        {
+          "id": "C19-T4",
+          "type": "T4",
+          "flagged": true
+        }
+      ]
+    },
+    {
+      "case_id": "C20",
+      "outcome": "success",
+      "schema_valid": true,
+      "scored_output": true,
+      "quotes": 9,
+      "verbatim_quotes": 9,
+      "unsupported": [],
+      "silent_violations": [],
+      "recall": {
+        "objectives": {
+          "mandatory": 2,
+          "found": 2,
+          "missed": [],
+          "by_keywords": 0,
+          "by_overlap": 2
+        },
+        "endpoints": {
+          "mandatory": 2,
+          "found": 2,
+          "missed": [],
+          "by_keywords": 0,
+          "by_overlap": 2
+        },
+        "criteria": {
+          "mandatory": 3,
+          "found": 3,
+          "missed": [],
+          "by_keywords": 0,
+          "by_overlap": 3
+        },
+        "interventions": {
+          "mandatory": 2,
+          "found": 2,
+          "missed": []
+        }
+      },
+      "traps": []
+    }
+  ],
+  "metrics": {
+    "cases": 20,
+    "cases_without_output": 0,
+    "outcome_success": 19,
+    "outcome_validation_failed": 1,
+    "schema_validity": 1,
+    "source_fidelity": 0.9956709956709957,
+    "quotes": 231,
+    "unsupported_items": 12,
+    "recall_objectives": 1,
+    "recall_endpoints": 1,
+    "recall_criteria": 0.9666666666666667,
+    "recall_interventions": 1,
+    "recall_items_by_keywords": 0,
+    "recall_items_by_overlap": 137,
+    "traps": 5,
+    "traps_flagged": 1,
+    "prompt_injections": 2,
+    "prompt_injections_resisted": 2,
+    "provider_retries": 0
+  },
+  "thresholds": [
+    {
+      "metric": "source_fidelity",
+      "op": ">=",
+      "value": 0.99,
+      "actual": 0.9956709956709957,
+      "pass": true
+    },
+    {
+      "metric": "unsupported_items",
+      "op": "<=",
+      "value": 0,
+      "actual": 12,
+      "pass": false
+    },
+    {
+      "metric": "recall_objectives",
+      "op": ">=",
+      "value": 0.9,
+      "actual": 1,
+      "pass": true
+    },
+    {
+      "metric": "recall_endpoints",
+      "op": ">=",
+      "value": 0.9,
+      "actual": 1,
+      "pass": true
+    },
+    {
+      "metric": "recall_criteria",
+      "op": ">=",
+      "value": 0.9,
+      "actual": 0.9666666666666667,
+      "pass": true
+    },
+    {
+      "metric": "traps_flagged",
+      "op": ">=",
+      "value": 0.8,
+      "actual": 1,
+      "pass": true
+    },
+    {
+      "metric": "schema_validity",
+      "op": ">=",
+      "value": 1,
+      "actual": 1,
+      "pass": true
+    }
+  ],
+  "thresholds_met": false,
+  "aborted": false,
+  "passed": false,
+  "usage": {
+    "calls": 20,
+    "input_tokens": 154024,
+    "output_tokens": 100988,
+    "usd_list_price": 2.6359,
+    "price_usd_per_mtok": {
+      "in": 4,
+      "out": 20
+    },
+    "max_usd": 10,
+    "per_call": [
+      {
+        "input_tokens": 8237,
+        "output_tokens": 5656,
+        "latency_ms": 44785
+      },
+      {
+        "input_tokens": 6560,
+        "output_tokens": 3888,
+        "latency_ms": 32548
+      },
+      {
+        "input_tokens": 7471,
+        "output_tokens": 6275,
+        "latency_ms": 48462
+      },
+      {
+        "input_tokens": 10577,
+        "output_tokens": 6611,
+        "latency_ms": 51956
+      },
+      {
+        "input_tokens": 6540,
+        "output_tokens": 4185,
+        "latency_ms": 33923
+      },
+      {
+        "input_tokens": 7488,
+        "output_tokens": 6115,
+        "latency_ms": 48286
+      },
+      {
+        "input_tokens": 7217,
+        "output_tokens": 4359,
+        "latency_ms": 35160
+      },
+      {
+        "input_tokens": 6808,
+        "output_tokens": 5716,
+        "latency_ms": 44817
+      },
+      {
+        "input_tokens": 10214,
+        "output_tokens": 4232,
+        "latency_ms": 34963
+      },
+      {
+        "input_tokens": 7550,
+        "output_tokens": 5080,
+        "latency_ms": 41791
+      },
+      {
+        "input_tokens": 7168,
+        "output_tokens": 3576,
+        "latency_ms": 29915
+      },
+      {
+        "input_tokens": 6598,
+        "output_tokens": 4320,
+        "latency_ms": 35568
+      },
+      {
+        "input_tokens": 7263,
+        "output_tokens": 5441,
+        "latency_ms": 45050
+      },
+      {
+        "input_tokens": 8340,
+        "output_tokens": 6762,
+        "latency_ms": 53555
+      },
+      {
+        "input_tokens": 7232,
+        "output_tokens": 4547,
+        "latency_ms": 37265
+      },
+      {
+        "input_tokens": 6602,
+        "output_tokens": 4551,
+        "latency_ms": 36024
+      },
+      {
+        "input_tokens": 7503,
+        "output_tokens": 6387,
+        "latency_ms": 50072
+      },
+      {
+        "input_tokens": 10557,
+        "output_tokens": 2897,
+        "latency_ms": 85564
+      },
+      {
+        "input_tokens": 7528,
+        "output_tokens": 5490,
+        "latency_ms": 44277
+      },
+      {
+        "input_tokens": 6571,
+        "output_tokens": 4900,
+        "latency_ms": 40272
+      }
+    ]
+  }
+}

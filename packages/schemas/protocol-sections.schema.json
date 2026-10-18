@@ -53,7 +53,7 @@
     "interventions": {
       "type": "array", "x-ich-m11": "6 Trial Intervention and Concomitant Therapy",
       "items": { "type": "object", "additionalProperties": false, "required": ["name", "type"],
-        "properties": { "name": { "type": "string", "minLength": 1 }, "type": { "enum": ["drug", "biologic", "placebo", "device", "other"] },
+        "properties": { "id": { "$ref": "#/$defs/id" }, "name": { "type": "string", "minLength": 1 }, "type": { "enum": ["drug", "biologic", "placebo", "device", "other"] },
           "dose": { "type": "string" }, "route": { "type": "string" }, "frequency": { "type": "string" } } }
     },
     "schedule": {

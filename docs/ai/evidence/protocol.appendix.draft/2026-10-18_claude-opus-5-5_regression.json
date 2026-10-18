@@ -1,0 +1,17 @@
+{
+  "task_type": "protocol.appendix.draft",
+  "model": "claude-opus-5-5",
+  "previous_model": "claude-opus-5-5",
+  "provider": "anthropic",
+  "mode": "live",
+  "run_at": "2026-10-18T21:47:19.387Z",
+  "dataset_sha256": "4431a81049fdefc4f5fce865bd2064cfa3383a72c3d5a047aa980d13b90d990c",
+  "cases": [
+    {
+      "case": "001_arm-d_small-molecule.json",
+      "outcome": "success"
+    }
+  ],
+  "schema_valid_rate": 1,
+  "passed": true
+}

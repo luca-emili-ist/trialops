@@ -50,11 +50,12 @@ test('[AI-02] changing the prompt text or the schema without a new prompt_versio
 
 test('[AI-02][AI-03] a new prompt version needs change control: change request, approver and passing live regression', () => {
   const def = REGISTRY['protocol.appendix.draft']!;
-  const v2: TaskTypeDef = { ...def, prompt_version: 2, render: i => ({ ...def.render(i), system: def.render(i).system + ' v2' }) };
-  assert.match(promptLockProblems({ x: v2 }, lock, exists, readEv).join('\n'), /last locked version is 1/);
   const base = lock.prompts['protocol-author']!;
+  const last = base.versions.at(-1)!.version;
+  const v2: TaskTypeDef = { ...def, prompt_version: last + 1, render: i => ({ ...def.render(i), system: def.render(i).system + ' next' }) };
+  assert.match(promptLockProblems({ x: v2 }, lock, exists, readEv).join('\n'), new RegExp(`last locked version is ${last}`));
   const fp = promptFingerprint(v2);
-  const entry = { ...base.versions[0]!, version: 2, ...fp, change_request: null, approved_by: null, regression_evidence: null };
+  const entry = { ...base.versions[0]!, version: last + 1, ...fp, change_request: null, approved_by: null, regression_evidence: null };
   const l2: PromptLock = { prompts: { 'protocol-author': { ...base, versions: [...base.versions, entry] } } };
   const p = promptLockProblems({ x: v2 }, l2, exists, readEv).join('\n');
   assert.match(p, /needs a change request/);

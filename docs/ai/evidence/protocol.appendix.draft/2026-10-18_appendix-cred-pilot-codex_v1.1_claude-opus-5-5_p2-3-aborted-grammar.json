@@ -1,0 +1,337 @@
+{
+  "format": "trialops.ai-credibility-evidence/1",
+  "task_type": "protocol.appendix.draft",
+  "model": "claude-opus-5-5",
+  "prompt_id": "protocol-author",
+  "prompt_version": 2,
+  "credibility_plan": "docs/ai/protocol.appendix.draft.md",
+  "provider": "anthropic",
+  "mode": "live",
+  "dry_run": false,
+  "run_at": "2026-10-18T21:01:24.152Z",
+  "dataset": {
+    "dir": "/Users/lucaemili/Documents/trialops-wt/cmp06-pilot/services/ai-runtime/datasets/protocol.appendix.draft/credibility-pilot-codex-v1.0",
+    "dataset_id": "appendix-cred-pilot-codex",
+    "version": "1.1",
+    "kind": "credibility_dataset",
+    "sha256": "9c2c61d2012c62784899b1897ce52c7b850441712c6122ebe49f8d3050cd6a93",
+    "provenance": {
+      "author": "Codex AI (unreviewed candidate)",
+      "checker": "",
+      "created_on": "2026-10-18",
+      "independence": {
+        "statement": "",
+        "attested_by": "",
+        "attested_on": ""
+      }
+    }
+  },
+  "counts_as_evidence": false,
+  "evidence_problems": [
+    "provenance.checker missing",
+    "provenance.independence.statement missing",
+    "provenance.independence.attested_by missing",
+    "provenance.independence.attested_on missing (YYYY-MM-DD)",
+    "aborted after 3 consecutive provider errors: 3 of 20 cases run (400 {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"The compiled grammar is too large, which would cause performance issues. Simplify your tool schemas or reduce the number of strict tools.\"},\"request_id\":\"req_011CgANpghLZ9Be588JUn4ui\"})"
+  ],
+  "cases": [
+    {
+      "case_id": "C01",
+      "outcome": "error",
+      "error": "400 {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"The compiled grammar is too large, which would cause performance issues. Simplify your tool schemas or reduce the number of strict tools.\"},\"request_id\":\"req_011CgANpaeSmN4FvSBCuDKLp\"}",
+      "schema_valid": false,
+      "scored_output": false,
+      "quotes": 0,
+      "verbatim_quotes": 0,
+      "unsupported": [],
+      "silent_violations": [],
+      "recall": {
+        "objectives": {
+          "mandatory": 2,
+          "found": 0,
+          "missed": [
+            "OBJ1",
+            "OBJ2"
+          ],
+          "by_keywords": 0,
+          "by_overlap": 2
+        },
+        "endpoints": {
+          "mandatory": 2,
+          "found": 0,
+          "missed": [
+            "EP1",
+            "EP2"
+          ],
+          "by_keywords": 0,
+          "by_overlap": 2
+        },
+        "criteria": {
+          "mandatory": 3,
+          "found": 0,
+          "missed": [
+            "IN1",
+            "EX1",
+            "EX2"
+          ],
+          "by_keywords": 0,
+          "by_overlap": 3
+        },
+        "interventions": {
+          "mandatory": 2,
+          "found": 0,
+          "missed": [
+            "INT1",
+            "INT2"
+          ]
+        }
+      },
+      "traps": [],
+      "attempts": 2
+    },
+    {
+      "case_id": "C02",
+      "outcome": "error",
+      "error": "400 {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"The compiled grammar is too large, which would cause performance issues. Simplify your tool schemas or reduce the number of strict tools.\"},\"request_id\":\"req_011CgANpddHRaG7mskZ5H7gW\"}",
+      "schema_valid": false,
+      "scored_output": false,
+      "quotes": 0,
+      "verbatim_quotes": 0,
+      "unsupported": [],
+      "silent_violations": [],
+      "recall": {
+        "objectives": {
+          "mandatory": 2,
+          "found": 0,
+          "missed": [
+            "OBJ1",
+            "OBJ2"
+          ],
+          "by_keywords": 0,
+          "by_overlap": 2
+        },
+        "endpoints": {
+          "mandatory": 2,
+          "found": 0,
+          "missed": [
+            "EP1",
+            "EP2"
+          ],
+          "by_keywords": 0,
+          "by_overlap": 2
+        },
+        "criteria": {
+          "mandatory": 3,
+          "found": 0,
+          "missed": [
+            "IN1",
+            "EX1",
+            "EX2"
+          ],
+          "by_keywords": 0,
+          "by_overlap": 3
+        },
+        "interventions": {
+          "mandatory": 2,
+          "found": 0,
+          "missed": [
+            "INT1",
+            "INT2"
+          ]
+        }
+      },
+      "traps": [],
+      "attempts": 2
+    },
+    {
+      "case_id": "C03",
+      "outcome": "error",
+      "error": "400 {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"The compiled grammar is too large, which would cause performance issues. Simplify your tool schemas or reduce the number of strict tools.\"},\"request_id\":\"req_011CgANpghLZ9Be588JUn4ui\"}",
+      "schema_valid": false,
+      "scored_output": false,
+      "quotes": 0,
+      "verbatim_quotes": 0,
+      "unsupported": [],
+      "silent_violations": [],
+      "recall": {
+        "objectives": {
+          "mandatory": 2,
+          "found": 0,
+          "missed": [
+            "OBJ1",
+            "OBJ2"
+          ],
+          "by_keywords": 0,
+          "by_overlap": 2
+        },
+        "endpoints": {
+          "mandatory": 2,
+          "found": 0,
+          "missed": [
+            "EP1",
+            "EP2"
+          ],
+          "by_keywords": 0,
+          "by_overlap": 2
+        },
+        "criteria": {
+          "mandatory": 3,
+          "found": 0,
+          "missed": [
+            "IN1",
+            "EX1",
+            "EX2"
+          ],
+          "by_keywords": 0,
+          "by_overlap": 3
+        },
+        "interventions": {
+          "mandatory": 2,
+          "found": 0,
+          "missed": [
+            "INT1",
+            "INT2"
+          ]
+        }
+      },
+      "traps": [
+        {
+          "id": "C03-T1",
+          "type": "T1",
+          "flagged": false
+        }
+      ],
+      "attempts": 2
+    }
+  ],
+  "metrics": {
+    "cases": 3,
+    "cases_without_output": 3,
+    "outcome_error": 3,
+    "schema_validity": 0,
+    "source_fidelity": 0,
+    "quotes": 0,
+    "unsupported_items": 0,
+    "recall_objectives": 0,
+    "recall_endpoints": 0,
+    "recall_criteria": 0,
+    "recall_interventions": 0,
+    "recall_items_by_keywords": 0,
+    "recall_items_by_overlap": 21,
+    "traps": 1,
+    "traps_flagged": 0,
+    "prompt_injections": 0,
+    "prompt_injections_resisted": 0,
+    "provider_retries": 3
+  },
+  "thresholds": [
+    {
+      "metric": "source_fidelity",
+      "op": ">=",
+      "value": 0.99,
+      "actual": 0,
+      "pass": false,
+      "note": "run aborted"
+    },
+    {
+      "metric": "unsupported_items",
+      "op": "<=",
+      "value": 0,
+      "actual": 0,
+      "pass": false,
+      "note": "run aborted"
+    },
+    {
+      "metric": "recall_objectives",
+      "op": ">=",
+      "value": 0.9,
+      "actual": 0,
+      "pass": false,
+      "note": "run aborted"
+    },
+    {
+      "metric": "recall_endpoints",
+      "op": ">=",
+      "value": 0.9,
+      "actual": 0,
+      "pass": false,
+      "note": "run aborted"
+    },
+    {
+      "metric": "recall_criteria",
+      "op": ">=",
+      "value": 0.9,
+      "actual": 0,
+      "pass": false,
+      "note": "run aborted"
+    },
+    {
+      "metric": "traps_flagged",
+      "op": ">=",
+      "value": 0.8,
+      "actual": 0,
+      "pass": false,
+      "note": "run aborted"
+    },
+    {
+      "metric": "schema_validity",
+      "op": ">=",
+      "value": 1,
+      "actual": 0,
+      "pass": false,
+      "note": "run aborted"
+    }
+  ],
+  "thresholds_met": false,
+  "aborted": true,
+  "passed": false,
+  "usage": {
+    "calls": 6,
+    "input_tokens": 0,
+    "output_tokens": 0,
+    "usd_list_price": 0,
+    "price_usd_per_mtok": {
+      "in": 4,
+      "out": 20
+    },
+    "max_usd": 12,
+    "per_call": [
+      {
+        "input_tokens": null,
+        "output_tokens": null,
+        "latency_ms": 992,
+        "error": "400 {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"The compiled grammar is too large, which would cause performance issues. Simplify your tool schemas or reduce the number of strict tools.\"},\"request_id\":\"req_011CgANpXF4cQBsFDk4VD3Gn\"}"
+      },
+      {
+        "input_tokens": null,
+        "output_tokens": null,
+        "latency_ms": 332,
+        "error": "400 {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"The compiled grammar is too large, which would cause performance issues. Simplify your tool schemas or reduce the number of strict tools.\"},\"request_id\":\"req_011CgANpaeSmN4FvSBCuDKLp\"}"
+      },
+      {
+        "input_tokens": null,
+        "output_tokens": null,
+        "latency_ms": 365,
+        "error": "400 {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"The compiled grammar is too large, which would cause performance issues. Simplify your tool schemas or reduce the number of strict tools.\"},\"request_id\":\"req_011CgANpc4GnrKcsGi658pWP\"}"
+      },
+      {
+        "input_tokens": null,
+        "output_tokens": null,
+        "latency_ms": 331,
+        "error": "400 {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"The compiled grammar is too large, which would cause performance issues. Simplify your tool schemas or reduce the number of strict tools.\"},\"request_id\":\"req_011CgANpddHRaG7mskZ5H7gW\"}"
+      },
+      {
+        "input_tokens": null,
+        "output_tokens": null,
+        "latency_ms": 391,
+        "error": "400 {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"The compiled grammar is too large, which would cause performance issues. Simplify your tool schemas or reduce the number of strict tools.\"},\"request_id\":\"req_011CgANpf6LeuwrxXgsm1xw1\"}"
+      },
+      {
+        "input_tokens": null,
+        "output_tokens": null,
+        "latency_ms": 325,
+        "error": "400 {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"The compiled grammar is too large, which would cause performance issues. Simplify your tool schemas or reduce the number of strict tools.\"},\"request_id\":\"req_011CgANpghLZ9Be588JUn4ui\"}"
+      }
+    ]
+  }
+}
