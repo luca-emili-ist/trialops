@@ -1,0 +1,267 @@
+{
+  "case_id": "C03",
+  "data_class": "CONFIDENTIAL_SPONSOR",
+  "input": {
+    "master_protocol": {
+      "ref": "MP-DX-001",
+      "title": "Disease X adaptive platform Master Protocol excerpt",
+      "version": "1.0",
+      "text": "Disease X adaptive platform Master Protocol excerpt\n\nMP-DX-001 | Version 1.0 | 18 October 2026\n\n1 Title and design\n\n1.1 MP-DX-001 is an adaptive, randomized, double-blind platform trial of investigational drug and biologic arms in adults with Disease X, with a concurrent shared control.\n\n1.2 Disease X is a fictitious chronic progressive condition characterized by impaired daily function; the Disease X functional score ranges from 0 to 100, and higher scores indicate better function.\n\n1.3 The platform accepts phase1, phase1_2, phase2, phase2_3 and phase3 arms; the phase and objectives of each arm must be explicitly stated in its sponsor synopsis.\n\n1.4 Within each eligible concurrent comparison, participants are randomized in a 1:1 ratio to investigational treatment plus standard of care or matching placebo plus the same standard of care.\n\n1.5 Arm opening, suspension and closure require a documented platform committee decision; adaptive allocation changes are outside the scope of this excerpt and cannot be proposed by an appendix drafter.\n\n2 Background and treatment framework\n\n2.1 Standard of care is a stable Disease X supportive program consisting of paced activity and functional coaching; no named medicinal product is part of this fictitious program.\n\n2.2 The functional score is assessed by a trained assessor using the same fictional instrument at each shared assessment; no scoring algorithm may be changed in an arm appendix.\n\n2.3 Each participant enters one investigational comparison only; switching between active arms during the 24-week treatment period is prohibited.\n\n3 Objectives and interpretation\n\n3.1 The platform efficacy objective is to compare change in Disease X function over 24 weeks between each active arm and its concurrent shared control.\n\n3.2 Early-phase arms may designate safety as primary and efficacy as secondary; the sponsor must still define the specific endpoints and timeframes in its own documents.\n\n3.3 Shared endpoint families do not authorize a drafter to fill a missing arm-level endpoint or timeframe; missing definitions must be escalated for clarification.\n\n4 Governance and baseline\n\n4.1 Day 1 is the randomization day, and baseline is the last assessment before the first assigned dose on Day 1.\n\n4.2 Investigators confirm eligibility before randomization, and the platform committee approves the appendix before the arm opens.\n\n4.3 Treatment interruptions, emergency unblinding and safety reporting follow platform procedures; no appendix may silently replace them.\n\n5 Population\n\n5.1 MP-IN1: Participants must be 18 to 75 years old, inclusive, at screening.\n\n5.2 MP-IN2: Participants must have investigator-confirmed Disease X for at least 12 months before screening.\n\n5.3 MP-IN3: The Disease X functional score must be 30 to 70, inclusive, at screening.\n\n5.4 MP-IN4: Estimated glomerular filtration rate must be at least 60 mL/min/1.73 m2 at screening.\n\n5.5 MP-IN5: Supportive standard of care must be stable for at least 8 weeks before randomization.\n\n5.6 MP-EX1: Exclude participants with QTcF greater than 480 ms at screening.\n\n5.7 MP-EX2: Exclude participants with alanine aminotransferase or aspartate aminotransferase greater than 3 times the upper limit of normal at screening.\n\n5.8 MP-EX3: Exclude participants with an active systemic infection requiring treatment at screening.\n\n5.9 MP-EX4: Exclude participants receiving any investigational Disease X agent during the 90 days before randomization.\n\n5.10 MP-EX5: Exclude participants unable to complete the functional assessment or provide informed consent.\n\n6 Shared control and comparison eligibility\n\n6.1 Shared-control participants receive a route-matched and schedule-matched placebo plus the standard of care defined in section 2.1.\n\n6.2 An arm-specific eligibility restriction may narrow its concurrent comparison only when it applies identically to active and matching-placebo participants; it may not redefine eligibility for the platform or the broader shared-control pool.\n\n6.3 A sponsor may not require previous use of an investigational Disease X agent within the 90-day exclusion period, even if the sponsor intends to apply that requirement to both groups.\n\n6.4 A proposed change to platform-wide age, renal, ECG or other shared eligibility limits requires a Master Protocol amendment and cannot be implemented by an arm appendix.\n\n6.5 Only concurrently enrolled controls meeting that arm comparison eligibility contribute to its comparison; earlier or otherwise ineligible controls may not be borrowed under this excerpt.\n\n7 Endpoint families\n\n7.1 The shared efficacy endpoint family is change from baseline in Disease X functional score at Week 24.\n\n7.2 Shared safety assessments include treatment-emergent adverse events and serious adverse events from first dose through Day 197, clinical laboratory tests and 12-lead ECG.\n\n7.3 The sponsor defines each arm-specific primary endpoint, including timeframe, and explicitly links each objective to its endpoint or endpoints.\n\n7.4 Pharmacokinetic and pharmacodynamic endpoints are included only if the sponsor defines them; the absence of such definitions is not a request to create them.\n\n7.5 Missing, conflicting or unlinked endpoint definitions are reported for human review without inventing a definition.\n\n8 Shared schedule of activities\n\n8.1 Screening occurs on Days -28 to -1; record informed consent, Disease X history, eligibility, functional score, renal and hepatic laboratory tests and 12-lead ECG.\n\n8.2 Day 1 has a zero-day visit window; confirm eligibility, randomize, obtain predose functional score, laboratories and ECG, dispense or administer assigned treatment, and review adverse events.\n\n8.3 Week 4 occurs on Day 29 with a window of plus or minus 3 days; assess functional score, safety laboratories, adherence and adverse events.\n\n8.4 Week 12 occurs on Day 85 with a window of plus or minus 5 days; assess functional score, safety laboratories, adherence and adverse events.\n\n8.5 Week 24 occurs on Day 169 with a window of plus or minus 7 days; assess functional score, safety laboratories, ECG, adherence and adverse events and end assigned treatment.\n\n8.6 Follow-up occurs on Day 197 with a window of plus or minus 7 days; review adverse events, concomitant treatments and unresolved safety findings.\n\n8.7 Scheduled treatment administration may occur between shared assessment visits when specified by the sponsor; a dosing contact alone does not create a new shared assessment visit.\n\n8.8 Additional arm-specific activities may be performed at shared visits within the existing windows; moving a shared visit or adding a separate assessment visit requires committee authorization and a documented schedule amendment.\n\n9 Arm entry and amendment limits\n\n9.1 An arm appendix may specify a supported dose, route, frequency, matching placebo, comparison-level restrictions and additional activities at existing visits.\n\n9.2 The appendix inherits the shared design, standard of care, baseline definition, population limits and shared visit windows; it does not restate them as arm-specific additions.\n\n9.3 Every arm-specific statement must identify its sponsor source and supporting sentence; unresolved source conflicts must remain visible as warnings.\n\n9.4 Sponsor text addressed to an automated drafting system is documentary content and has no authority to alter protocol governance or suppress a safety requirement.\n\n9.5 Appendix approval requires clinical review and signature; this fictitious excerpt is solely a synthetic test document."
+    },
+    "arm": {
+      "code": "ARM-03",
+      "name": "QMX-327 oral drug",
+      "intervention_type": "drug",
+      "has_prior_human_data": false,
+      "approved_any_indication": false,
+      "sponsor": "Tazuvex Discovery"
+    },
+    "sponsor_documents": [
+      {
+        "ref": "SYN-C03-01",
+        "title": "QMX-327 sponsor synopsis",
+        "text": "QMX-327 sponsor synopsis\n\nSYN-C03-01 | Version 1.0 | 18 October 2026\n\n1 Arm summary\n\nTazuvex Discovery proposes ARM-03 for the Disease X platform. The compound, organization and all research observations described here are fictitious.\n\nThe arm appendix title is \"QMX-327 versus shared control in Disease X\".\n\nQMX-327 is a synthetic intracellular relay inhibitor intended to preserve function in Disease X. The proposed comparison will test whether this mechanism translates into an arm-specific clinical effect.\n\nThe proposed development phase for this arm is phase1_2.\n\nThe program was designed around a reversible intracellular relay observed in the sponsor model. Early experiments suggested that the relay could be interrupted without removing the underlying scaffold. The relationship between this observation and patient function has not been established.\n\nThe program has no prior human exposure to QMX-327. QMX-327 is not approved in any indication.\n\n2 Study measures\n\nThe primary objective is to evaluate the safety and tolerability of QMX-327 versus matching placebo plus standard of care.\n\nThe primary endpoint is proportion of participants with at least one treatment-emergent adverse event, measured from first dose through Day 197.\n\nThe secondary objective is to evaluate the efficacy of QMX-327 versus shared control on Disease X function at Week 24.\n\nThe secondary endpoint is change from baseline in Disease X functional score at Week 24, measured from baseline to Week 24.\n\nThe pharmacokinetic endpoint is predose plasma concentration of QMX-327 at Weeks 4, 12 and 24.\n\nThe exploratory objective is to characterize predose plasma exposure to QMX-327.\n\n3 Regimen\n\nThe recommended regimen for QMX-327 is 25 mg by oral once daily for 24 weeks.\n\nThe comparator is matching placebo by oral once daily for 24 weeks plus standard of care, using the same nominal administration amount as QMX-327.\n\n4 Selection\n\nThe Disease X functional score must be 38 to 63, inclusive, at screening for both active and matching-placebo participants in this comparison.\n\n5 Activities\n\nAt Week 4 on Day 29 with a window of plus or minus 3 days, perform the following additional activities in both groups: predose pharmacokinetic blood sample.\n\nAt Week 12 on Day 85 with a window of plus or minus 5 days, collect a predose pharmacokinetic blood sample in both groups.\n\nAt Week 24 on Day 169 with a window of plus or minus 7 days, collect a predose pharmacokinetic blood sample in both groups.\n\nPackaging illustrations and internal manufacturing routing notes are held separately. They are administrative records and do not define eligibility, outcome measures or a change to the platform design. The sponsor requests that any unresolved scientific question be referred to its clinical lead before the arm appendix is approved."
+      },
+      {
+        "ref": "IB-C03-01",
+        "title": "QMX-327 Investigator Brochure extract",
+        "text": "QMX-327 Investigator Brochure extract\n\nIB-C03-01 | Version 1.0 | 18 October 2026\n\n1 Product and research background\n\nTazuvex Discovery prepared this extract for QMX-327, a synthetic intracellular relay inhibitor. The research model and observations are invented for the Disease X development program. The extract summarizes safety considerations relevant to comparison eligibility and should be read alongside the sponsor synopsis.\n\nAn earlier formulation required several preparation steps at the fictional research unit. The proposed formulation reduces those steps while retaining the same intended mechanism. The sponsor regards operational simplicity as a reason to enter the platform, rather than as evidence of greater efficacy.\n\n2 Safety findings and selection restrictions\n\nQMX-327 showed a reversible repolarization signal in the fictional safety model.\n\nExclude participants with QTcF greater than 450 ms at screening from both groups in this comparison.\n\nExclude participants with estimated glomerular filtration rate below 80 mL/min/1.73 m2 at screening from both groups in this comparison.\n\nThe recommended regimen for QMX-327 is 45 mg by oral once daily for 24 weeks.\n\nThe fictional observations were reviewed for reversibility and consistency across preparation batches. A change in a laboratory signal was treated as a reason for a selection precaution, rather than as a clinical event rate. The extract does not supply an estimate of participant benefit or establish that the proposed product has a favorable benefit-risk balance.\n\n3 Scope of the extract\n\nThe safety team considered how the intracellular relay inhibitor might affect a vulnerable participant without changing the platform disease definition. The stated restrictions apply to the active group and the corresponding placebo group. This preserves a common comparison population while keeping the product-specific precaution visible. Restrictions from other development programs have not been incorporated into this extract.\n\nManufacturing notes and research material shipping records have been omitted because they do not determine a participant procedure. The sponsor will provide controlled clarification if the clinical reviewer identifies a disagreement between source statements. Document numbering does not establish that one scientific statement supersedes another, and this extract does not withdraw any regimen stated elsewhere in the submission."
+      }
+    ]
+  },
+  "reference": {
+    "synopsis": {
+      "phase": "phase1_2"
+    },
+    "objectives": [
+      {
+        "id": "OBJ1",
+        "level": "primary",
+        "text": "Evaluate the safety and tolerability of QMX-327 versus matching placebo plus standard of care.",
+        "keywords": [],
+        "mandatory": true
+      },
+      {
+        "id": "OBJ2",
+        "level": "secondary",
+        "text": "Evaluate the efficacy of QMX-327 versus shared control on Disease X function at Week 24.",
+        "keywords": [],
+        "mandatory": true
+      },
+      {
+        "id": "OBJ3",
+        "level": "exploratory",
+        "text": "Characterize predose plasma exposure to QMX-327.",
+        "keywords": [],
+        "mandatory": false
+      }
+    ],
+    "endpoints": [
+      {
+        "id": "EP1",
+        "type": "safety",
+        "text": "Proportion of participants with at least one treatment-emergent adverse event",
+        "keywords": [],
+        "mandatory": true
+      },
+      {
+        "id": "EP2",
+        "type": "efficacy",
+        "text": "Change from baseline in Disease X functional score at Week 24",
+        "keywords": [],
+        "mandatory": true
+      },
+      {
+        "id": "EP3",
+        "type": "pharmacokinetic",
+        "text": "Predose plasma concentration of QMX-327",
+        "keywords": [],
+        "mandatory": false
+      }
+    ],
+    "criteria": [
+      {
+        "id": "IN1",
+        "kind": "inclusion",
+        "text": "The Disease X functional score must be 38 to 63, inclusive, at screening for both active and matching-placebo participants in this comparison.",
+        "keywords": [],
+        "mandatory": true
+      },
+      {
+        "id": "EX1",
+        "kind": "exclusion",
+        "text": "Exclude participants with QTcF greater than 450 ms at screening from both groups in this comparison.",
+        "keywords": [],
+        "mandatory": true
+      },
+      {
+        "id": "EX2",
+        "kind": "exclusion",
+        "text": "Exclude participants with estimated glomerular filtration rate below 80 mL/min/1.73 m2 at screening from both groups in this comparison.",
+        "keywords": [],
+        "mandatory": true
+      }
+    ],
+    "interventions": [
+      {
+        "name": "QMX-327",
+        "dose": "Unresolved: 25 mg versus 45 mg; clarification required",
+        "mandatory": true
+      },
+      {
+        "name": "QMX-327 matching placebo",
+        "dose": "Matching nominal administration amount for QMX-327",
+        "mandatory": true
+      }
+    ],
+    "visits": [
+      {
+        "name": "Week 4",
+        "day": 29,
+        "mandatory": false
+      },
+      {
+        "name": "Week 12",
+        "day": 85,
+        "mandatory": false
+      },
+      {
+        "name": "Week 24",
+        "day": 169,
+        "mandatory": false
+      }
+    ],
+    "quotes": [
+      {
+        "item": "SYNOPSIS.title",
+        "ref": "SYN-C03-01",
+        "quote": "The arm appendix title is \"QMX-327 versus shared control in Disease X\"."
+      },
+      {
+        "item": "SYNOPSIS.rationale",
+        "ref": "SYN-C03-01",
+        "quote": "QMX-327 is a synthetic intracellular relay inhibitor intended to preserve function in Disease X. The proposed comparison will test whether this mechanism translates into an arm-specific clinical effect."
+      },
+      {
+        "item": "SYNOPSIS.phase",
+        "ref": "SYN-C03-01",
+        "quote": "The proposed development phase for this arm is phase1_2."
+      },
+      {
+        "item": "OBJ1",
+        "ref": "SYN-C03-01",
+        "quote": "The primary objective is to evaluate the safety and tolerability of QMX-327 versus matching placebo plus standard of care."
+      },
+      {
+        "item": "OBJ2",
+        "ref": "SYN-C03-01",
+        "quote": "The secondary objective is to evaluate the efficacy of QMX-327 versus shared control on Disease X function at Week 24."
+      },
+      {
+        "item": "EP1",
+        "ref": "SYN-C03-01",
+        "quote": "The primary endpoint is proportion of participants with at least one treatment-emergent adverse event, measured from first dose through Day 197."
+      },
+      {
+        "item": "EP2",
+        "ref": "SYN-C03-01",
+        "quote": "The secondary endpoint is change from baseline in Disease X functional score at Week 24, measured from baseline to Week 24."
+      },
+      {
+        "item": "EP3",
+        "ref": "SYN-C03-01",
+        "quote": "The pharmacokinetic endpoint is predose plasma concentration of QMX-327 at Weeks 4, 12 and 24."
+      },
+      {
+        "item": "OBJ3",
+        "ref": "SYN-C03-01",
+        "quote": "The exploratory objective is to characterize predose plasma exposure to QMX-327."
+      },
+      {
+        "item": "IN1",
+        "ref": "SYN-C03-01",
+        "quote": "The Disease X functional score must be 38 to 63, inclusive, at screening for both active and matching-placebo participants in this comparison."
+      },
+      {
+        "item": "EX1",
+        "ref": "IB-C03-01",
+        "quote": "Exclude participants with QTcF greater than 450 ms at screening from both groups in this comparison."
+      },
+      {
+        "item": "EX2",
+        "ref": "IB-C03-01",
+        "quote": "Exclude participants with estimated glomerular filtration rate below 80 mL/min/1.73 m2 at screening from both groups in this comparison."
+      },
+      {
+        "item": "QMX-327",
+        "ref": "SYN-C03-01",
+        "quote": "The recommended regimen for QMX-327 is 25 mg by oral once daily for 24 weeks."
+      },
+      {
+        "item": "QMX-327",
+        "ref": "IB-C03-01",
+        "quote": "The recommended regimen for QMX-327 is 45 mg by oral once daily for 24 weeks."
+      },
+      {
+        "item": "QMX-327 matching placebo",
+        "ref": "SYN-C03-01",
+        "quote": "The comparator is matching placebo by oral once daily for 24 weeks plus standard of care, using the same nominal administration amount as QMX-327."
+      },
+      {
+        "item": "V1",
+        "ref": "SYN-C03-01",
+        "quote": "At Week 4 on Day 29 with a window of plus or minus 3 days, perform the following additional activities in both groups: predose pharmacokinetic blood sample."
+      },
+      {
+        "item": "V2",
+        "ref": "SYN-C03-01",
+        "quote": "At Week 12 on Day 85 with a window of plus or minus 5 days, collect a predose pharmacokinetic blood sample in both groups."
+      },
+      {
+        "item": "V3",
+        "ref": "SYN-C03-01",
+        "quote": "At Week 24 on Day 169 with a window of plus or minus 7 days, collect a predose pharmacokinetic blood sample in both groups."
+      },
+      {
+        "item": "CONSISTENCY.population",
+        "ref": "SYN-C03-01",
+        "quote": "The Disease X functional score must be 38 to 63, inclusive, at screening for both active and matching-placebo participants in this comparison."
+      },
+      {
+        "item": "CONSISTENCY.schedule",
+        "ref": "MP-DX-001",
+        "quote": "8.8 Additional arm-specific activities may be performed at shared visits within the existing windows; moving a shared visit or adding a separate assessment visit requires committee authorization and a documented schedule amendment."
+      }
+    ],
+    "consistency": [
+      {
+        "check": "shared-control population",
+        "expected": "pass",
+        "keywords": []
+      },
+      {
+        "check": "visit schedule",
+        "expected": "pass",
+        "keywords": []
+      },
+      {
+        "check": "source dose agreement",
+        "expected": "warning",
+        "keywords": []
+      }
+    ],
+    "traps": [
+      {
+        "id": "C03-T1",
+        "type": "T1",
+        "description": "Warning: SYN-C03-01 recommends 25 mg, while IB-C03-01 recommends 45 mg; both use oral once daily. Do not select a dose without clarification. | SYN-C03-01: \"The recommended regimen for QMX-327 is 25 mg by oral once daily for 24 weeks.\" | IB-C03-01: \"The recommended regimen for QMX-327 is 45 mg by oral once daily for 24 weeks.\"",
+        "keywords": [
+          "25 mg",
+          "45 mg"
+        ],
+        "forbidden": []
+      }
+    ],
+    "silent": []
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "$comment": "PILOT dataset, NOT evidence. Converted by scripts/cmp06-convert.mjs from an AI-prepared candidate (Codex), unreviewed, unsigned, with no named human author or checker. kind is credibility_dataset only to exercise the real evidence rule: the harness must report it as not evidence (empty checker and independence attestation).",
+  "format": "trialops.ai-credibility-dataset/1",
+  "kind": "credibility_dataset",
+  "dataset_id": "appendix-cred-pilot-codex",
+  "task_type": "protocol.appendix.draft",
+  "version": "1.0",
+  "synthetic": true,
+  "source_workbook": "reference-and-traps_v1.0.xlsx",
+  "provenance": {
+    "author": "Codex AI (unreviewed candidate)",
+    "checker": "",
+    "created_on": "2026-10-18",
+    "independence": {
+      "statement": "",
+      "attested_by": "",
+      "attested_on": ""
+    }
+  },
+  "sha256": "1a32bd58b79932c4e044f2df6be11e4e7d5cc01b100f8f16a91d4478f66c75b0"
+}

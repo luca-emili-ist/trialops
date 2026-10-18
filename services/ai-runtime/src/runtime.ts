@@ -12,7 +12,7 @@ import { replayProvider, recording } from './providers/replay.ts';
 import type { AiTaskRequest, AiTaskResult, LedgerDb, Outcome, Provider } from './types.ts';
 
 /** USD per million tokens (list price). Ledger cost is in EUR at TRIALOPS_USD_EUR. */
-const PRICE_USD_PER_MTOK: Record<string, { in: number; out: number }> = { 'claude-opus-5-5': { in: 4, out: 20 } };
+export const PRICE_USD_PER_MTOK: Record<string, { in: number; out: number }> = { 'claude-opus-5-5': { in: 4, out: 20 } };
 
 export class AiRequestError extends Error {
   readonly status = 422;
