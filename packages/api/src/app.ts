@@ -8,6 +8,8 @@ import type { RawResponse, RouteDef, Services } from './route.ts';
 import { openapi } from './openapi.ts';
 import { ajv } from './lib/validate.ts';
 import { routes as allRoutes } from './routes/index.ts';
+import { appProvenance, checkIfMatch, currentVersion, etagOf, idempotencyKey, isApp, isKeyRace, lookupResponse, parseIfMatch,
+  requestHash, storeResponse, type StoredResponse } from './lib/write-controls.ts';
 import { accessConfigFromEnv, authTx, enforceAccessPolicy, policyReauth, SYSTEM_AUTH, type Deferred } from './lib/access-policy.ts';
 
 /** ctx.db of a manualTx route: there is no request transaction, the handler must use ctx.tx. */
@@ -52,15 +54,60 @@ export function createApp({ pool, verify, services = {}, routes = allRoutes }: A
         const claims = r.public ? ANONYMOUS : await verify(bearer(req.header('authorization')));
         // IAM-01, CMP-03: lockout, idle timeout and MFA for every authenticated route (lib/access-policy.ts)
         if (!r.public) await enforceAccessPolicy(pool, claims, access, !!r.allowBelowMfa);
+        // APP-DT-02 / APP-DT-05 write controls (lib/write-controls.ts); manualTx routes run their own transactions and are
+        // not replayable (sign-in, worker), public routes have no caller to bind a key to.
+        const write = r.method !== 'get' && !r.public && !r.manualTx;
+        const idemKey = write && r.idempotent !== false ? idempotencyKey(req.header('idempotency-key'), claims) : undefined;
+        const hash = idemKey ? requestHash(r.method, req.originalUrl, reason, req.body) : '';
+        const settings: Record<string, string> = {};
+        if (write && isApp(claims) && r.provenance !== false) settings['trialops.provenance'] = JSON.stringify(appProvenance(req.headers as Record<string, string | undefined>, claims));
+        const ifMatch = r.versioned && write ? parseIfMatch(req.header('if-match')) : undefined;
+        if (r.versioned && write && !ifMatch && isApp(claims)) {
+          throw new HttpError(428, 'precondition_required', 'If-Match with the row_version (ETag) required for updates by apps (APP-DT-02)');
+        }
         const ctxBase = { params: req.params as Record<string, string>, query: req.query as Record<string, string | undefined>,
           body: req.body as never, reason, services: svc, headers: req.headers as Record<string, string | undefined>, claims, access,
-          tx: <T>(fn: (db: Db) => Promise<T>) => withClaims(pool, claims, r.public ? undefined : reason, fn),
+          tx: <T>(fn: (db: Db) => Promise<T>) => withClaims(pool, claims, r.public ? undefined : reason, fn, settings),
           authTx: <T>(fn: (db: Db) => Promise<T>) => authTx(pool, r.public ? SYSTEM_AUTH : claims, fn),
           afterCommit: (fn: () => Promise<void> | void) => { after.push(fn); } };
-        const out: unknown = r.manualTx ? await r.handler({ ...ctxBase, db: NO_TX })
-          : await ctxBase.tx(db => r.handler({ ...ctxBase, db }));
+        const versionId = r.versioned ? (req.params as Record<string, string>)[r.versioned.param] : undefined;
+        let etag: string | undefined;
+        let replay: StoredResponse | undefined;
+        const run = async (db: Db): Promise<unknown> => {
+          if (idemKey) { replay = await lookupResponse(db, idemKey, hash); if (replay) return undefined; }
+          if (ifMatch) checkIfMatch(ifMatch, await currentVersion(db, r.versioned!, versionId, true));
+          const result = await r.handler({ ...ctxBase, db });
+          if (result === undefined) return result;
+          if (r.versioned) { const v = await currentVersion(db, r.versioned, versionId, false); if (v !== undefined) etag = etagOf(v); }
+          if (idemKey) {
+            const raw = r.raw ? result as RawResponse : { status: r.status ?? 200, headers: {}, body: result };
+            const headers = { ...(raw.headers ?? {}), ...(etag ? { ETag: etag } : {}) };
+            await storeResponse(db, idemKey, r.method, req.originalUrl, hash, typeof raw.body === 'string'
+              ? { status: raw.status, headers, body: null, text: raw.body } : { status: raw.status, headers, body: raw.body, text: null });
+          }
+          return result;
+        };
+        let out: unknown;
+        try {
+          out = r.manualTx ? await r.handler({ ...ctxBase, db: NO_TX }) : await ctxBase.tx(run);
+        } catch (e) {
+          // a concurrent request with the same key won: this one was rolled back; answer with the stored response
+          if (!idemKey || !isKeyRace(e)) throw e;
+          await ctxBase.tx(async db => { replay = await lookupResponse(db, idemKey, hash); });
+          if (!replay) throw e;
+        }
+        if (replay) {
+          res.status(replay.status).set({ ...replay.headers, 'Idempotent-Replayed': 'true' });
+          if (replay.text !== null) res.send(replay.text); else res.json(replay.body);
+          return;
+        }
         for (const fn of after) await fn();
         if (out === undefined) throw new HttpError(404, 'not_found', 'not found');
+        if (etag) {
+          // the ETag is the version of the record, not a hash of this representation: no 304 on If-None-Match, no caching
+          res.set({ ETag: etag, 'Cache-Control': 'no-store' });
+          delete req.headers['if-none-match'];
+        }
         if (r.raw) {
           const { status, headers, body } = out as RawResponse;
           // a string body is sent as is with the route's content type (e.g. the CSV export of the audit trail)

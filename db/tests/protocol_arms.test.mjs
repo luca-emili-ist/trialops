@@ -59,7 +59,9 @@ test('[DM-01] every clinical table carries platform_id', async () => {
     // identity and session security records (0018, CMP-03): an account works across platforms, they hold no clinical data
     'auth_event','account_lock','user_session',
     // ledger integrity records (0022, CMP-12): seals and DDL cover the whole database, not one platform
-    'audit_seal','audit_anchor','ddl_event'];
+    'audit_seal','audit_anchor','ddl_event',
+    // API replay cache (0024, APP-DT-02): keyed by caller, holds no clinical record of its own
+    'idempotency_record'];
   const r = (await c.query(`select t.table_name from information_schema.tables t
      where t.table_schema='core' and t.table_type='BASE TABLE' and t.table_name <> all($1)
        and not exists (select 1 from information_schema.columns k where k.table_schema='core' and k.table_name=t.table_name and k.column_name='platform_id')`, [exempt])).rows;

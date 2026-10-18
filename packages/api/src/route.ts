@@ -7,6 +7,7 @@ import type { AiRuntime } from '@trialops/ai-runtime';
 import type { Oidc } from './lib/oidc.ts';
 import type { AuthProvider } from './lib/auth-provider.ts';
 import type { AccessConfig } from './lib/access-policy.ts';
+import type { VersionedRecord } from './lib/write-controls.ts';
 
 export type JsonSchema = Record<string, unknown>;
 
@@ -72,6 +73,13 @@ export interface RouteDef {
   manualTx?: boolean;
   /** Reachable by a person whose token is not yet MFA-satisfied (aal1): the routes of the sign-in itself (IAM-01). */
   allowBelowMfa?: boolean;
+  /** The route reads or updates one versioned record (row_version): GET answers with its ETag, writes honour If-Match
+   * (412 on a stale version; required for apps) and answer with the new ETag (APP-DT-02). */
+  versioned?: VersionedRecord;
+  /** false: the write is not replayable (e.g. it returns a one-time secret): no Idempotency-Key, no stored response. */
+  idempotent?: false;
+  /** false: the write does not create or change data that needs app provenance (e.g. an AI request, ledgered by AI-06). */
+  provenance?: false;
   handler: (ctx: Ctx<never>) => Promise<unknown>;
 }
 

@@ -48,7 +48,7 @@ export const armRoutes = [
   route<NewArm>({ method: 'post', path: '/v1/platforms/:id/arms', status: 201, summary: 'Create a draft arm', tag: 'arms', reqs: ['M01-04'],
     body: newArmSchema, handler: async ({ db, claims, params, body }) => createArm(db, claims, params.id!, body) }),
 
-  route({ method: 'get', path: '/v1/arms/:id', summary: 'Arm detail with appendix versions, stage history and site activations', tag: 'arms',
+  route({ method: 'get', path: '/v1/arms/:id', versioned: { table: 'arm', param: 'id' }, summary: 'Arm detail with appendix versions, stage history and site activations', tag: 'arms',
     reqs: ['M01-04', 'M02-03', 'CMP-11'],
     handler: async ({ db, params }) => {
       const arm = await getArm(db, params.id!);
@@ -65,7 +65,7 @@ export const armRoutes = [
       return { ...arm, appendix_versions: versions, stage_history: stages.rows, site_activations: activations.rows };
     } }),
 
-  route<{ to: string }>({ method: 'post', path: '/v1/arms/:id/status', needsReason: true, summary: 'Move an arm along its lifecycle',
+  route<{ to: string }>({ method: 'post', path: '/v1/arms/:id/status', versioned: { table: 'arm', param: 'id' }, needsReason: true, summary: 'Move an arm along its lifecycle',
     tag: 'arms', reqs: ['M01-04', 'DM-03'],
     body: { type: 'object', required: ['to'], additionalProperties: false, properties: { to: { enum: STATUSES } } },
     handler: async ({ db, claims, params, body }) => {
@@ -80,7 +80,7 @@ export const armRoutes = [
       return getArm(db, arm.id);
     } }),
 
-  route<{ to_stage: string; decision_record_id?: string }>({ method: 'post', path: '/v1/arms/:id/stage', needsReason: true,
+  route<{ to_stage: string; decision_record_id?: string }>({ method: 'post', path: '/v1/arms/:id/stage', versioned: { table: 'arm', param: 'id' }, needsReason: true,
     summary: 'Record a stage transition of an active arm', tag: 'arms', reqs: ['M01-04', 'DM-03'],
     body: { type: 'object', required: ['to_stage'], additionalProperties: false,
       properties: { to_stage: { enum: STAGES }, decision_record_id: uuid } },

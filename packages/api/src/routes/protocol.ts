@@ -119,6 +119,7 @@ export async function approve(db: Db, claims: Claims, reauth: Reauthenticator | 
 
 function routesFor(k: Kind): RouteDef[] {
   const reqs = ['M01-01', 'DM-02'];
+  const versioned = { table: k.table, param: 'vid' };
   return [
     route({ method: 'get', path: k.parentPath, summary: `${k.label} versions`, tag: 'protocol', reqs,
       handler: async ({ db, params }) => ({
@@ -130,20 +131,20 @@ function routesFor(k: Kind): RouteDef[] {
       body: { type: 'object', required: ['version_label'], additionalProperties: false,
         properties: { version_label: { type: 'string', minLength: 1, maxLength: 40 }, usdm: { type: 'object' }, copy_from: uuid } },
       handler: async ({ db, claims, params, body }) => createDraft(db, claims, k, params.id!, body) }),
-    route({ method: 'get', path: `${k.base}/:vid`, summary: `${k.label} version with approval signature manifestation and AI provenance`,
+    route({ method: 'get', path: `${k.base}/:vid`, versioned, summary: `${k.label} version with approval signature manifestation and AI provenance`,
       tag: 'protocol', reqs: [...reqs, 'CMP-11', 'CMP-09'],
       handler: async ({ db, params }) => getVersion(db, k, params.vid!) }),
-    route<{ content: unknown }>({ method: 'put', path: `${k.base}/:vid/sections/:section`, needsReason: true,
+    route<{ content: unknown }>({ method: 'put', path: `${k.base}/:vid/sections/:section`, versioned, needsReason: true,
       summary: `Replace one structured section of a draft ${k.label} (ICH M11 / USDM)`, tag: 'protocol', reqs: ['M01-01', 'DM-02', 'DM-03'],
       body: { type: 'object', required: ['content'], properties: { content: {} } },
       handler: async ({ db, claims, params, body }) => putSection(db, claims, k, params.vid!, params.section!, body.content) }),
-    route({ method: 'post', path: `${k.base}/:vid/submit`, needsReason: true, summary: `Send a draft ${k.label} to review`, tag: 'protocol', reqs,
+    route({ method: 'post', path: `${k.base}/:vid/submit`, versioned, needsReason: true, summary: `Send a draft ${k.label} to review`, tag: 'protocol', reqs,
       handler: async ({ db, claims, params }) => {
         requireRole(claims, k.editRoles, `Submitting the ${k.label}`);
         await draftOrFail(db, k, params.vid!);
         return (await db.query(`update core.${k.table} set status = 'in_review' where id = $1 returning ${colsFor(k)}`, [params.vid])).rows[0];
       } }),
-    route({ method: 'post', path: `${k.base}/:vid/return`, needsReason: true, summary: `Return a ${k.label} in review to draft`, tag: 'protocol', reqs,
+    route({ method: 'post', path: `${k.base}/:vid/return`, versioned, needsReason: true, summary: `Return a ${k.label} in review to draft`, tag: 'protocol', reqs,
       handler: async ({ db, claims, params }) => {
         requireRole(claims, [...new Set([...k.editRoles, ...k.approveRoles])], `Returning the ${k.label}`);
         const r = (await db.query(`update core.${k.table} set status = 'draft' where id = $1 and status = 'in_review' returning ${colsFor(k)}`,
@@ -151,7 +152,7 @@ function routesFor(k: Kind): RouteDef[] {
         if (!r) throw new HttpError(409, 'not_in_review', 'only versions in review can be returned to draft');
         return r;
       } }),
-    route<{ password?: string; totp?: string }>({ method: 'post', path: `${k.base}/:vid/approve`, needsReason: true,
+    route<{ password?: string; totp?: string }>({ method: 'post', path: `${k.base}/:vid/approve`, versioned, needsReason: true,
       summary: `Approve a ${k.label} version with a Part 11 signature`, tag: 'protocol', reqs: ['M01-01', 'DM-02', 'CMP-02', 'IAM-05', 'CMP-11'],
       body: { type: 'object', additionalProperties: false, properties: { password: { type: 'string' }, totp: { type: 'string', maxLength: 16 } } },
       handler: async ({ db, claims, params, body, services }) => approve(db, claims, services.reauth, k, params.vid!, { password: body.password, totp: body.totp }) }),

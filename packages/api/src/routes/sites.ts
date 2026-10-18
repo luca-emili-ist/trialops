@@ -71,7 +71,7 @@ export const siteRoutes = [
       return getSite(db, id);
     } }),
 
-  route({ method: 'get', path: '/v1/sites/:id', summary: 'Site detail: investigators, certifications, concurrent trials, arm activations',
+  route({ method: 'get', path: '/v1/sites/:id', versioned: { table: 'site', param: 'id' }, summary: 'Site detail: investigators, certifications, concurrent trials, arm activations',
     tag: 'sites', reqs: ['M02-01', 'M02-03'],
     handler: async ({ db, params }) => {
       const site = await getSite(db, params.id!);
@@ -118,7 +118,7 @@ export const siteRoutes = [
       return getActivation(db, id);
     } }),
 
-  route<{ at?: string }>({ method: 'post', path: '/v1/site-activations/:id/steps/:step', needsReason: true,
+  route<{ at?: string }>({ method: 'post', path: '/v1/site-activations/:id/steps/:step', versioned: { table: 'site_arm_activation', param: 'id' }, needsReason: true,
     summary: 'Date the next activation step (qualified, contract_executed, irb_approved, training_done, green_light)',
     tag: 'sites', reqs: ['M02-03', 'DM-03'],
     body: { type: 'object', additionalProperties: false, properties: { at: { type: 'string', format: 'date-time' } } },
