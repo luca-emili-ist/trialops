@@ -2,6 +2,7 @@
 // Deterministic: same seed => same rows, same UUIDs (DEMO-01).
 import pg from 'pg';
 import { seedGovernance } from './seed-governance.mjs';
+import { seedEdc } from './seed-edc.mjs';
 
 const SEED = 20261006;
 let s = SEED >>> 0;
@@ -204,6 +205,9 @@ for (let i = 0; i < 6; i++) {
 
 // --- quality and privacy governance (CMP-05, CMP-08, VAL-04). Appended last so earlier UUIDs stay stable.
 await seedGovernance(c, plat, org);
+
+// --- native EDC (EDC-01..EDC-12): CRF library, visits, values and queries at site 101. Appended last.
+await seedEdc(c);
 
 await c.query('commit');
 const counts = await c.query(`select (select count(*) from core.subject) subjects, (select count(*) from core.site) sites,
