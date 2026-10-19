@@ -1,21 +1,21 @@
 # Traceability matrix
 
-Generated 2026-10-19T08:09:06.328Z by scripts/trace.mjs from test tags and test-results.xml.
+Generated 2026-10-19T10:53:05.463Z by scripts/trace.mjs from test tags and test-results.xml.
 
 | Requirement | Release | Description | Tests | Result |
 | --- | --- | --- | --- | --- |
 | CMP-01 | foundations | Append-only, hash-chained audit trail; tampering detectable | db/tests/audit.test.mjs (3) | PASS |
-| CMP-02 | foundations | Part 11 e-signatures: immutable, linked to signed version | db/tests/audit.test.mjs, db/tests/protocol_arms.test.mjs, packages/api/test/protocol_arms.test.ts, packages/api/test/wizard.test.ts (5) | PASS |
+| CMP-02 | foundations | Part 11 e-signatures: immutable, linked to signed version | db/tests/audit.test.mjs, db/tests/edc.test.mjs, db/tests/protocol_arms.test.mjs, packages/api/test/edc.test.ts, packages/api/test/protocol_arms.test.ts, packages/api/test/wizard.test.ts (7) | PASS |
 | CMP-04 | foundations | ALCOA+: who/when/old/new/reason captured on every GxP change | db/tests/audit.test.mjs (1) | PASS |
 | DM-01 | foundations | Every clinical entity carries platform_id (+ arm_id, site_id) | db/tests/protocol_arms.test.mjs (1) | PASS |
 | DM-02 | foundations | Approved controlled versions are immutable; approval needs signature | db/tests/protocol_arms.test.mjs, packages/api/test/protocol_arms.test.ts (4) | PASS |
-| DM-03 | foundations | Change reason mandatory on GxP updates; no physical delete | db/tests/audit.test.mjs, db/tests/sites_registry.test.mjs (4) | PASS |
+| DM-03 | foundations | Change reason mandatory on GxP updates; no physical delete | apps/web/test/edc_pages.test.ts, db/tests/audit.test.mjs, db/tests/edc.test.mjs, db/tests/sites_registry.test.mjs, packages/api/test/edc.test.ts (7) | PASS |
 | DM-05 | foundations | Deterministic synthetic demo seed; no real data | db/tests/tasks_apps_metrics.test.mjs (1) | PASS |
 | IAM-02 | foundations | RLS driven by JWT claims platform_ids / arm_scopes / site_scopes | db/tests/access.test.mjs, db/tests/claims.test.mjs, db/tests/sites_registry.test.mjs, packages/api/test/apps_sso.test.ts, packages/api/test/platform.test.ts, packages/api/test/sites.test.ts (11) | PASS |
 | IAM-03 | foundations | Sponsors see and write only their own arm | db/tests/access.test.mjs, packages/api/test/ai.test.ts, packages/api/test/metrics.test.ts, packages/api/test/platform.test.ts, packages/api/test/protocol_arms.test.ts (6) | PASS |
-| IAM-04 | foundations | Unblinded data only in sac_enclave for the unblinded role | db/tests/access.test.mjs, db/tests/claims.test.mjs, db/tests/privacy.test.mjs, packages/api/test/certified_copies.test.ts (5) | PASS |
-| IAM-05 | foundations | Separation of duties: the author of a GxP document or change cannot approve it | packages/api/test/protocol_arms.test.ts, packages/api/test/wizard.test.ts (2) | PASS |
-| IAM-07 | foundations | Agents are never unblinded | db/tests/access.test.mjs, db/tests/access_log.test.mjs, packages/api/test/jobs.test.ts, packages/api/test/platform.test.ts, packages/api/test/wizard.test.ts (5) | PASS |
+| IAM-04 | foundations | Unblinded data only in sac_enclave for the unblinded role | db/tests/access.test.mjs, db/tests/claims.test.mjs, db/tests/edc.test.mjs, db/tests/privacy.test.mjs, packages/api/test/certified_copies.test.ts (6) | PASS |
+| IAM-05 | foundations | Separation of duties: the author of a GxP document or change cannot approve it | db/tests/edc.test.mjs, packages/api/test/edc.test.ts, packages/api/test/protocol_arms.test.ts, packages/api/test/wizard.test.ts (4) | PASS |
+| IAM-07 | foundations | Agents are never unblinded | db/tests/access.test.mjs, db/tests/access_log.test.mjs, db/tests/edc.test.mjs, packages/api/test/jobs.test.ts, packages/api/test/platform.test.ts, packages/api/test/wizard.test.ts (6) | PASS |
 | AI-05 | foundations | GxP AI output is a proposal until a person signs | db/tests/tasks_apps_metrics.test.mjs, packages/api/test/ai.test.ts, packages/api/test/ai_monitoring.test.ts, packages/api/test/protocol_arms.test.ts, packages/api/test/wizard.test.ts (9) | PASS |
 | AI-06 | foundations | AI ledger with model version and input hash | db/tests/ai_monitoring.test.mjs, db/tests/tasks_apps_metrics.test.mjs, packages/api/test/ai.test.ts, packages/api/test/jobs.test.ts, services/ai-runtime/test/runtime.test.ts (8) | PASS |
 | AI-11 | foundations | AI never sees unblinded data outside the SAC enclave | db/tests/access.test.mjs, services/ai-runtime/test/runtime.test.ts (2) | PASS |
@@ -28,8 +28,8 @@ Generated 2026-10-19T08:09:06.328Z by scripts/trace.mjs from test tags and test-
 | M01-04 | foundations | Arm lifecycle with allowed transitions and events | db/tests/protocol_arms.test.mjs, packages/api/test/protocol_arms.test.ts (5) | PASS |
 | M05-02 | foundations | Enrollment funnel per site (blinded) | db/tests/tasks_apps_metrics.test.mjs (1) | PASS |
 | M07-01 | foundations | SAE expedited reporting clock | db/tests/protocol_arms.test.mjs (1) | PASS |
-| M11-01 | foundations | SURPASS TA3 metric catalogue with targets | db/tests/tasks_apps_metrics.test.mjs, packages/api/test/metrics.test.ts (2) | PASS |
-| M11-02 | foundations | Arm onboarding metrics computed from records | db/tests/tasks_apps_metrics.test.mjs, packages/api/test/metrics.test.ts (4) | PASS |
+| M11-01 | foundations | SURPASS TA3 metric catalogue with targets | db/tests/edc.test.mjs, db/tests/tasks_apps_metrics.test.mjs, packages/api/test/metrics.test.ts (3) | PASS |
+| M11-02 | foundations | Arm onboarding metrics computed from records | db/tests/tasks_apps_metrics.test.mjs, packages/api/test/edc.test.ts, packages/api/test/metrics.test.ts (5) | PASS |
 | APP-ID-01 | v0 | OIDC SSO via identity broker | packages/api/test/apps_sso.test.ts (3) | PASS |
 | APP-ID-02 | v0 | Access token carries sub, email, org_id and TrialOps claims platform_ids, arm_scopes, roles, blinding | db/tests/claims.test.mjs, db/tests/sites_registry.test.mjs, packages/api/test/apps_sso.test.ts, packages/api/test/platform.test.ts (10) | PASS |
 | APP-ID-02 | foundations | TrialOps claims (platform/arm/site scopes, blinding) added to the Supabase token | db/tests/claims.test.mjs, db/tests/sites_registry.test.mjs, packages/api/test/apps_sso.test.ts, packages/api/test/platform.test.ts (10) | PASS |
@@ -53,12 +53,12 @@ Generated 2026-10-19T08:09:06.328Z by scripts/trace.mjs from test tags and test-
 | APP-AU-01 | v2 | Apps push audit events to the core | — (0) | NO TEST |
 | FIN-09 | v2 | Cost per arm vs CRO quotes | — (0) | NO TEST |
 | DEMO-01 | v2 | One-command demo reset | — (0) | NO TEST |
-| EDC-01 | v1 | Versioned CRF library linked to protocol visits | — (0) | NO TEST |
-| EDC-03 | v1 | Site data entry | — (0) | NO TEST |
-| EDC-04 | v1 | Declarative edit checks | — (0) | NO TEST |
-| EDC-05 | v1 | Query workflow | — (0) | NO TEST |
-| EDC-11 | v1 | No arm data in blinded eCRF | — (0) | NO TEST |
-| EDC-12 | v1 | visit.completed event and data-collection metric | — (0) | NO TEST |
+| EDC-01 | v1 | Versioned CRF library linked to protocol visits: CDASH-like item OIDs, units and coded values from versioned codelists (no free-text terminology), approved versions signed and immutable | apps/web/test/edc_pages.test.ts, db/tests/edc.test.mjs, packages/api/test/edc.test.ts (8) | PASS |
+| EDC-03 | v1 | Site data entry: typed values or a missing-data reason (ND/NA/UNK), server UTC time and author on every value, changes with reason, provenance of app-written values, investigator access to site data | apps/web/test/edc_pages.test.ts, db/tests/edc.test.mjs, packages/api/test/edc.test.ts (11) | PASS |
+| EDC-04 | v1 | Declarative edit checks (required, range, cross-field) stored on the CRF version and evaluated by the database at entry, at form completion and in batch; soft checks open queries, hard checks refuse the value | db/tests/edc.test.mjs, packages/api/test/edc.test.ts (7) | PASS |
+| EDC-05 | v1 | Query workflow open -> answered -> closed / cancelled as a database state machine, audited, attributable, with times for metrics; no physical deletes | apps/web/test/edc_pages.test.ts, db/tests/edc.test.mjs, packages/api/test/edc.test.ts (4) | PASS |
+| EDC-11 | v1 | No arm data in blinded eCRF: no EDC table, view, function, API response or event carries the arm of a subject | apps/web/test/edc_pages.test.ts, db/tests/edc.test.mjs, packages/api/test/edc.test.ts (4) | PASS |
+| EDC-12 | v1 | visit.completed event at visit completion and the TA3 data collection time metric (visit date to data available) computed from it | db/tests/edc.test.mjs, packages/api/test/edc.test.ts (3) | PASS |
 | EDC-02 | v2 | eCRF versions per arm/stage | — (0) | NO TEST |
 | EDC-06 | v2 | SDV and reviews | — (0) | NO TEST |
 | EDC-07 | v2 | PI signature | — (0) | NO TEST |
@@ -68,7 +68,7 @@ Generated 2026-10-19T08:09:06.328Z by scripts/trace.mjs from test tags and test-
 | IAM-01 | gxp-p0 | MFA mandatory for every role with GxP impact (TOTP or passkey); signing with MFA step-up | apps/web/test/pages.test.ts, db/tests/access_controls.test.mjs, packages/api/test/access_controls.test.ts (10) | PASS |
 | CMP-03 | gxp-p0 | Session idle timeout and account lockout after repeated failed logins or signing attempts, both recorded in the audit trail | apps/web/test/pages.test.ts, db/tests/access_controls.test.mjs, packages/api/test/access_controls.test.ts (14) | PASS |
 | CMP-10 | gxp-p0 | Audit trail review for QA/inspector roles: filter by record, user and period; readable PDF/CSV export; reviews recorded and signed | apps/web/test/pages.test.ts, db/tests/audit_review.test.mjs, packages/api/test/audit_review.test.ts (14) | PASS |
-| CMP-11 | gxp-p0 | Signature manifestation (printed name, UTC date/time, meaning, reason) on screen, print and export; reason stored on the signature record | apps/web/test/pages.test.ts, db/tests/audit_review.test.mjs, packages/api/test/audit_review.test.ts, packages/shell/test/manifest.test.ts (7) | PASS |
+| CMP-11 | gxp-p0 | Signature manifestation (printed name, UTC date/time, meaning, reason) on screen, print and export; reason stored on the signature record | apps/web/test/edc_pages.test.ts, apps/web/test/pages.test.ts, db/tests/audit_review.test.mjs, packages/api/test/audit_review.test.ts, packages/shell/test/manifest.test.ts (8) | PASS |
 | CMP-15 | gxp-p0 | Every table in the core schema is audited (attach_std) or listed in a justified exception list; checked by a test | db/tests/compliance.test.mjs (2) | PASS |
 | CMP-09 | gxp-p0 | AI-generated content carries a persistent marker (agent, ai_request, reviewer) wherever it is shown or exported; users are told when content is AI-generated | apps/web/test/pages.test.ts, db/tests/audit_review.test.mjs, packages/api/test/audit_review.test.ts, packages/shell/test/manifest.test.ts (5) | PASS |
 | NFR-04 | gxp-p0 | Backups with point-in-time recovery, documented quarterly restore test, retention policy per platform (default 25 years) and archive readable for the whole period | db/tests/retention.test.mjs (3) | PASS |
@@ -84,7 +84,7 @@ Generated 2026-10-19T08:09:06.328Z by scripts/trace.mjs from test tags and test-
 | AI-04 | v1 | Fixed generation parameters, JSON Schema output, mandatory source citation for extraction and classification | db/tests/ai_monitoring.test.mjs, services/ai-runtime/test/citation.test.ts (13) | PASS |
 | AI-10 | v1 | Continuous monitoring per task type (accuracy on reviewed samples, drift, rejection rate); below threshold the task type falls back to suggestion-only | db/tests/ai_monitoring.test.mjs, packages/api/test/ai_monitoring.test.ts (9) | PASS |
 | APP-DT-02 | v1 | Writes require Idempotency-Key; optimistic concurrency with If-Match on the version | apps/web/test/api_client.test.ts, packages/api/test/write_controls.test.ts (9) | PASS |
-| APP-DT-05 | v1 | Provenance on every app-written datum: source_app, source_record_id, source_version, transformation_id | db/tests/compliance.test.mjs, packages/api/test/write_controls.test.ts (4) | PASS |
+| APP-DT-05 | v1 | Provenance on every app-written datum: source_app, source_record_id, source_version, transformation_id | db/tests/compliance.test.mjs, db/tests/edc.test.mjs, packages/api/test/write_controls.test.ts (5) | PASS |
 | NFR-05 | v1 | TLS 1.2+, encryption at rest, server-side secrets, SAST, dependency scanning and SBOM in CI; penetration test before production | db/tests/security_controls.test.mjs (3) | PASS |
 | NFR-06 | v1 | Same code deployable in EU, US and Japan regions with data kept separate per region | — (0) | NO TEST |
 | NFR-07 | v1 | WCAG 2.1 AA; UI localisable, with English and Japanese for site- and subject-facing pages | — (0) | NO TEST |
