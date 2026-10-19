@@ -16,5 +16,10 @@ import { authRoutes } from './auth.ts';
 import { changeRoutes } from './changes.ts';
 import { accessLogRoutes } from './access-log.ts';
 import { certifiedCopyRoutes } from './certified-copies.ts';
+import { governanceRoutes } from './governance.ts';
+import { privacyRoutes } from './privacy.ts';
+import { appValidationRoutes } from './app-validation.ts';
 
 export const routes: RouteDef[] = [...platformRoutes, ...armRoutes, ...protocolRoutes, ...signatureRoutes, ...siteRoutes, ...metricRoutes, ...aiRoutes, ...aiGovernanceRoutes, ...jobRoutes, ...taskRoutes, ...appRoutes, ...auditRoutes, ...accessLogRoutes, ...certifiedCopyRoutes, ...changeRoutes, ...authRoutes, ...devRoutes];
+// v1 quality and privacy governance (CMP-05, CMP-08, VAL-04)
+routes.push(...governanceRoutes, ...privacyRoutes, ...appValidationRoutes);

@@ -1,0 +1,157 @@
+# VAL-02: the only way a release reaches the test or production environment (Annex 11 §4/§10, EMA 2023 validation,
+# JP CSV life cycle, 21 CFR 11.10(a), ICH E6(R3) computerised systems). No `netlify deploy` from a laptop for these
+# environments. Procedure, roles and the one-time activation: docs/compliance/RELEASE_PROMOTION.md.
+#   1. verify  : the tag vX.Y.Z is on main, CI passed on that commit, the full gate runs again on a synthetic copy (OQ)
+#   2. deploy  : waits for the approval of the GitHub environment (required reviewers), deploys the tagged commit,
+#                runs the installation qualification (scripts/iq-check.mjs) and records the release
+#                (version, commit, deploy, approvers, IQ result) as an artifact and on the GitHub release.
+# Secrets live only in the GitHub environments (NETLIFY_AUTH_TOKEN, IQ_DATABASE_URL); variables: NETLIFY_SITE_ID,
+# TRIALOPS_URL. Actions pinned to full commit SHAs, as in ci.yml.
+name: promote
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release tag vX.Y.Z (must be on main)'
+        required: true
+        type: string
+      environment:
+        description: 'Target environment'
+        required: true
+        type: choice
+        options: [test, production]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: promote-${{ inputs.environment }}
+  cancel-in-progress: false
+
+env:
+  NETLIFY_CLI_VERSION: '17.38.1'   # pinned; check it at activation (docs/compliance/RELEASE_PROMOTION.md)
+  TRIALOPS_GATE: foundations,v0,gxp-p0
+
+jobs:
+  verify:
+    name: verify release (tag on main, CI green, OQ on a synthetic copy)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      actions: read
+    outputs:
+      commit: ${{ steps.release.outputs.commit }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: refs/tags/${{ inputs.tag }}
+          fetch-depth: 0
+      - name: The tag is a release on main
+        id: release
+        env:
+          TAG: ${{ inputs.tag }}
+        run: |
+          git fetch --no-tags origin main:refs/remotes/origin/main
+          node scripts/release-check.mjs --tag "$TAG" --main origin/main
+          echo "commit=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+      - name: CI passed on this commit
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          SHA: ${{ steps.release.outputs.commit }}
+        run: |
+          n=$(gh api "repos/$REPO/actions/workflows/ci.yml/runs?head_sha=$SHA&status=success" --jq '.total_count')
+          if [ "${n:-0}" -lt 1 ]; then echo "::error::no successful ci run on $SHA"; exit 1; fi
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with: { node-version: 24 }
+      - run: npm ci || npm install
+      - run: npm run db:reset
+      - run: npm run verify
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        if: always()
+        with:
+          name: oq-evidence-${{ inputs.environment }}-${{ inputs.tag }}
+          path: |
+            test-results.xml
+            docs/traceability.md
+            docs/compliance/compliance-matrix.md
+
+  deploy:
+    name: deploy + IQ (${{ inputs.environment }})
+    needs: verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    # Required reviewers on this environment approve the promotion before any step below runs.
+    environment:
+      name: ${{ inputs.environment }}
+      url: ${{ vars.TRIALOPS_URL }}
+    permissions:
+      contents: write   # attach the release record to the GitHub release
+      actions: read     # read the environment approvals of this run
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: refs/tags/${{ inputs.tag }}
+      - name: Same commit as verified
+        env:
+          EXPECTED: ${{ needs.verify.outputs.commit }}
+        run: test "$(git rev-parse HEAD)" = "$EXPECTED"
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with: { node-version: 24 }
+      - run: npm ci || npm install
+      - name: Deploy the tagged commit
+        id: deploy
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ vars.NETLIFY_SITE_ID }}
+          TAG: ${{ inputs.tag }}
+          COMMIT: ${{ needs.verify.outputs.commit }}
+        run: |
+          npx --yes "netlify-cli@${NETLIFY_CLI_VERSION}" deploy --prod --build --filter @trialops/web --site "$NETLIFY_SITE_ID" \
+            --message "trialops ${TAG} ${COMMIT}" --json > deploy.json
+          echo "deploy_id=$(node -e "process.stdout.write(JSON.parse(require('fs').readFileSync('deploy.json','utf8')).deploy_id)")" >> "$GITHUB_OUTPUT"
+      - name: Approvers of this promotion
+        id: approvers
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          RUN_ID: ${{ github.run_id }}
+        run: |
+          list=$(gh api "repos/$REPO/actions/runs/$RUN_ID/approvals" --jq '[.[] | select(.state == "approved") | .user.login] | unique | join(",")' || true)
+          echo "list=$list" >> "$GITHUB_OUTPUT"
+      - name: Installation qualification (IQ)
+        if: always() && steps.deploy.outputs.deploy_id != ''
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          IQ_DATABASE_URL: ${{ secrets.IQ_DATABASE_URL }}
+          URL: ${{ vars.TRIALOPS_URL }}
+          NETLIFY_SITE_ID: ${{ vars.NETLIFY_SITE_ID }}
+          ENVIRONMENT: ${{ inputs.environment }}
+          TAG: ${{ inputs.tag }}
+          COMMIT: ${{ needs.verify.outputs.commit }}
+          DEPLOY_ID: ${{ steps.deploy.outputs.deploy_id }}
+          APPROVERS: ${{ steps.approvers.outputs.list }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          node scripts/iq-check.mjs --url "$URL" --environment "$ENVIRONMENT" --commit "$COMMIT" --tag "$TAG" \
+            --deploy-id "$DEPLOY_ID" --site-id "$NETLIFY_SITE_ID" --dist apps/web/dist --approvers "$APPROVERS" --run-url "$RUN_URL" \
+            --require web,deploy,db --out "iq-evidence/release-${ENVIRONMENT}-${TAG}.json"
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        if: always()
+        with:
+          name: release-record-${{ inputs.environment }}-${{ inputs.tag }}
+          path: |
+            iq-evidence/
+            deploy.json
+          retention-days: 90
+      - name: Attach the release record to the GitHub release
+        if: always() && hashFiles('iq-evidence/*.json') != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ inputs.tag }}
+        run: |
+          gh release view "$TAG" > /dev/null 2>&1 || gh release create "$TAG" --verify-tag --title "$TAG" --notes "TrialOps $TAG (VAL-02 release record attached)"
+          gh release upload "$TAG" iq-evidence/*.json --clobber
