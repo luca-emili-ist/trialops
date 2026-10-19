@@ -1,6 +1,6 @@
 # Traceability matrix
 
-Generated 2026-10-19T07:33:18.734Z by scripts/trace.mjs from test tags and test-results.xml.
+Generated 2026-10-19T07:58:49.369Z by scripts/trace.mjs from test tags and test-results.xml.
 
 | Requirement | Release | Description | Tests | Result |
 | --- | --- | --- | --- | --- |
@@ -40,8 +40,8 @@ Generated 2026-10-19T07:33:18.734Z by scripts/trace.mjs from test tags and test-
 | M02-03 | v0 | Per-arm site activation workflow | packages/api/test/sites.test.ts (3) | PASS |
 | APP-TK-01 | v1 | Task model and inbox | — (0) | NO TEST |
 | APP-TK-03 | v1 | Apps claim and close tasks via API | — (0) | NO TEST |
-| AI-07 | v1 | Tool registry AUTO/CONFIRM/BLOCK | — (0) | NO TEST |
-| AI-08 | v1 | Internal policy engine with signed decision records | — (0) | NO TEST |
+| AI-07 | v1 | Tool registry AUTO/CONFIRM/BLOCK | db/tests/ai_governance.test.mjs, packages/api/test/ai_governance.test.ts (11) | PASS |
+| AI-08 | v1 | Internal policy engine with signed decision records | db/tests/ai_governance.test.mjs, packages/api/test/ai_governance.test.ts (11) | PASS |
 | M03-01 | v1 | Arm addendum generation | — (0) | NO TEST |
 | M04-02 | v1 | IRB package assembly | — (0) | NO TEST |
 | M05-01 | v1 | AI-assisted pre-screening | — (0) | NO TEST |

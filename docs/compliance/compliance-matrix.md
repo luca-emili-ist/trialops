@@ -1,6 +1,6 @@
 # Compliance matrix
 
-Generated 2026-10-19T07:33:18.736Z by scripts/trace.mjs from docs/compliance/crosswalk.json and docs/requirements.json.
+Generated 2026-10-19T07:58:49.372Z by scripts/trace.mjs from docs/compliance/crosswalk.json and docs/requirements.json.
 Technical clauses are covered by requirements and their tests; procedural clauses are covered by SOPs of the quality system.
 
 ## P11 — US 21 CFR Part 11 — Electronic records; electronic signatures
@@ -11,9 +11,9 @@ Technical clauses are covered by requirements and their tests; procedural clause
 | P11-10b | §11.10(b) | Accurate and complete copies in human readable and electronic form for inspection | technical | CMP-10 (gxp-p0: PASS), CMP-14 (v1: PASS) | covered |
 | P11-10c | §11.10(c) | Protection of records for accurate and ready retrieval throughout the retention period | technical | NFR-04 (gxp-p0: PASS) | covered |
 | P11-10d | §11.10(d) | Limiting system access to authorized individuals | technical | IAM-02 (foundations: PASS), APP-MF-04 (foundations: PASS), APP-ID-01 (v0: PASS), IAM-01 (gxp-p0: PASS), CMP-03 (gxp-p0: PASS), IAM-06 (v2: NO TEST), APP-ID-03 (v2: NO TEST) | partial |
-| P11-10e | §11.10(e) | Secure, computer-generated, time-stamped audit trail; changes do not obscure previous values | technical | CMP-01 (foundations: PASS), CMP-04 (foundations: PASS), DM-03 (foundations: PASS), AI-06 (foundations: PASS), APP-TK-02 (foundations: PASS), AI-08 (v1: NO TEST), APP-AU-01 (v2: NO TEST), EDC-05 (v1: NO TEST), CMP-10 (gxp-p0: PASS), CMP-15 (gxp-p0: PASS), CMP-12 (v1: PASS) | partial |
+| P11-10e | §11.10(e) | Secure, computer-generated, time-stamped audit trail; changes do not obscure previous values | technical | CMP-01 (foundations: PASS), CMP-04 (foundations: PASS), DM-03 (foundations: PASS), AI-06 (foundations: PASS), APP-TK-02 (foundations: PASS), AI-08 (v1: PASS), APP-AU-01 (v2: NO TEST), EDC-05 (v1: NO TEST), CMP-10 (gxp-p0: PASS), CMP-15 (gxp-p0: PASS), CMP-12 (v1: PASS) | partial |
 | P11-10f | §11.10(f) | Operational system checks to enforce permitted sequencing of steps | technical | DM-02 (foundations: PASS), IAM-05 (foundations: PASS), AI-05 (foundations: PASS), APP-TK-02 (foundations: PASS), APP-TK-04 (foundations: PASS), M01-04 (foundations: PASS), M07-01 (foundations: PASS), M01-01 (v0: PASS), M02-03 (v0: PASS), EDC-04 (v1: NO TEST), EDC-08 (v2: NO TEST) | partial |
-| P11-10g | §11.10(g) | Authority checks: only authorized individuals can use, sign, alter or access records | technical | IAM-02 (foundations: PASS), IAM-03 (foundations: PASS), IAM-04 (foundations: PASS), IAM-05 (foundations: PASS), APP-MF-02 (foundations: PASS), APP-ID-02 (v0: PASS), APP-ID-02 (foundations: PASS), APP-TK-03 (v1: NO TEST), AI-07 (v1: NO TEST) | partial |
+| P11-10g | §11.10(g) | Authority checks: only authorized individuals can use, sign, alter or access records | technical | IAM-02 (foundations: PASS), IAM-03 (foundations: PASS), IAM-04 (foundations: PASS), IAM-05 (foundations: PASS), APP-MF-02 (foundations: PASS), APP-ID-02 (v0: PASS), APP-ID-02 (foundations: PASS), APP-TK-03 (v1: NO TEST), AI-07 (v1: PASS) | partial |
 | P11-10h | §11.10(h) | Device checks to determine validity of the source of data input | technical | EDC-03 (v1: NO TEST), APP-DT-05 (v1: PASS) | partial |
 | P11-10i | §11.10(i) | Persons who develop, maintain or use the system have education, training and experience | procedural | — | SOP |
 | P11-10j | §11.10(j) | Written policies holding individuals accountable for actions under their e-signatures | procedural | — | SOP |
@@ -155,7 +155,7 @@ Technical clauses are covered by requirements and their tests; procedural clause
 | FDA-AI-COU | Credibility framework steps 1–3 | Question of interest, context of use, model risk (influence × decision consequence) | technical | M05-01 (v1: NO TEST), CMP-06 (v1: PASS), AI-02 (v1: PASS) | partial |
 | FDA-AI-CRED | Credibility framework steps 4–7 | Credibility assessment plan, execution, report, adequacy for the context of use | technical | CMP-06 (v1: PASS), CMP-07 (v1: PASS), AI-02 (v1: PASS), AI-04 (v1: PASS) | covered |
 | FDA-AI-LIFECYCLE | Life cycle maintenance; Good AI Practice principle 9 | Model change control, performance monitoring, drift | technical | AI-06 (foundations: PASS), AI-01 (v0: PASS), AI-09 (v1: PASS), CMP-07 (v1: PASS), AI-03 (v1: PASS), AI-10 (v1: PASS) | covered |
-| FDA-AI-HUMAN | Good AI Practice principles 1, 3 | Human-centric design and oversight, adherence to GxP | technical | IAM-07 (foundations: PASS), AI-05 (foundations: PASS), AI-11 (foundations: PASS), APP-TK-04 (foundations: PASS), M01-02 (v0: PASS), AI-07 (v1: NO TEST), AI-08 (v1: NO TEST), M04-02 (v1: NO TEST), M05-01 (v1: NO TEST), M08-02 (v1: NO TEST), M09-02 (v1: NO TEST), AI-09 (v1: PASS), CMP-09 (gxp-p0: PASS) | partial |
+| FDA-AI-HUMAN | Good AI Practice principles 1, 3 | Human-centric design and oversight, adherence to GxP | technical | IAM-07 (foundations: PASS), AI-05 (foundations: PASS), AI-11 (foundations: PASS), APP-TK-04 (foundations: PASS), M01-02 (v0: PASS), AI-07 (v1: PASS), AI-08 (v1: PASS), M04-02 (v1: NO TEST), M05-01 (v1: NO TEST), M08-02 (v1: NO TEST), M09-02 (v1: NO TEST), AI-09 (v1: PASS), CMP-09 (gxp-p0: PASS) | partial |
 
 ## CDISC — FDA Data Standards Catalog / PMDA electronic study data (CDISC SDTM, ADaM, Define-XML, ODM)
 
