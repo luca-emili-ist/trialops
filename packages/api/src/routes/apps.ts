@@ -19,7 +19,7 @@ export function catalogue(): Row[] {
 
 async function getInstallation(db: Db, id: string): Promise<Row | undefined> {
   const i = (await db.query(`select id, app_id, version, gxp_class, platform_id, status, approved_by, approved_at, uninstalled_at, manifest,
-    created_at from core.app_installation where id = $1`, [id])).rows[0];
+    validation_package_id, contract_test_run_id, created_at from core.app_installation where id = $1`, [id])).rows[0];
   if (!i) return undefined;
   const scopes = (await db.query('select scope, granted_at, revoked_at from core.app_scope_grant where installation_id = $1 order by scope', [id])).rows;
   return { ...i, scopes };
@@ -71,8 +71,8 @@ export const appRoutes = [
       return getInstallation(db, id);
     } }),
 
-  route({ method: 'post', path: '/v1/app-installations/:id/approve', versioned: { table: 'app_installation', param: 'id' }, tag: 'apps', reqs: ['APP-MF-02'],
-    summary: 'Approve the scopes requested by an app (the app becomes active)',
+  route({ method: 'post', path: '/v1/app-installations/:id/approve', versioned: { table: 'app_installation', param: 'id' }, tag: 'apps', reqs: ['APP-MF-02', 'VAL-04', 'CMP-08'],
+    summary: 'Approve the scopes requested by an app (the app becomes active); L2-L3 need the accepted validation package and passing contract tests',
     handler: async ({ db, claims, params }) => {
       requirePerson(claims, 'Approving app scopes');
       requireRole(claims, [...ADMIN], 'Approving app scopes');
