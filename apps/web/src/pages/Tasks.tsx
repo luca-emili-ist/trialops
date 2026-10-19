@@ -2,7 +2,7 @@
 // Site-facing: localised in English and Japanese (NFR-07). Content of records (titles, protocol text) stays as recorded.
 import { useState, type ReactNode } from 'react';
 import { PageHeader, Panel, DataTable, StatusPill, Button, Loading, ErrorNote, DefinitionList, SelectField, SignDialog, DiffList, EmptyState, useToast,
-  SignatureManifest, AiProvenance, useT, type SectionDiff, type SignatureLike, type AiProvenanceLike } from '@trialops/shell';
+  SignatureManifest, AiProvenance, ReasonDialog, useT, type SectionDiff, type SignatureLike, type AiProvenanceLike } from '@trialops/shell';
 import { api, runJob } from '../api.ts';
 import { useData, useSession } from '../session.tsx';
 import { go } from '../router.ts';
@@ -72,12 +72,55 @@ export function TaskDetail({ id }: { id: string }) {
         </Panel>
       </div>
       {t.type === 'protocol.appendix.review' && t.state === 'waiting_review' ? <ProposalReview task={t} onDone={() => task.reload()} /> : null}
+      {t.type === 'arm.onboarding.plan' && t.state === 'waiting_review' && t.outputs?.proposal ? <PlanConfirmation task={t} onDone={() => task.reload()} /> : null}
       {t.type === 'arm.onboarding.plan' && t.outputs?.checklist ? <Panel title={tr('Onboarding checklist')}>
         <DataTable label={tr('Onboarding checklist')} rows={(t.outputs.checklist as { area: string; item: string }[]).map((c, i) => ({ ...c, k: `${i}` }))} rowKey={c => c.k}
           columns={[{ key: 'area', label: tr('Area'), render: c => tr(human(c.area)) }, { key: 'item', wrap: true, label: tr('Item') }]} /></Panel> : null}
-      {t.outputs?.decision ? <Panel title={tr('Review decision')}><DefinitionList items={[[tr('Decision'), <StatusPill tone={tone(t.outputs.decision)}>{tr(human(t.outputs.decision))}</StatusPill>],
+      {t.outputs?.decision && !POLICY_DECISIONS.includes(t.outputs.decision) ? <Panel title={tr('Review decision')}><DefinitionList items={[[tr('Decision'), <StatusPill tone={tone(t.outputs.decision)}>{tr(human(t.outputs.decision))}</StatusPill>],
           [tr('Signature'), <SignatureManifest signature={t.review_signature} empty={t.outputs.decided_by} />]]} />
         {t.outputs.edits?.length ? <DiffList sections={t.outputs.edits as SectionDiff[]} /> : null}</Panel> : null}
+    </>
+  );
+}
+
+/** Decisions of the policy engine (AI-08) kept in the task outputs; the review decision of a person is accepted/edited/rejected. */
+const POLICY_DECISIONS = ['ALLOW', 'REVIEW', 'BLOCK'];
+const PLAN_ROLES = ['platform_admin', 'platform_ops_manager'] as const;
+
+/** AI-10 / AI-07: an onboarding plan held as a proposal (task type in suggestion-only, or the tool in CONFIRM). The planned
+ * tasks are shown as additions before the decision (P4), in the AI material until a person decides (P5), with the reason
+ * the plan was held (P6); confirming creates the tasks in the name of the person. */
+function PlanConfirmation({ task, onDone }: { task: Task; onDone: () => void }) {
+  const t = useT();
+  const s = useSession();
+  const toast = useToast();
+  const [deciding, setDeciding] = useState<null | 'accept' | 'reject'>(null);
+  const plan = task.outputs!.proposal as { tasks?: { key: string; title: string; area: string; assignee_role: string; due_in_days?: number; gxp_impact?: boolean }[];
+    checklist?: unknown[] };
+  const why = task.outputs!.monitoring_mode === 'suggestion_only'
+    ? t('The planner is in suggestion-only mode (AI monitoring): a person confirms the plan before any task is created.')
+    : t('The tool that creates the tasks is in CONFIRM mode: a person confirms the plan before any task is created.');
+  const diff: SectionDiff[] = [{ section: t('Tasks'), change: 'added', items: (plan.tasks ?? []).map(p => ({ id: p.key, change: 'added' as const,
+    after: { title: [p.title, t(human(p.assignee_role)), p.due_in_days !== undefined ? t('due in {n} days', { n: p.due_in_days }) : null, p.gxp_impact ? 'GxP' : null]
+      .filter(Boolean).join(' · ') } })) }];
+  return (
+    <>
+      <Panel ai title={t('AI-generated onboarding plan — waiting for confirmation')}
+        meta={<AiProvenance provenance={{ agent: task.assignee, ai_request_id: task.outputs!.ai_request_id ?? null }} />}
+        actions={s.can(...PLAN_ROLES) ? <>
+          <Button variant="primary" onClick={() => setDeciding('accept')}>{t('Confirm the plan…')}</Button>
+          <Button variant="danger" onClick={() => setDeciding('reject')}>{t('Reject…')}</Button></> : undefined}>
+        <p>{why}{task.outputs!.rule_ids?.length ? <> <span className="t-mono">({(task.outputs!.rule_ids as string[]).join(', ')})</span></> : null}</p>
+        <DiffList sections={diff} />
+        <p className="t-muted">{t('{n} tasks and {c} checklist items would be created.', { n: plan.tasks?.length ?? 0, c: plan.checklist?.length ?? 0 })}</p>
+      </Panel>
+      {deciding ? <ReasonDialog title={deciding === 'accept' ? t('Confirm the onboarding plan') : t('Reject the onboarding plan')}
+        confirmLabel={deciding === 'accept' ? t('Confirm and create the tasks') : t('Reject')}
+        description={deciding === 'accept' ? t('The tasks are created in your name; a signed decision record keeps your reason.') : t('No task is created; a signed decision record keeps your reason.')}
+        onClose={() => setDeciding(null)} onConfirm={async reason => {
+          const r = await api<{ tasks_created: number }>('POST', `/v1/tasks/${task.id}/confirm-plan`, { reason, body: { decision: deciding } });
+          setDeciding(null); toast(deciding === 'accept' ? t('{n} tasks created', { n: r.tasks_created }) : t('Plan rejected')); onDone();
+        }} /> : null}
     </>
   );
 }

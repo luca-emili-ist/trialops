@@ -13,6 +13,12 @@ export const PAGE_CODES = {
   oidcAuthorize: 'TRO-041',
   aiLedger: 'TRO-050',
   auditTrail: 'TRO-051',
+  aiMonitoring: 'TRO-052',    // AI-10 monitoring per task type, autonomy per task type (AI-08 decision record anomalies)
+  pendingActions: 'TRO-053',  // AI-07/AI-08 agent actions held for a person: confirm or reject
+  quality: 'TRO-054',         // CMP-05 CtQ factors, risk register, KRIs/QTLs
+  providers: 'TRO-055',       // CMP-05/CMP-08 service providers, agreements, oversight
+  privacy: 'TRO-056',         // CMP-08 privacy self-check, data residency (NFR-06), ROPA
+  appValidation: 'TRO-057',   // VAL-04 activation gate of L2-L3 apps
   changeRequests: 'TRO-060',  // Admin: triage of the changes suggested from the pages (UX-02)
   login: 'TRO-090',
   loginMfa: 'TRO-091',        // sign-in step: authenticator code (IAM-01); not a route, part of the sign-in
