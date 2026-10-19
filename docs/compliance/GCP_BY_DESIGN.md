@@ -182,7 +182,7 @@ Fonte: inventario del codice al commit `45bc4e2` e `docs/SPEC.md` §9–§11. Le
 | **Backup, PITR, test di restore, retention di 25 anni, archivio** | 🟡 | NFR-04: retention per piattaforma (0016), test di restore con evidenza (`BACKUP_RESTORE.md`), backup giornalieri Supabase; PITR e archivio WORM rimandati al primo trial reale (decisione 2026-10-10) |
 | **Copie certificate ed export leggibile** dell'intero record con audit e firme | ❌ | Non presente |
 | Archivio documenti immutabile (WORM) | ❌ | Non c'è ancora un archivio file |
-| Accesso indipendente dello sperimentatore ai dati del proprio sito (EMA 2023 §4.6) | ❌ | Da progettare insieme all'EDC (M06b) |
+| Accesso indipendente dello sperimentatore ai dati del proprio sito (EMA 2023 §4.6) | 🟡 | EDC nativo (0027, EDC-03): solo il personale del sito (`site_pi`, `study_coordinator`) inserisce e corregge i dati, il PI legge sempre i dati del proprio sito (RLS per sito, nessun ruolo dello sponsor può modificarli); manca la copia indipendente consegnata al sito a fine studio |
 
 ### 3.5 Validazione e processo — GAMP 5, CSA, Annex 11 §4, EMA 2023 Annex 2
 
