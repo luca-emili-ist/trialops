@@ -7,3 +7,5 @@ export * from './ui/manifest.ts';
 export * from './ui/provenance.tsx';
 export * from './ui/suggest.ts';
 export * from './ui/SuggestChanges.tsx';
+export * from './i18n.tsx';
+export { SHELL_CATALOGUES } from './i18n/index.ts';

@@ -1,6 +1,7 @@
 // Modal, signature dialog (Part 11: meaning + re-authentication + reason) and toasts.
 import { createContext, useCallback, useContext, useEffect, useId, useRef, useState, type ReactNode } from 'react';
 import { Button, TextField } from './basic.tsx';
+import { useT } from '../i18n.tsx';
 
 export function Modal({ title, onClose, children, actions }: { title: string; onClose: () => void; children: ReactNode; actions?: ReactNode }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -8,7 +9,16 @@ export function Modal({ title, onClose, children, actions }: { title: string; on
   useEffect(() => {
     const prev = document.activeElement as HTMLElement | null;
     ref.current?.querySelector<HTMLElement>('input, select, textarea, button')?.focus();
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') { onClose(); return; }
+      // keep the keyboard focus inside the dialog (WCAG 2.4.3)
+      if (e.key !== 'Tab' || !ref.current) return;
+      const f = [...ref.current.querySelectorAll<HTMLElement>('a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])')];
+      if (!f.length) return;
+      const first = f[0]!, last = f[f.length - 1]!;
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    };
     document.addEventListener('keydown', onKey);
     return () => { document.removeEventListener('keydown', onKey); prev?.focus(); };
   }, [onClose]);
@@ -35,6 +45,7 @@ export function SignDialog({ title, meaning, what, confirmLabel, onSign, onClose
   /** Ask for the authenticator code; default from SignMfaContext. */
   mfa?: boolean;
 }) {
+  const t = useT();
   const fromSession = useContext(SignMfaContext);
   const [password, setPassword] = useState('');
   const [totp, setTotp] = useState('');
@@ -55,16 +66,16 @@ export function SignDialog({ title, meaning, what, confirmLabel, onSign, onClose
   const onEnter = (e: { key: string }) => { if (e.key === 'Enter' && ready) void submit(); };
   return (
     <Modal title={title} onClose={onClose} actions={<>
-      <Button onClick={onClose}>Cancel</Button>
-      <Button variant="sign" disabled={!ready || busy} onClick={submit}>{busy ? 'Signing…' : confirmLabel}</Button>
+      <Button onClick={onClose}>{t('Cancel')}</Button>
+      <Button variant="sign" disabled={!ready || busy} onClick={submit}>{busy ? t('Signing…') : confirmLabel}</Button>
     </>}>
-      <div className="sign-meaning"><strong>Meaning of this signature: {meaning}</strong><span>{what}</span></div>
-      <TextField label="Reason" value={reason} onChange={e => setReason(e.target.value)} hint="Recorded in the audit trail" />
-      <TextField label="Password" type="password" autoComplete="current-password" value={password}
-        onChange={e => setPassword(e.target.value)} hint="Re-enter your password to sign" error={withCode ? undefined : error ?? undefined}
+      <div className="sign-meaning"><strong>{t('Meaning of this signature: {meaning}', { meaning: t(meaning) })}</strong><span>{what}</span></div>
+      <TextField label={t('Reason')} value={reason} onChange={e => setReason(e.target.value)} hint={t('Recorded in the audit trail')} />
+      <TextField label={t('Password')} type="password" autoComplete="current-password" value={password}
+        onChange={e => setPassword(e.target.value)} hint={t('Re-enter your password to sign')} error={withCode ? undefined : error ?? undefined}
         onKeyDown={onEnter} />
-      {withCode ? <TextField label="Authenticator code" inputMode="numeric" autoComplete="one-time-code" maxLength={6} value={totp}
-        onChange={e => setTotp(e.target.value.replace(/\D/g, ''))} hint="6-digit code from your authenticator app" error={error ?? undefined}
+      {withCode ? <TextField label={t('Authenticator code')} inputMode="numeric" autoComplete="one-time-code" maxLength={6} value={totp}
+        onChange={e => setTotp(e.target.value.replace(/\D/g, ''))} hint={t('6-digit code from your authenticator app')} error={error ?? undefined}
         onKeyDown={onEnter} /> : null}
     </Modal>
   );
@@ -89,6 +100,7 @@ export function ReasonDialog({ title, description, confirmLabel, onConfirm, onCl
   title: string; description?: ReactNode; confirmLabel: string; reasonDefault?: string;
   onConfirm: (reason: string) => Promise<void>; onClose: () => void;
 }) {
+  const t = useT();
   const [reason, setReason] = useState(reasonDefault);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -98,15 +110,15 @@ export function ReasonDialog({ title, description, confirmLabel, onConfirm, onCl
   };
   return (
     <Modal title={title} onClose={onClose} actions={<>
-      <Button onClick={onClose}>Cancel</Button>
-      <Button variant="primary" disabled={!reason.trim() || busy} onClick={submit}>{busy ? 'Saving…' : confirmLabel}</Button>
+      <Button onClick={onClose}>{t('Cancel')}</Button>
+      <Button variant="primary" disabled={!reason.trim() || busy} onClick={submit}>{busy ? t('Saving…') : confirmLabel}</Button>
     </>}>
       {description ? <p className="t-muted">{description}</p> : null}
-      <TextField label="Reason for change" value={reason} onChange={e => setReason(e.target.value)} hint="Recorded in the audit trail"
+      <TextField label={t('Reason for change')} value={reason} onChange={e => setReason(e.target.value)} hint={t('Recorded in the audit trail')}
         error={error ?? undefined} onKeyDown={e => { if (e.key === 'Enter' && reason.trim()) void submit(); }} />
     </Modal>
   );
 }
 
-export function Loading({ what = 'Loading' }: { what?: string }) { return <p className="t-muted" role="status">{what}…</p>; }
-export function ErrorNote({ error }: { error: string }) { return <div className="empty" role="alert"><strong>Something went wrong</strong><span>{error}</span></div>; }
+export function Loading({ what }: { what?: string }) { const t = useT(); return <p className="t-muted" role="status">{what ?? t('Loading')}…</p>; }
+export function ErrorNote({ error }: { error: string }) { const t = useT(); return <div className="empty" role="alert"><strong>{t('Something went wrong')}</strong><span>{error}</span></div>; }

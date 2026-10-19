@@ -7,7 +7,7 @@
 // the server enforces the same limit and answers 401 session_idle, which also ends the session here.
 import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from 'react';
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
-import { Button, Modal, SignMfaContext } from '@trialops/shell';
+import { Button, Modal, SignMfaContext, useT } from '@trialops/shell';
 import { api, get, setSessionEndHandler, setToken } from './api.ts';
 import { go } from './router.ts';
 
@@ -68,6 +68,9 @@ async function nextMfaStep(): Promise<MfaStep> {
 const Ctx = createContext<Session | null>(null);
 
 export function SessionProvider({ children }: { children: ReactNode }) {
+  const t = useT();
+  const tr = useRef(t);   // callbacks below are stable: they read the translation of the current locale through the ref
+  tr.current = t;
   const [me, setMe] = useState<Me | null>(null);
   const [platform, setPlatform] = useState<Platform | null>(null);
   const [loading, setLoading] = useState(true);
@@ -91,7 +94,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
       return null;
     } catch (e) {
       setToken(null); store.set(null); setMe(null); setPlatform(null); setMfaStep(null); setLoading(false);
-      return `Signed in, but TrialOps could not load your profile: ${(e as Error).message}`;
+      return tr.current('Signed in, but TrialOps could not load your profile: {error}', { error: (e as Error).message });
     }
   }, []);
 
@@ -144,7 +147,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
       if (idle >= limit) {
         window.clearInterval(timer);
         void api('POST', '/v1/auth/session/end', { body: { reason: 'idle_timeout' } }).catch(() => undefined)
-          .then(() => endLocally(`Your session ended after ${minutes} minutes of inactivity. Sign in again to continue.`));
+          .then(() => endLocally(tr.current('Your session ended after {minutes} minutes of inactivity. Sign in again to continue.', { minutes })));
       } else setWarning(idle >= limit - 60_000);
     }, 1_000);
     return () => { window.clearInterval(timer); for (const ev of events) window.removeEventListener(ev, onActivity); setWarning(false); };
@@ -191,12 +194,12 @@ export function SessionProvider({ children }: { children: ReactNode }) {
   return (
     <Ctx.Provider value={value}>
       <SignMfaContext.Provider value={!!me?.mfa?.enrolled}>{children}</SignMfaContext.Provider>
-      {warning && me ? <Modal title="Your session is about to end" onClose={() => setWarning(false)} actions={<>
-        <Button onClick={() => { void value.signOut().then(() => go('/login')); }}>Sign out</Button>
-        <Button variant="primary" onClick={() => setWarning(false)}>Stay signed in</Button>
+      {warning && me ? <Modal title={t('Your session is about to end')} onClose={() => setWarning(false)} actions={<>
+        <Button onClick={() => { void value.signOut().then(() => go('/login')); }}>{t('Sign out')}</Button>
+        <Button variant="primary" onClick={() => setWarning(false)}>{t('Stay signed in')}</Button>
       </>}>
-        <p>For your security you will be signed out in less than a minute because of inactivity
-          ({me.session?.idle_timeout_minutes ?? 15} minutes). Unsaved changes will be lost.</p>
+        <p>{t('For your security you will be signed out in less than a minute because of inactivity ({minutes} minutes). Unsaved changes will be lost.',
+          { minutes: me.session?.idle_timeout_minutes ?? 15 })}</p>
       </Modal> : null}
     </Ctx.Provider>
   );

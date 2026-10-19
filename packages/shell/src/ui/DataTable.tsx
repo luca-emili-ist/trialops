@@ -1,6 +1,7 @@
 // Data table with sticky header and sortable columns (house standard: sticky headers, sortable tables everywhere).
 import { useMemo, useState, type ReactNode } from 'react';
 import { EmptyState } from './basic.tsx';
+import { useT } from '../i18n.tsx';
 
 export interface Column<T> {
   key: string;
@@ -12,10 +13,12 @@ export interface Column<T> {
   wrap?: boolean;
 }
 
-export function DataTable<T>({ columns, rows, rowKey, onRowClick, selectedKey, empty, caption }: {
+/** `caption`: visible caption; `label`: accessible name of the scrollable table region when the panel title names it already. */
+export function DataTable<T>({ columns, rows, rowKey, onRowClick, selectedKey, empty, caption, label }: {
   columns: Column<T>[]; rows: T[]; rowKey: (row: T) => string; onRowClick?: (row: T) => void; selectedKey?: string | null;
-  empty?: ReactNode; caption?: string;
+  empty?: ReactNode; caption?: string; label?: string;
 }) {
+  const t = useT();
   const [sort, setSort] = useState<{ key: string; dir: 1 | -1 } | null>(null);
   const sorted = useMemo(() => {
     if (!sort) return rows;
@@ -27,9 +30,10 @@ export function DataTable<T>({ columns, rows, rowKey, onRowClick, selectedKey, e
       return (x < y ? -1 : 1) * sort.dir;
     });
   }, [rows, sort, columns]);
-  if (!rows.length) return <>{empty ?? <EmptyState title="Nothing here yet" />}</>;
+  if (!rows.length) return <>{empty ?? <EmptyState title={t('Nothing here yet')} />}</>;
   return (
-    <div className="table-wrap">
+    // scrollable region: reachable and scrollable with the keyboard (WCAG 2.1.1), named by its caption when there is one
+    <div className="table-wrap" tabIndex={0} role="region" aria-label={label ?? caption ?? t('Table')}>
       <table className="table">
         {caption ? <caption className="table-caption">{caption}</caption> : null}
         <thead><tr>{columns.map(c => {

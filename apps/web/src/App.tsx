@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef } from 'react';
-import { AppShell, Loading, Button, SuggestChanges, type NavItem, type SuggestedChange, type OpenRequest } from '@trialops/shell';
+import { AppShell, Loading, Button, SuggestChanges, LanguageSelect, useT, type NavItem, type SuggestedChange, type OpenRequest } from '@trialops/shell';
 import { useRoute, go } from './router.ts';
 import { PAGE_CODES, type PageKey } from './pageCodes.ts';
 import { useSession, useData } from './session.tsx';
@@ -35,6 +35,7 @@ const PUBLIC: PageKey[] = ['login', 'loginMfa', 'loginMfaEnrol', 'uiCatalogue'];
 export function App() {
   const route = useRoute();
   const s = useSession();
+  const t = useT();
   const needsLogin = !s.loading && !s.me && !PUBLIC.includes(route.page);
   useEffect(() => {
     if (needsLogin) {
@@ -54,7 +55,7 @@ export function App() {
   const suggest = useCallback(async (c: SuggestedChange) => { await api('POST', '/v1/change-requests', { body: { platform_id: platformId, ...c } }); }, [platformId]);
   const openOn = useCallback(async (page: string) => (await get<{ items: OpenRequest[] }>(
     `/v1/change-requests?platform_id=${platformId}&status=open&page_code=${encodeURIComponent(page)}`)).items, [platformId]);
-  if (s.loading) return <AppShell brand="TrialOps" nav={[]} pageCode={code}><Loading what="Signing in" /></AppShell>;
+  if (s.loading) return <AppShell brand="TrialOps" nav={[]} pageCode={code}><Loading what={t('Signing in')} /></AppShell>;
   if (route.page === 'login') return <Login />;
   if (route.page === 'uiCatalogue') return <UiCatalogue />;
   if (!s.me) return null;
@@ -68,15 +69,16 @@ export function App() {
     notFound: <NotFound />, login: null, loginMfa: null, loginMfaEnrol: null, uiCatalogue: null,
   }[route.page];
   const waiting = inbox.data?.items.filter(t => t.state === 'waiting_review').length ?? 0;
-  const nav: NavItem[] = NAV.filter(n => !n.roles || s.can(...n.roles)).map(n => ({ label: n.label, href: n.href, group: n.group, active: n.pages.includes(route.page),
+  const nav: NavItem[] = NAV.filter(n => !n.roles || s.can(...n.roles)).map(n => ({ label: t(n.label), href: n.href, group: t(n.group), active: n.pages.includes(route.page),
     ...(n.href === '#/tasks' && inbox.data ? { count: inbox.data.items.length, severity: waiting ? 'warn' as const : 'neutral' as const } : {}) }));
   return (
     <AppShell brand="TrialOps" subtitle={s.platform ? `${s.platform.code} · ${s.platform.therapeutic_area}` : undefined} nav={nav}
-      pageCode={code} banner="Synthetic data — demonstration environment"
-      actions={s.platform ? <SuggestChanges pageCode={code} onSubmit={suggest} loadOpen={openOn} triageHint="Admin → Change requests (TRO-060)" /> : null}
+      pageCode={code} banner={t('Synthetic data — demonstration environment')}
+      actions={s.platform ? <SuggestChanges pageCode={code} onSubmit={suggest} loadOpen={openOn} triageHint={t('Admin → Change requests (TRO-060)')} /> : null}
       user={<>
-        <span><strong>{s.me.person?.full_name ?? s.me.email ?? s.me.sub}</strong><br />{s.me.roles.map(r => r.replace(/_/g, ' ')).join(', ') || 'no role'}</span>
-        <Button variant="ghost" onClick={() => { void s.signOut().then(() => go('/login')); }}>{s.mode === 'dev' ? 'Switch user' : 'Sign out'}</Button>
+        <span><strong>{s.me.person?.full_name ?? s.me.email ?? s.me.sub}</strong><br />{s.me.roles.map(r => t(r.replace(/_/g, ' '))).join(', ') || t('no role')}</span>
+        <LanguageSelect />
+        <Button variant="ghost" onClick={() => { void s.signOut().then(() => go('/login')); }}>{s.mode === 'dev' ? t('Switch user') : t('Sign out')}</Button>
       </>}>
       {page}
     </AppShell>

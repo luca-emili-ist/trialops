@@ -29,7 +29,7 @@ test('[DEMO-04] pages use design tokens only: no hex colours, rgb() or inline co
 
 test('[DEMO-04] the synthetic-data label is on every page of the shell', () => {
   const app = readFileSync(join(src, 'App.tsx'), 'utf8');
-  assert.match(app, /banner="Synthetic data — demonstration environment"/);
+  assert.match(app, /banner=\{t\('Synthetic data — demonstration environment'\)\}/, 'translated (NFR-07), never removed');
   for (const f of ['Login.tsx', 'UiCatalogue.tsx']) assert.match(readFileSync(join(src, 'pages', f), 'utf8'), /Synthetic data — demonstration environment/);
 });
 
@@ -95,7 +95,7 @@ test('[IAM-01] the sign-in asks for the authenticator code or its enrolment befo
   assert.match(session, /supabase\.auth\.mfa\.enroll\(\{ factorType: 'totp'/);
   assert.match(session, /<SignMfaContext\.Provider value=\{!!me\?\.mfa\?\.enrolled\}>/);
   const overlays = readFileSync(join(src, '../../../packages/shell/src/ui/overlays.tsx'), 'utf8');
-  assert.match(overlays, /label="Authenticator code"/);
+  assert.match(overlays, /label=\{t\('Authenticator code'\)\}/);
   for (const f of ['ProtocolEditor.tsx', 'Tasks.tsx', 'AuditTrail.tsx', 'ArmWizard.tsx']) assert.match(page(f), /onSign=\{(async )?\(password, reason, totp\) =>/, f);
 });
 
@@ -103,12 +103,12 @@ test('[CMP-03] idle timer with a warning 60 s before the limit; the API ending t
   const session = readFileSync(join(src, 'session.tsx'), 'utf8');
   assert.match(session, /const limit = minutes \* 60_000;/);
   assert.match(session, /setWarning\(idle >= limit - 60_000\)/);
-  assert.match(session, /title="Your session is about to end"/);
-  assert.match(session, /Your session ended after \$\{minutes\} minutes of inactivity/);
+  assert.match(session, /title=\{t\('Your session is about to end'\)\}/);
+  assert.match(session, /Your session ended after \{minutes\} minutes of inactivity/);
   assert.match(session, /\/v1\/auth\/session\/end', \{ body: \{ reason: 'idle_timeout' \} \}/, 'the server records the timeout');
   assert.match(session, /setSessionEndHandler\(e => \{ void endLocally\(e\.message\); \}\)/);
   assert.match(readFileSync(join(src, 'api.ts'), 'utf8'), /const SESSION_END_CODES = \['session_idle', 'session_ended', 'account_locked'\];/);
-  assert.match(page('Login.tsx'), /<Panel title="Session ended">/);
+  assert.match(page('Login.tsx'), /<Panel title=\{t\('Session ended'\)\}>/);
 });
 
 test('[UX-01] Suggest changes is at the top right of every signed-in page with the code of the page registry', () => {

@@ -3,6 +3,7 @@
 // the component declares. Clicking a number opens a panel to describe the change; the application stores it (UX-02).
 import { useCallback, useEffect, useState } from 'react';
 import { Button, StatusPill, Textarea } from './basic.tsx';
+import { useT } from '../i18n.tsx';
 import { classifyBox, componentCode, orderComponents, snippet, type ComponentKind } from './suggest.ts';
 
 export interface SuggestedChange { page_code: string; component_code: string; component_kind: ComponentKind; component_text: string;
@@ -90,13 +91,14 @@ function Icon() {
 export function SuggestChanges({ pageCode, onSubmit, loadOpen, triageHint = 'Change requests' }: {
   pageCode: string; onSubmit: (c: SuggestedChange) => Promise<void>; loadOpen: (pageCode: string) => Promise<OpenRequest[]>; triageHint?: string;
 }) {
+  const t = useT();
   const [active, setActive] = useState(false);
   useEffect(() => { setActive(false); }, [pageCode]);
   return (
     <>
       <button type="button" data-suggest-ui className="suggest-btn" aria-pressed={active} onClick={() => setActive(a => !a)}
-        title="Suggest changes: number the components of this page and describe what should change">
-        <Icon /><span className="suggest-label">Suggest changes</span>
+        title={t('Suggest changes: number the components of this page and describe what should change')} aria-label={t('Suggest changes')}>
+        <Icon /><span className="suggest-label">{t('Suggest changes')}</span>
       </button>
       {active ? <SuggestOverlay pageCode={pageCode} onExit={() => setActive(false)} onSubmit={onSubmit} loadOpen={loadOpen} triageHint={triageHint} /> : null}
     </>
@@ -105,6 +107,7 @@ export function SuggestChanges({ pageCode, onSubmit, loadOpen, triageHint = 'Cha
 
 function SuggestOverlay({ pageCode, onExit, onSubmit, loadOpen, triageHint }: { pageCode: string; onExit: () => void; triageHint: string;
   onSubmit: (c: SuggestedChange) => Promise<void>; loadOpen: (pageCode: string) => Promise<OpenRequest[]> }) {
+  const t = useT();
   const [items, setItems] = useState<Item[]>([]);
   const [inModal, setInModal] = useState(false);
   const [hover, setHover] = useState<Item | null>(null);
@@ -130,10 +133,10 @@ function SuggestOverlay({ pageCode, onExit, onSubmit, loadOpen, triageHint }: { 
   const hoverRect = hover?.el.isConnected ? hover.el.getBoundingClientRect() : null;
   return (
     <div data-suggest-ui className="suggest-layer">
-      <div className="suggest-bar" role="toolbar" aria-label="Suggestion mode">
-        <span><b className="t-mono">{pageCode}</b>{inModal ? ' · dialog' : ''} · click a number to suggest a change · {items.length} components</span>
-        <button type="button" className="suggest-bar-btn" onClick={scan} title="Renumber (after opening a dialog or changing tab)">Renumber</button>
-        <button type="button" className="suggest-bar-btn suggest-bar-done" onClick={onExit}>Done</button>
+      <div className="suggest-bar" role="toolbar" aria-label={t('Suggestion mode')}>
+        <span><b className="t-mono">{pageCode}</b>{inModal ? ` · ${t('dialog')}` : ''} · {t('click a number to suggest a change')} · {t('{n} components', { n: items.length })}</span>
+        <button type="button" className="suggest-bar-btn" onClick={scan} title={t('Renumber (after opening a dialog or changing tab)')}>{t('Renumber')}</button>
+        <button type="button" className="suggest-bar-btn suggest-bar-done" onClick={onExit}>{t('Done')}</button>
       </div>
       {hoverRect ? <div className="suggest-outline" style={{ left: hoverRect.left - 3, top: hoverRect.top - 3, width: hoverRect.width + 6, height: hoverRect.height + 6 }} /> : null}
       {items.map(it => {
@@ -142,7 +145,7 @@ function SuggestOverlay({ pageCode, onExit, onSubmit, loadOpen, triageHint }: { 
         if (r.bottom < 0 || r.top > window.innerHeight || r.right < 0 || r.left > window.innerWidth) return null;
         return (
           <button type="button" key={it.code} className="suggest-num" aria-pressed={picked?.code === it.code} title={`${it.code} · ${it.kind}`}
-            aria-label={`Component ${it.code}, ${it.kind}`} style={{ left: Math.max(2, r.left - 8), top: Math.max(2, r.top - 8) }}
+            aria-label={t('Component {code}, {kind}', { code: it.code, kind: it.kind })} style={{ left: Math.max(2, r.left - 8), top: Math.max(2, r.top - 8) }}
             onMouseEnter={() => setHover(it)} onMouseLeave={() => setHover(h => (h === it ? null : h))} onFocus={() => setHover(it)} onClick={() => setPicked(it)}>
             {it.explicit ? it.code.split('.').pop() : it.n}
           </button>
@@ -153,10 +156,11 @@ function SuggestOverlay({ pageCode, onExit, onSubmit, loadOpen, triageHint }: { 
   );
 }
 
-const KIND_LABEL: [SuggestedChange['kind'], string][] = [['change', 'Change'], ['bug', 'Bug'], ['new', 'New feature']];
+const KIND_LABEL: [SuggestedChange['kind'], string][] = [['change', 'Change'], ['bug', 'Bug'], ['new', 'New feature']];   // English keys of the catalogue
 
 function SuggestPanel({ item, pageCode, onClose, onSubmit, loadOpen, triageHint }: { item: Item; pageCode: string; onClose: () => void; triageHint: string;
   onSubmit: (c: SuggestedChange) => Promise<void>; loadOpen: (pageCode: string) => Promise<OpenRequest[]> }) {
+  const t = useT();
   const [kind, setKind] = useState<SuggestedChange['kind']>('change');
   const [text, setText] = useState('');
   const [busy, setBusy] = useState(false);
@@ -168,7 +172,7 @@ function SuggestPanel({ item, pageCode, onClose, onSubmit, loadOpen, triageHint 
   useEffect(() => { let live = true; loadOpen(pageCode).then(o => live && setOpen(o), () => live && setOpen([])); return () => { live = false; }; }, [pageCode, loadOpen]);
 
   const submit = async () => {
-    if (!text.trim()) { setError('Describe the change first.'); return; }
+    if (!text.trim()) { setError(t('Describe the change first.')); return; }
     setBusy(true); setError(null);
     try {
       await onSubmit({ page_code: pageCode, component_code: item.code, component_kind: item.kind, component_text: shown, dom_path: domPath(item.el),
@@ -179,26 +183,26 @@ function SuggestPanel({ item, pageCode, onClose, onSubmit, loadOpen, triageHint 
   };
   const same = (open ?? []).filter(o => o.component_code === item.code).length;
   return (
-    <div className="suggest-panel" role="dialog" aria-label={`Suggest a change on ${item.code}`}>
+    <div className="suggest-panel" role="dialog" aria-label={t('Suggest a change on {code}', { code: item.code })}>
       <div className="suggest-panel-head">
         <div><strong className="t-mono">{item.code}</strong><small>{item.kind}{shown ? ` · “${shown.slice(0, 70)}${shown.length > 70 ? '…' : ''}”` : ''}</small></div>
-        <button type="button" className="suggest-bar-btn" onClick={onClose} aria-label="Close">×</button>
+        <button type="button" className="suggest-bar-btn" onClick={onClose} aria-label={t('Close')}>×</button>
       </div>
-      <div className="row" role="radiogroup" aria-label="Type of request">
-        {KIND_LABEL.map(([k, l]) => <button type="button" key={k} role="radio" aria-checked={kind === k} className="suggest-kind" onClick={() => setKind(k)}>{l}</button>)}
+      <div className="row" role="radiogroup" aria-label={t('Type of request')}>
+        {KIND_LABEL.map(([k, l]) => <button type="button" key={k} role="radio" aria-checked={kind === k} className="suggest-kind" onClick={() => setKind(k)}>{t(l)}</button>)}
       </div>
-      <Textarea aria-label="What should change" value={text} onChange={e => setText(e.target.value)} rows={4} autoFocus disabled={busy}
-        placeholder="What should change here? For example: add a column with the due date, sort by site, rename this button…" />
-      <small className="t-muted">Describe the screen, not patients: no personal or clinical data in the request.</small>
-      {error ? <span><StatusPill tone="bad">Not sent</StatusPill> {error}</span> : null}
-      {sent ? <small>Sent — it is in {triageHint} with code {item.code}. Pick another number or press Done.</small> : null}
+      <Textarea aria-label={t('What should change')} value={text} onChange={e => setText(e.target.value)} rows={4} autoFocus disabled={busy}
+        placeholder={t('What should change here? For example: add a column with the due date, sort by site, rename this button…')} />
+      <small className="t-muted">{t('Describe the screen, not patients: no personal or clinical data in the request.')}</small>
+      {error ? <span><StatusPill tone="bad">{t('Not sent')}</StatusPill> {error}</span> : null}
+      {sent ? <small role="status">{t('Sent — it is in {where} with code {code}. Pick another number or press Done.', { where: triageHint, code: item.code })}</small> : null}
       <div className="modal-actions">
-        <Button onClick={onClose}>Close</Button>
-        <Button variant="primary" disabled={busy} onClick={() => { void submit(); }}>{busy ? 'Sending…' : 'Send suggestion'}</Button>
+        <Button onClick={onClose}>{t('Close')}</Button>
+        <Button variant="primary" disabled={busy} onClick={() => { void submit(); }}>{busy ? t('Sending…') : t('Send suggestion')}</Button>
       </div>
       {open?.length ? (
         <div className="suggest-open">
-          <span className="suggest-open-title">Open on {pageCode}: {open.length}{same ? ` · ${same} on this component` : ''}</span>
+          <span className="suggest-open-title">{t('Open on {page}: {n}', { page: pageCode, n: open.length })}{same ? ` · ${t('{n} on this component', { n: same })}` : ''}</span>
           {open.slice(0, 6).map(o => <div key={o.id} data-same={o.component_code === item.code ? 'true' : undefined}>
             <span className="t-mono">{(o.component_code ?? '').split('.').pop()}</span> {o.request.slice(0, 90)}{o.request.length > 90 ? '…' : ''}</div>)}
         </div>

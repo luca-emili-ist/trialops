@@ -292,3 +292,19 @@ a { color: var(--c-accent); text-underline-offset: 2px; }
   .suggest-label { display: none; }
   .suggest-bar > span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
 }
+
+/* Accessibility (NFR-07, WCAG 2.1 AA): skip link, language switch, focus of the main region */
+.skip-link { position: absolute; left: var(--s-2); top: var(--s-2); z-index: 50; transform: translateY(-200%); background: var(--c-surface); color: var(--c-accent); padding: var(--s-2) var(--s-3); border-radius: var(--radius); box-shadow: var(--shadow-raised); font-weight: 600; }
+.skip-link:focus { transform: none; }
+.shell-content:focus { outline: none; }
+.lang-select { display: grid; gap: var(--s-1); font-size: var(--fs-xs); }
+.lang-select label { color: var(--c-nav-ink); }
+.lang-select .select { min-height: var(--control-h); }
+.signin-tools { display: flex; justify-content: flex-end; }
+.signin-tools .lang-select { width: min(12rem, 100%); }
+/* Filter bar above a table: controls keep a readable width instead of stretching across the page (TRO-030) */
+.form-grid.filters { grid-template-columns: repeat(auto-fill, minmax(12rem, 16rem)); }
+@media (max-width: 30rem) { .form-grid.filters { grid-template-columns: minmax(0, 1fr); } }
+/* Stacked cell: a code over its secondary facts (e.g. app id over version and publisher) */
+.cell-stack { display: grid; gap: 0; line-height: 1.35; padding-block: var(--s-1); }
+.cell-stack small { color: var(--c-ink-muted); font-size: var(--fs-xs); }
