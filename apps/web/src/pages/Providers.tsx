@@ -46,8 +46,7 @@ export function Providers() {
       <Panel title="Needs attention">
         <AttentionList items={attention} clear="Every provider is within its review interval, has its agreements in force, and may receive the data it is given." />
       </Panel>
-      <div className="grid-2">
-        <Panel title="Registry">
+      <Panel title="Registry" meta="Choose a provider to see its agreements and oversight history.">
           <DataTable rows={rows} rowKey={p => p.id} onRowClick={p => setOpen(p.id)} selectedKey={open} label="Service provider registry" columns={[
             { key: 'code', label: 'Provider', render: p => <span className="cell-stack"><span className="t-mono">{p.code}</span><small>{p.name}</small></span> },
             { key: 'kind', label: 'Kind', render: p => human(p.kind) },
@@ -58,10 +57,8 @@ export function Providers() {
             { key: 'gaps', label: 'Missing agreements', align: 'right', sortValue: p => p.agreement_gaps ?? 0,
               render: p => (p.agreement_gaps ?? 0) > 0 ? <StatusPill tone="bad">{p.agreement_gaps}</StatusPill> : '0' },
           ]} />
-        </Panel>
-        {open ? <ProviderPanel id={open} onClose={() => setOpen(null)} /> :
-          <Panel title="Provider"><p className="t-muted">Choose a provider to see its agreements and oversight history.</p></Panel>}
-      </div>
+      </Panel>
+      {open ? <ProviderPanel id={open} onClose={() => setOpen(null)} /> : null}
       <Panel title="Used on this platform" meta="Participant data goes only to an active provider that processes in the platform region and has its agreements (checked by the database on activation and by the AI runtime before each call).">
         {used.error ? <ErrorNote error={used.error} /> : !used.data ? <Loading /> :
           <DataTable rows={used.data.items} rowKey={u => u.id} label="Providers used on this platform" empty={<EmptyState title="No provider used on this platform" />} columns={[
@@ -77,19 +74,20 @@ export function Providers() {
 }
 
 function ProviderPanel({ id, onClose }: { id: string; onClose: () => void }) {
+  // the detail of the provider: summary beside its agreements, oversight history below
   const d = useData<ProviderDetail>(`/v1/service-providers/${id}`);
   if (d.error) return <ErrorNote error={d.error} />;
   if (!d.data) return <Loading />;
   const p = d.data;
   return (
-    <div className="stack">
+    <div className="grid-2">
       <Panel title={`${p.code} · ${p.name}`} actions={<Button variant="ghost" onClick={onClose}>Close</Button>}
         meta={`Recorded by ${p.created_by} on ${fmtDateTime(p.created_at)}; review every ${p.review_interval_months} months.`}>
         <DefinitionList items={[['Status', human(p.status)], ['Kind', human(p.kind)], ['GxP relevant', p.gxp_relevant ? 'Yes' : 'No'],
           ['Responsibilities', p.responsibilities], ['Data categories', p.data_categories.map(human).join(', ') || '—'], ['Processes in', p.processing_regions.join(', ')],
           ['Missing agreements', p.agreement_gaps.length ? <StatusPill tone="bad">{p.agreement_gaps.map(g => [g.kind, g.category ? human(g.category) : null, g.region].filter(Boolean).join(' ')).join('; ')}</StatusPill> : 'None']]} />
       </Panel>
-      <Panel title="Agreements">
+      <div className="stack"><Panel title="Agreements">
         <DataTable rows={p.agreements} rowKey={a => a.id} label="Agreements" empty={<EmptyState title="No agreement recorded" />} columns={[
           { key: 'kind', label: 'Kind', render: a => <span className="cell-stack"><span>{a.kind}</span><small>{[...a.data_categories.map(human), ...a.regions].join(', ')}</small></span> },
           { key: 'period', label: 'In force', render: a => `${fmtDate(a.effective_from)} → ${a.expires_on ? fmtDate(a.expires_on) : 'open'}`, sortValue: a => a.effective_from },
@@ -104,7 +102,7 @@ function ProviderPanel({ id, onClose }: { id: string; onClose: () => void }) {
           { key: 'outcome', label: 'Outcome', render: o => o.outcome === 'unsatisfactory' ? <StatusPill tone="bad">{human(o.outcome)}</StatusPill> : human(o.outcome) },
           { key: 'by', label: 'Recorded by', render: o => <span className="cell-stack"><span>{o.recorded_by}</span><small>{fmtDateTime(o.recorded_at)}</small></span> },
         ]} />
-      </Panel>
+      </Panel></div>
     </div>
   );
 }

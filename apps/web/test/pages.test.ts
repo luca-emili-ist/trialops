@@ -113,7 +113,8 @@ test('[CMP-03] idle timer with a warning 60 s before the limit; the API ending t
 
 test('[UX-01] Suggest changes is at the top right of every signed-in page with the code of the page registry', () => {
   const app = readFileSync(join(src, 'App.tsx'), 'utf8');
-  assert.match(app, /actions=\{s\.platform \? <SuggestChanges pageCode=\{code\} onSubmit=\{suggest\} loadOpen=\{openOn\}/);
+  assert.match(app, /\{s\.platform \? <SuggestChanges pageCode=\{code\} onSubmit=\{suggest\} loadOpen=\{openOn\}/);
+  assert.match(app, /actions=\{<><LanguageSelect \/>/, 'the language switch is beside it (NFR-07)');
   assert.match(app, /const code = PAGE_CODES\[route\.page\]/, 'the page code comes from the registry, not from the DOM');
   assert.match(app, /if \(route\.page === 'login'\) return <Login \/>;/, 'the sign-in pages are rendered without the shell, so without the button');
   assert.match(app, /'\/v1\/change-requests'/);

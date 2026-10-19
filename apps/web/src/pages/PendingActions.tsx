@@ -53,8 +53,7 @@ export function PendingActions() {
           { value: 'pending', label: 'Pending' }, { value: 'executed', label: 'Executed' }, { value: 'rejected', label: 'Rejected' },
           { value: 'blocked', label: 'Blocked' }, { value: 'all', label: 'All' }]} />
       </div>
-      <div className="grid-2">
-        <Panel title="Agent actions">
+      <Panel title="Agent actions" meta="Choose an action to read what the agent wants to do and why it was held.">
           {list.error ? <ErrorNote error={list.error} /> : !list.data ? <Loading /> :
             <DataTable rows={list.data.items} rowKey={p => p.id} onRowClick={p => setOpen(p.id)} selectedKey={open} label="Agent actions"
               empty={<EmptyState title="No agent actions with this status" />} columns={[
@@ -63,10 +62,8 @@ export function PendingActions() {
                 { key: 'status', label: 'Status', render: p => <StatusPill tone={STATUS_TONE[p.status] ?? 'neutral'}>{human(p.status)}</StatusPill>, sortValue: p => p.status },
                 { key: 'requested_at', label: 'Requested', render: p => fmtDateTime(p.requested_at), sortValue: p => p.requested_at },
               ]} />}
-        </Panel>
-        {open ? <PendingDetail id={open} onClose={() => setOpen(null)} onDecide={(p, decision) => setDeciding({ p, decision })} /> :
-          <Panel title="Action"><p className="t-muted">Choose an action to read what the agent wants to do and why it was held.</p></Panel>}
-      </div>
+      </Panel>
+      {open ? <PendingDetail id={open} onClose={() => setOpen(null)} onDecide={(p, decision) => setDeciding({ p, decision })} /> : null}
       {deciding ? <ReasonDialog title={deciding.decision === 'confirm' ? `Confirm ${deciding.p.tool}` : `Reject ${deciding.p.tool}`}
         confirmLabel={deciding.decision === 'confirm' ? 'Confirm and run' : 'Reject'}
         description={deciding.decision === 'confirm'

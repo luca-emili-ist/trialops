@@ -308,3 +308,8 @@ a { color: var(--c-accent); text-underline-offset: 2px; }
 /* Stacked cell: a code over its secondary facts (e.g. app id over version and publisher) */
 .cell-stack { display: grid; gap: 0; line-height: 1.35; padding-block: var(--s-1); }
 .cell-stack small { color: var(--c-ink-muted); font-size: var(--fs-xs); }
+.nowrap { white-space: nowrap; }
+.shell-actions .lang-select { display: flex; align-items: center; gap: var(--s-2); }
+.shell-actions .lang-select label { color: var(--c-ink-muted); }
+.shell-actions .lang-select .select { width: auto; padding-right: var(--s-6); }
+@media (max-width: 52rem) { .shell-actions .lang-select label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; } }

@@ -80,8 +80,7 @@ export function AiMonitoring() {
       <Panel title="Needs attention" meta={`${attention.length} item(s). Evaluating records the switch to suggestion-only; it never switches back to normal.`}>
         <AttentionList items={attention} clear="Every task type is in normal mode, within its rules and without drift; every decision record is signed." />
       </Panel>
-      <div className="grid-2">
-        <Panel title="Task types">
+      <Panel title="Task types" meta="Choose a task type to see its rules, its drift and who set its mode.">
           <DataTable rows={d.items} rowKey={i => i.task_type} onRowClick={i => setOpen(i.task_type)} selectedKey={open} label="Task types" columns={[
             { key: 'task_type', label: 'Task type', render: i => <span className="t-mono">{i.task_type}</span> },
             { key: 'mode', label: 'Mode', sortValue: i => i.mode, render: i => <StatusPill tone={i.mode === 'suggestion_only' ? 'warn' : 'neutral'}>{human(i.mode)}</StatusPill> },
@@ -92,11 +91,9 @@ export function AiMonitoring() {
             { key: 'drift', label: 'Drift', render: i => i.drift.signal === 'drift' ? <StatusPill tone="warn">Drift</StatusPill> : human(i.drift.signal) },
             { key: 'rules', label: 'Rules', render: i => i.breach ? <StatusPill tone="bad">Crossed</StatusPill> : 'Within' },
           ]} />
-        </Panel>
-        {selected ? <TaskTypeDetail m={selected} admin={admin} onClose={() => setOpen(null)}
-          onMode={to => setChange({ task_type: selected.task_type, from: selected.mode, to })} /> :
-          <Panel title="Autonomy per task type"><p className="t-muted">Choose a task type to see its rules, its drift and who set its mode.</p></Panel>}
-      </div>
+      </Panel>
+      {selected ? <TaskTypeDetail m={selected} admin={admin} onClose={() => setOpen(null)}
+        onMode={to => setChange({ task_type: selected.task_type, from: selected.mode, to })} /> : null}
       {change ? <ReasonDialog title={`Change the mode of ${change.task_type}`} confirmLabel="Change mode"
         description={`${MODE_LABEL[change.from]} → ${MODE_LABEL[change.to]}. ${change.to === 'normal'
           ? 'Back to normal: the agent acts again within the modes of its tools. Record why the cause is solved.' : 'Every output of the agent then waits for a person.'}`}

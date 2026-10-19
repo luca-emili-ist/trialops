@@ -64,6 +64,7 @@ export function PageCodeBadge({ code }: { code: string }) {
       console.warn('Copy link failed', e);
     }
   };
-  return <button type="button" className="page-code t-mono" data-page-code={code} onClick={copy} title={t(COPY_LINK_LABEL)} aria-label={`${t(COPY_LINK_LABEL)} (${code})`}>
+  // the accessible name starts with the visible code (WCAG 2.5.3 label in name)
+  return <button type="button" className="page-code t-mono" data-page-code={code} onClick={copy} title={t(COPY_LINK_LABEL)} aria-label={`${code} — ${t(COPY_LINK_LABEL)}`}>
     {code}{copied ? <span className="page-code-copied" role="status"> · {t(LINK_COPIED_LABEL)}</span> : null}</button>;
 }

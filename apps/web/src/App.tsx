@@ -91,10 +91,10 @@ export function App() {
   return (
     <AppShell brand="TrialOps" subtitle={s.platform ? `${s.platform.code} · ${s.platform.therapeutic_area}` : undefined} nav={nav}
       pageCode={code} banner={t('Synthetic data — demonstration environment')}
-      actions={s.platform ? <SuggestChanges pageCode={code} onSubmit={suggest} loadOpen={openOn} triageHint={t('Admin → Change requests (TRO-060)')} /> : null}
+      actions={<><LanguageSelect />
+        {s.platform ? <SuggestChanges pageCode={code} onSubmit={suggest} loadOpen={openOn} triageHint={t('Admin → Change requests (TRO-060)')} /> : null}</>}
       user={<>
         <span><strong>{s.me.person?.full_name ?? s.me.email ?? s.me.sub}</strong><br />{s.me.roles.map(r => t(r.replace(/_/g, ' '))).join(', ') || t('no role')}</span>
-        <LanguageSelect />
         <Button variant="ghost" onClick={() => { void s.signOut().then(() => go('/login')); }}>{s.mode === 'dev' ? t('Switch user') : t('Sign out')}</Button>
       </>}>
       {page}
