@@ -19,6 +19,12 @@ const TABLE: [RegExp, PageKey, string[]][] = [
   [/^\/ai$/, 'aiLedger', []],
   [/^\/audit$/, 'auditTrail', []],
   [/^\/change-requests$/, 'changeRequests', []],
+  [/^\/edc$/, 'edcSubjects', []],
+  [/^\/edc\/subjects\/([0-9a-f-]{36})$/, 'edcCasebook', ['id']],
+  [/^\/edc\/visits\/([0-9a-f-]{36})$/, 'edcVisit', ['id']],
+  [/^\/edc\/queries$/, 'edcQueries', []],
+  [/^\/edc\/crfs$/, 'crfLibrary', []],
+  [/^\/edc\/crfs\/([0-9a-f-]{36})$/, 'crfVersion', ['id']],
   [/^\/login$/, 'login', []],
   [/^\/ui$/, 'uiCatalogue', []],
 ];

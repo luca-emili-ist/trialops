@@ -14,6 +14,13 @@ export const PAGE_CODES = {
   aiLedger: 'TRO-050',
   auditTrail: 'TRO-051',
   changeRequests: 'TRO-060',  // Admin: triage of the changes suggested from the pages (UX-02)
+  // Data decade: native EDC, module M06b (EDC-01, EDC-03, EDC-05)
+  crfLibrary: 'TRO-070',
+  crfVersion: 'TRO-071',
+  edcSubjects: 'TRO-072',
+  edcCasebook: 'TRO-073',
+  edcVisit: 'TRO-074',
+  edcQueries: 'TRO-075',
   login: 'TRO-090',
   loginMfa: 'TRO-091',        // sign-in step: authenticator code (IAM-01); not a route, part of the sign-in
   loginMfaEnrol: 'TRO-092',   // sign-in step: enrolment of a first authenticator (IAM-01)
