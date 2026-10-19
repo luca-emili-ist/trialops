@@ -1,6 +1,6 @@
 # Traceability matrix
 
-Generated 2026-10-19T12:59:29.640Z by scripts/trace.mjs from test tags and test-results.xml.
+Generated 2026-10-19T19:20:11.749Z by scripts/trace.mjs from test tags and test-results.xml.
 
 | Requirement | Release | Description | Tests | Result |
 | --- | --- | --- | --- | --- |
@@ -89,7 +89,7 @@ Generated 2026-10-19T12:59:29.640Z by scripts/trace.mjs from test tags and test-
 | NFR-06 | v1 | Same code deployable in EU, US and Japan regions with data kept separate per region | db/tests/regions.test.mjs, packages/api/test/regions.test.ts, services/ai-runtime/test/residency.test.ts (14) | PASS |
 | NFR-07 | v1 | WCAG 2.1 AA; UI localisable, with English and Japanese for site- and subject-facing pages | apps/web/test/edc_pages.test.ts, apps/web/test/i18n.test.ts, apps/web/test/pages.test.ts (6) | NOT RUN |
 | VAL-01 | v1 | Every test carries the requirement IDs it covers; CI fails when a gated requirement has no passing test | db/tests/trace_gate.test.mjs (3) | PASS |
-| VAL-02 | v1 | No direct change in test or production: promotion only through the pipeline with approval; IQ check after every deploy | db/tests/release_pipeline.test.mjs (6) | PASS |
+| VAL-02 | v1 | No direct change in test or production: promotion only through the pipeline with approval; IQ check after every deploy | db/tests/iq_reader.test.mjs, db/tests/release_pipeline.test.mjs (9) | PASS |
 | VAL-03 | v1 | Database migrations tested on a synthetic or anonymised copy before promotion | db/tests/migration_check.test.mjs, db/tests/migrations_idempotent.test.mjs (5) | PASS |
 | VAL-04 | v1 | L2–L3 apps not activated in production without the supplier validation package and passing contract tests | apps/web/test/pages.test.ts, db/tests/app_validation.test.mjs, packages/api/test/quality_privacy_governance.test.ts (6) | PASS |
 | VAL-05 | gxp-p0 | Requirements carry gxp_impact, risk, assurance and regulatory references; CI generates per-regulation compliance matrices from docs/compliance/crosswalk.json | db/tests/compliance.test.mjs (1) | PASS |
