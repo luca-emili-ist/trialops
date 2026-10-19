@@ -16,6 +16,7 @@ export function replayProvider(dir = FIXTURES): Provider {
   return {
     name: 'replay',
     accepts: DATA_CLASSES,                 // nothing leaves the perimeter
+    local: true,
     async call(c: ProviderCall): Promise<ProviderResult> {
       const exact = join(dir, c.task_type, `${c.input_sha256}.json`);
       const output = existsSync(exact) ? JSON.parse(readFileSync(exact, 'utf8')) : structuredClone(DEFAULTS[c.task_type]);
@@ -29,6 +30,7 @@ export function replayProvider(dir = FIXTURES): Provider {
 export function recording(live: Provider, dir = FIXTURES): Provider {
   return {
     ...live,
+    local: false,                          // the live provider is called: its residency rules apply
     async call(c) {
       const r = await live.call(c);
       if (r.output !== null && !r.refusal) {

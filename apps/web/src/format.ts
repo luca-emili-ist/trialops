@@ -1,7 +1,9 @@
-import type { Tone } from '@trialops/shell';
+import { formatDate, formatDateTime, type Tone } from '@trialops/shell';
 
-export const fmtDate = (v?: string | null) => v ? new Date(v).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : '—';
-export const fmtDateTime = (v?: string | null) => v ? new Date(v).toLocaleString('en-US', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '—';
+/** Date in the locale of the page (NFR-07). */
+export const fmtDate = (v?: string | null) => formatDate(v);
+/** Date and time in the locale of the page, with the time zone shown (rule 11: the server stores UTC). */
+export const fmtDateTime = (v?: string | null) => formatDateTime(v);
 export const human = (s?: string | null) => (s ?? '—').replace(/_/g, ' ');
 export const short = (id?: string | null) => id ? id.slice(0, 8) : '—';
 

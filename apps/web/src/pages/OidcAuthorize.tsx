@@ -1,12 +1,13 @@
 // TRO-041 Single sign-on hand-off: the signed-in user is sent here by an installed app; TrialOps issues a code and
 // returns the user to the app without a new login (APP-ID-01).
 import { useEffect, useRef, useState } from 'react';
-import { PageHeader, Panel, ErrorNote, Loading, DefinitionList } from '@trialops/shell';
+import { PageHeader, Panel, ErrorNote, Loading, DefinitionList, useT } from '@trialops/shell';
 import { api } from '../api.ts';
 import { useSession } from '../session.tsx';
 
 export function OidcAuthorize() {
   const s = useSession();
+  const t = useT();
   const q = new URLSearchParams(window.location.search);
   const [error, setError] = useState<string | null>(null);
   const asked = useRef(false);   // one code per hand-off, even when React runs the effect twice (StrictMode in development)
@@ -22,10 +23,10 @@ export function OidcAuthorize() {
   }, []);
   return (
     <>
-      <PageHeader title="Signing you in" subtitle="You are being returned to the application with your TrialOps identity." />
+      <PageHeader title={t('Signing you in')} subtitle={t('You are being returned to the application with your TrialOps identity.')} />
       <Panel>
-        <DefinitionList items={[['Application', q.get('client_id') ?? '—'], ['Signed in as', s.me?.person?.full_name ?? s.me?.sub ?? '—']]} />
-        {error ? <ErrorNote error={error} /> : <Loading what="Redirecting" />}
+        <DefinitionList items={[[t('Application'), q.get('client_id') ?? '—'], [t('Signed in as'), s.me?.person?.full_name ?? s.me?.sub ?? '—']]} />
+        {error ? <ErrorNote error={error} /> : <Loading what={t('Redirecting')} />}
       </Panel>
     </>
   );

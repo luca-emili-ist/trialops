@@ -34,10 +34,15 @@ const oauthError = (status: number, error: string, description: string): RawResp
 
 export const appRoutes = [
   route({ method: 'get', path: '/v1/apps/catalogue', summary: 'Published apps: publisher, GxP class, scopes, residency, validation package',
-    tag: 'apps', reqs: ['APP-MF-01'],
-    handler: async () => ({ items: catalogue().map(m => ({ app_id: m.app_id, version: m.version, publisher: m.publisher, gxp_class: m.gxp_class,
-      hosting: m.hosting, scopes: m.scopes, roles: m.roles ?? [], data_residency: m.data_residency,
-      validation_package: m.validation_package_url ?? null, valid: validateManifest(m), manifest: m })) }) }),
+    tag: 'apps', reqs: ['APP-MF-01', 'NFR-06'],
+    handler: async ({ services }) => {
+      const region = services.regionGate?.region ?? null;
+      return { region, items: catalogue().map(m => ({ app_id: m.app_id, version: m.version, publisher: m.publisher, gxp_class: m.gxp_class,
+        hosting: m.hosting, scopes: m.scopes, roles: m.roles ?? [], data_residency: m.data_residency,
+        // NFR-06: an app is offered in a regional deployment only when its manifest keeps the data in that region
+        available_in_region: region === null || ((m.data_residency as string[] | undefined) ?? []).includes(region),
+        validation_package: m.validation_package_url ?? null, valid: validateManifest(m), manifest: m })) };
+    } }),
 
   route({ method: 'get', path: '/v1/platforms/:id/apps', summary: 'Apps installed on a platform', tag: 'apps', reqs: ['APP-MF-02'],
     handler: async ({ db, params }) => {
@@ -47,14 +52,23 @@ export const appRoutes = [
       return { items };
     } }),
 
-  route<{ manifest: Row }>({ method: 'post', path: '/v1/platforms/:id/apps', status: 201, tag: 'apps', reqs: ['APP-MF-01', 'APP-MF-02'],
-    summary: 'Request the installation of an app; the manifest is validated and the scopes wait for approval',
+  route<{ manifest: Row }>({ method: 'post', path: '/v1/platforms/:id/apps', status: 201, tag: 'apps', reqs: ['APP-MF-01', 'APP-MF-02', 'NFR-06'],
+    summary: 'Request the installation of an app; the manifest is validated, its data residency must cover the region, the scopes wait for approval',
     body: { type: 'object', additionalProperties: false, required: ['manifest'], properties: { manifest: { type: 'object' } } },
-    handler: async ({ db, claims, params, body }) => {
+    handler: async ({ db, claims, params, body, services }) => {
       requireRole(claims, [...ADMIN], 'Installing an app');
       const m = body.manifest;
       if (!validateManifest(m)) {
         throw new HttpError(422, 'invalid_manifest', `manifest rejected (APP-MF-01): ${ajv.errorsText(validateManifest.errors, { dataVar: 'manifest' })}`);
+      }
+      // NFR-06 / CMP-08: refused at the request already (the database refuses it again at activation, 0026)
+      const platformRegion = (await db.query('select data_region from core.platform where id = $1', [params.id])).rows[0]?.data_region as string | undefined;
+      const residency = (m.data_residency as string[] | undefined) ?? [];
+      for (const [what, region] of [['this deployment', services.regionGate?.region], ['the platform', platformRegion]] as const) {
+        if (region && !residency.includes(region)) {
+          throw new HttpError(422, 'residency_mismatch', `app ${m.app_id} keeps its data in ${residency.join(', ') || 'no declared region'}; ` +
+            `${what} keeps its data in ${region} (data_residency of the manifest, NFR-06, CMP-08)`);
+        }
       }
       const existing = (await db.query('select id, status from core.app_installation where app_id = $1 and platform_id = $2', [m.app_id, params.id])).rows[0];
       let id: string;

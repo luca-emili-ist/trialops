@@ -1,4 +1,5 @@
 // Base components of the TrialOps design system. Pages use only these (docs/DESIGN.md).
+import { useT } from '../i18n.tsx';
 import { useId, type ReactNode, type ButtonHTMLAttributes, type InputHTMLAttributes, type SelectHTMLAttributes, type TextareaHTMLAttributes } from 'react';
 
 type Variant = 'sign' | 'primary' | 'secondary' | 'ghost' | 'danger';
@@ -69,13 +70,14 @@ export function EmptyState({ title, children, action }: { title: string; childre
 
 /** Measured value against interim and final targets. Neutral grey in range; `tone` colours the bar only for an anomaly (P3). */
 export function MetricBar({ value, interim, final, max, tone }: { value: number | null; interim: number | null; final: number | null; max?: number; tone?: 'warn' | 'bad' }) {
+  const t = useT();
   const top = max ?? (Math.max(value ?? 0, interim ?? 0, final ?? 0) * 1.15 || 1);
   const pct = (v: number) => `${Math.min(100, (v / top) * 100)}%`;
   return (
-    <div className="metric-bar" data-tone={tone} role="img" aria-label={`value ${value ?? 'no data'}, interim target ${interim ?? '—'}, final target ${final ?? '—'}`}>
+    <div className="metric-bar" data-tone={tone} role="img" aria-label={t('value {v}, interim target {i}, final target {f}', { v: value ?? t('no data'), i: interim ?? '—', f: final ?? '—' })}>
       {value !== null ? <i style={{ width: pct(value) }} /> : null}
-      {interim !== null ? <b style={{ left: pct(interim) }} title={`Interim target ${interim}`} /> : null}
-      {final !== null ? <b className="final" style={{ left: pct(final) }} title={`Final target ${final}`} /> : null}
+      {interim !== null ? <b style={{ left: pct(interim) }} title={t('Interim target {n}', { n: interim })} /> : null}
+      {final !== null ? <b className="final" style={{ left: pct(final) }} title={t('Final target {n}', { n: final })} /> : null}
     </div>
   );
 }
@@ -91,13 +93,14 @@ export function DefinitionList({ items }: { items: [string, ReactNode][] }) {
 
 /** Exceptions first (P3) with a reason line beside the colour (P6): severity stripe, what, why, value against target. */
 export interface AttentionItem { key: string; severity: 'warn' | 'bad'; title: ReactNode; reason?: ReactNode; value?: ReactNode; target?: ReactNode; onOpen?: () => void }
-export function AttentionList({ items, clear = 'Everything is within target.' }: { items: AttentionItem[]; clear?: ReactNode }) {
-  if (!items.length) return <p className="attention-clear">{clear}</p>;
+export function AttentionList({ items, clear }: { items: AttentionItem[]; clear?: ReactNode }) {
+  const t = useT();
+  if (!items.length) return <p className="attention-clear">{clear ?? t('Everything is within target.')}</p>;
   return (
     <div className="attention" role="list">{items.map(i => (
       <div className="attention-item" role="listitem" key={i.key} data-severity={i.severity} data-clickable={i.onOpen ? 'true' : undefined}
         tabIndex={i.onOpen ? 0 : undefined} onClick={i.onOpen} onKeyDown={i.onOpen ? e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); i.onOpen!(); } } : undefined}>
-        <div><strong><span className="sr-only">{i.severity === 'bad' ? 'Critical: ' : 'Warning: '}</span>{i.title}</strong>{i.reason ? <p>{i.reason}</p> : null}</div>
+        <div><strong><span className="sr-only">{i.severity === 'bad' ? t('Critical: ') : t('Warning: ')}</span>{i.title}</strong>{i.reason ? <p>{i.reason}</p> : null}</div>
         {i.value !== undefined ? <div className="attention-value">{i.value}{i.target ? <small>{i.target}</small> : null}</div> : <span />}
       </div>))}
     </div>
@@ -106,11 +109,12 @@ export function AttentionList({ items, clear = 'Everything is within target.' }:
 
 /** Process map (P2) with signature gates and the autonomy of each step (P7). An agent step in progress pulses. */
 export interface ProcessStep { key: string; label: ReactNode; state: 'done' | 'current' | 'todo'; status?: ReactNode; gate?: boolean; actor?: 'person' | 'agent'; autonomy?: ReactNode }
-export function ProcessMap({ steps, label = 'Process' }: { steps: ProcessStep[]; label?: string }) {
+export function ProcessMap({ steps, label }: { steps: ProcessStep[]; label?: string }) {
+  const t = useT();
   return (
-    <ol className="process" aria-label={label}>{steps.map((s, n) => (
+    <ol className="process" aria-label={label ?? t('Process')}>{steps.map((s, n) => (
       <li className="process-step" key={s.key} data-state={s.state} data-actor={s.actor} aria-current={s.state === 'current' ? 'step' : undefined}>
-        <span className="process-k"><i aria-hidden="true" />{n + 1}{s.status ? <> · {s.status}</> : null}{s.gate ? <span className="process-gate">Signature</span> : null}</span>
+        <span className="process-k"><i aria-hidden="true" />{n + 1}{s.status ? <> · {s.status}</> : null}{s.gate ? <span className="process-gate">{t('Signature')}</span> : null}</span>
         <strong>{s.label}</strong>
         {s.autonomy ? <small>{s.autonomy}</small> : null}
       </li>))}

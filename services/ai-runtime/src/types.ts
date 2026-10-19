@@ -46,6 +46,8 @@ export interface Provider {
   name: string;                        // 'anthropic' | 'replay'
   /** Data classes this provider may receive (spec §9). */
   accepts: DataClass[];
+  /** Nothing leaves the deployment (replay of recorded answers): no service provider is involved (NFR-06, CMP-08). */
+  local?: boolean;
   call(c: ProviderCall): Promise<ProviderResult>;
 }
 
