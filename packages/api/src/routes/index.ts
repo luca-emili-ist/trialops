@@ -19,7 +19,10 @@ import { certifiedCopyRoutes } from './certified-copies.ts';
 import { governanceRoutes } from './governance.ts';
 import { privacyRoutes } from './privacy.ts';
 import { appValidationRoutes } from './app-validation.ts';
+import { edcRoutes } from './edc.ts';
 
 export const routes: RouteDef[] = [...platformRoutes, ...armRoutes, ...protocolRoutes, ...signatureRoutes, ...siteRoutes, ...metricRoutes, ...aiRoutes, ...aiGovernanceRoutes, ...jobRoutes, ...taskRoutes, ...appRoutes, ...auditRoutes, ...accessLogRoutes, ...certifiedCopyRoutes, ...changeRoutes, ...authRoutes, ...devRoutes];
 // v1 quality and privacy governance (CMP-05, CMP-08, VAL-04)
 routes.push(...governanceRoutes, ...privacyRoutes, ...appValidationRoutes);
+// v1 native EDC, module M06b (EDC-01, EDC-03, EDC-04, EDC-05, EDC-11, EDC-12)
+routes.push(...edcRoutes);

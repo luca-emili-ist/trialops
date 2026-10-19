@@ -30,6 +30,17 @@ const SIGNABLE: Record<string, (db: Db, id: string) => Promise<unknown | undefin
   master_protocol_version: async (db, id) => (await db.query('select version_label, usdm from core.master_protocol_version where id = $1', [id])).rows[0],
   arm_appendix_version: async (db, id) => (await db.query('select version_label, usdm from core.arm_appendix_version where id = $1', [id])).rows[0],
   task: async (db, id) => (await db.query('select id, type, outputs from core.task where id = $1', [id])).rows[0],
+  // EDC-01: the signature covers the whole CRF version (items with their metadata, edit checks, visits)
+  crf_version: async (db, id) => (await db.query(`select v.id, f.oid form_oid, v.version_no,
+      (select coalesce(jsonb_agg(jsonb_build_object('oid', i.oid, 'cdash_variable', i.cdash_variable, 'label', i.label, 'data_type', i.data_type,
+         'codelist_id', i.codelist_id, 'unit_term_id', i.unit_term_id, 'required', i.required) order by i.oid), '[]')
+         from core.crf_item i where i.crf_version_id = v.id and i.status = 'active') items,
+      (select coalesce(jsonb_agg(jsonb_build_object('code', k.code, 'kind', k.kind, 'item_oid', k.item_oid, 'operator', k.operator,
+         'other_item_oid', k.other_item_oid, 'min_value', k.min_value, 'max_value', k.max_value, 'severity', k.severity, 'message', k.message) order by k.code), '[]')
+         from core.crf_edit_check k where k.crf_version_id = v.id and k.status = 'active') checks,
+      (select coalesce(jsonb_agg(l.visit_definition_id order by l.visit_definition_id), '[]') from core.crf_visit l
+         where l.crf_version_id = v.id and l.status = 'active') visits
+    from core.crf_version v join core.crf_form f on f.id = v.form_id where v.id = $1 and v.status = 'draft'`, [id])).rows[0],
   audit_review: async (db, id) => (await db.query(`select id, platform_id, filters, reviewed_from_seq, reviewed_to_seq, row_count, conclusion, created_by
     from core.audit_review where id = $1 and status = 'open'`, [id])).rows[0],
 };

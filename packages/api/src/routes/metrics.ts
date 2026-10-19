@@ -61,6 +61,16 @@ async function platformMetric(db: Db, platformId: string, code: string): Promise
       sources: [rec('submission', r.id, 'IND submitted', r.submitted_at), { kind: 'record', table: 'subject_status_history', id: platformId,
         label: 'First subject randomized', at: new Date(r.fsd).toISOString() }] }];
   }
+  if (code === 'TA3-DATA-COLLECT') {
+    // EDC-12: visit date -> data available (visit completed, event visit.completed), mean over completed visits. Platform level
+    // only: a per-arm value would need the allocation (rule 5). The view keeps the reader's perimeter.
+    const visits = (await db.query(`select subject_visit_id, visit_code, visit_date::text visit_date, completed_at, days_to_data from core.v_visit_data_collection
+      where platform_id = $1 order by completed_at desc`, [platformId])).rows;
+    if (!visits.length) return [{ arm_id: null, arm_code: null, value: null, status: 'no_data', sources: [] }];
+    const mean = Math.round(visits.reduce((a, v) => a + Number(v.days_to_data), 0) / visits.length * 10) / 10;
+    return [{ arm_id: null, arm_code: null, value: mean, status: 'no_data',
+      sources: visits.slice(0, 50).map(v => rec('subject_visit', v.subject_visit_id, `Visit ${v.visit_code} of ${v.visit_date} completed: ${Number(v.days_to_data)} days`, v.completed_at)) }];
+  }
   if (code === 'TA3-HUMAN-HOURS') {
     // The ratio needs a historical FTE baseline that is not loaded yet: report the measured hours as a source, value null.
     const h = (await db.query(`select coalesce(sum(hours),0)::float hours, count(*)::int n from core.time_entry where platform_id = $1 and status <> 'void'`,
@@ -80,7 +90,7 @@ export async function metricValues(db: Db, platformId: string, def: Row): Promis
 
 /** Events linked to the source records (drill-down to the event, M11-02). */
 async function eventsFor(db: Db, sources: Source[]): Promise<Source[]> {
-  const subjects = sources.filter(s => s.kind === 'record' && ['arm', 'contract', 'submission'].includes(s.table)).map(s => {
+  const subjects = sources.filter(s => s.kind === 'record' && ['arm', 'contract', 'submission', 'subject_visit'].includes(s.table)).map(s => {
     const prefix = s.table === 'arm' ? 'arm' : s.table;
     return `${prefix}/${s.id}`;
   });
