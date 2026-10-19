@@ -1,6 +1,6 @@
 # Traceability matrix
 
-Generated 2026-10-19T07:33:18.734Z by scripts/trace.mjs from test tags and test-results.xml.
+Generated 2026-10-19T08:05:44.788Z by scripts/trace.mjs from test tags and test-results.xml.
 
 | Requirement | Release | Description | Tests | Result |
 | --- | --- | --- | --- | --- |
@@ -13,7 +13,7 @@ Generated 2026-10-19T07:33:18.734Z by scripts/trace.mjs from test tags and test-
 | DM-05 | foundations | Deterministic synthetic demo seed; no real data | db/tests/tasks_apps_metrics.test.mjs (1) | PASS |
 | IAM-02 | foundations | RLS driven by JWT claims platform_ids / arm_scopes / site_scopes | db/tests/access.test.mjs, db/tests/claims.test.mjs, db/tests/sites_registry.test.mjs, packages/api/test/apps_sso.test.ts, packages/api/test/platform.test.ts, packages/api/test/sites.test.ts (11) | PASS |
 | IAM-03 | foundations | Sponsors see and write only their own arm | db/tests/access.test.mjs, packages/api/test/ai.test.ts, packages/api/test/metrics.test.ts, packages/api/test/platform.test.ts, packages/api/test/protocol_arms.test.ts (6) | PASS |
-| IAM-04 | foundations | Unblinded data only in sac_enclave for the unblinded role | db/tests/access.test.mjs, db/tests/claims.test.mjs, packages/api/test/certified_copies.test.ts (4) | PASS |
+| IAM-04 | foundations | Unblinded data only in sac_enclave for the unblinded role | db/tests/access.test.mjs, db/tests/claims.test.mjs, db/tests/privacy.test.mjs, packages/api/test/certified_copies.test.ts (5) | PASS |
 | IAM-05 | foundations | Separation of duties: the author of a GxP document or change cannot approve it | packages/api/test/protocol_arms.test.ts, packages/api/test/wizard.test.ts (2) | PASS |
 | IAM-07 | foundations | Agents are never unblinded | db/tests/access.test.mjs, db/tests/access_log.test.mjs, packages/api/test/jobs.test.ts, packages/api/test/platform.test.ts, packages/api/test/wizard.test.ts (5) | PASS |
 | AI-05 | foundations | GxP AI output is a proposal until a person signs | db/tests/tasks_apps_metrics.test.mjs, packages/api/test/ai.test.ts, packages/api/test/ai_monitoring.test.ts, packages/api/test/protocol_arms.test.ts, packages/api/test/wizard.test.ts (9) | PASS |
@@ -75,10 +75,10 @@ Generated 2026-10-19T07:33:18.734Z by scripts/trace.mjs from test tags and test-
 | CMP-12 | v1 | Audit ledger sealed in blocks with Ed25519 and anchored outside the database; DDL on audited objects recorded; database admin roles segregated | db/tests/ddl_roles.test.mjs, packages/api/test/audit_seal.test.ts (7) | PASS |
 | CMP-13 | v1 | Read access to unblinded data (sac_enclave) and every export recorded and reportable | db/tests/access.test.mjs, db/tests/access_log.test.mjs, packages/api/test/access_log.test.ts (7) | PASS |
 | CMP-14 | v1 | Certified copies: export of a record or a whole trial (data, audit trail, signatures, hashes) in an open, human-readable format | packages/api/test/certified_copies.test.ts (5) | PASS |
-| CMP-05 | v1 | ICH E6(R3) data governance: critical-to-quality factors, RBQM, reconstructability of every decision and adaptation, service provider oversight | — (0) | NO TEST |
+| CMP-05 | v1 | ICH E6(R3) data governance: critical-to-quality factors, RBQM, reconstructability of every decision and adaptation, service provider oversight | db/tests/quality_governance.test.mjs, packages/api/test/quality_privacy_governance.test.ts (9) | PASS |
 | CMP-06 | v1 | Each GxP AI task type has a context of use, risk, credibility plan, test results and monitoring (docs/ai/<task_type>.md) | services/ai-runtime/test/credibility.test.ts, services/ai-runtime/test/registry.test.ts (7) | PASS |
 | CMP-07 | v1 | AI test data independent from development, pre-specified metrics, explainability through cited sources, model change control | services/ai-runtime/test/credibility.test.ts, services/ai-runtime/test/registry.test.ts (4) | PASS |
-| CMP-08 | v1 | Privacy by design across GDPR, HIPAA and APPI: pseudonymisation in the core, minimisation, record of processing, DPA/BAA with every provider, data residency per region | — (0) | NO TEST |
+| CMP-08 | v1 | Privacy by design across GDPR, HIPAA and APPI: pseudonymisation in the core, minimisation, record of processing, DPA/BAA with every provider, data residency per region | db/tests/app_validation.test.mjs, db/tests/privacy.test.mjs, packages/api/test/quality_privacy_governance.test.ts (10) | PASS |
 | AI-02 | v1 | Every GxP task type registered with intended use, risk, exact approved model and version, versioned prompt, validator, thresholds, test dataset | services/ai-runtime/test/registry.test.ts (5) | PASS |
 | AI-03 | v1 | GxP task types pinned to an immutable model id (a dated snapshot where the provider publishes one); a model change is a change request with regression on the test dataset | services/ai-runtime/test/model-lock.test.ts, services/ai-runtime/test/registry.test.ts (5) | PASS |
 | AI-04 | v1 | Fixed generation parameters, JSON Schema output, mandatory source citation for extraction and classification | db/tests/ai_monitoring.test.mjs, services/ai-runtime/test/citation.test.ts (13) | PASS |
@@ -89,9 +89,9 @@ Generated 2026-10-19T07:33:18.734Z by scripts/trace.mjs from test tags and test-
 | NFR-06 | v1 | Same code deployable in EU, US and Japan regions with data kept separate per region | — (0) | NO TEST |
 | NFR-07 | v1 | WCAG 2.1 AA; UI localisable, with English and Japanese for site- and subject-facing pages | — (0) | NO TEST |
 | VAL-01 | v1 | Every test carries the requirement IDs it covers; CI fails when a gated requirement has no passing test | db/tests/trace_gate.test.mjs (3) | PASS |
-| VAL-02 | v1 | No direct change in test or production: promotion only through the pipeline with approval; IQ check after every deploy | — (0) | NO TEST |
+| VAL-02 | v1 | No direct change in test or production: promotion only through the pipeline with approval; IQ check after every deploy | db/tests/release_pipeline.test.mjs (6) | PASS |
 | VAL-03 | v1 | Database migrations tested on a synthetic or anonymised copy before promotion | db/tests/migration_check.test.mjs, db/tests/migrations_idempotent.test.mjs (5) | PASS |
-| VAL-04 | v1 | L2–L3 apps not activated in production without the supplier validation package and passing contract tests | — (0) | NO TEST |
+| VAL-04 | v1 | L2–L3 apps not activated in production without the supplier validation package and passing contract tests | db/tests/app_validation.test.mjs, packages/api/test/quality_privacy_governance.test.ts (5) | PASS |
 | VAL-05 | gxp-p0 | Requirements carry gxp_impact, risk, assurance and regulatory references; CI generates per-regulation compliance matrices from docs/compliance/crosswalk.json | db/tests/compliance.test.mjs (1) | PASS |
 | IAM-06 | v2 | Periodic access review every 90 days generated as a signed task for the platform admin | — (0) | NO TEST |
 | APP-ID-03 | v2 | SCIM 2.0 user provisioning to apps; deactivation propagated within 5 minutes | — (0) | NO TEST |
