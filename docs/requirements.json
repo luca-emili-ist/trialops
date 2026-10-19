@@ -602,73 +602,82 @@
   {
    "id": "EDC-01",
    "release": "v1",
-   "text": "Versioned CRF library linked to protocol visits",
+   "text": "Versioned CRF library linked to protocol visits: CDASH-like item OIDs, units and coded values from versioned codelists (no free-text terminology), approved versions signed and immutable",
    "gxp_impact": "direct",
    "risk": "medium",
    "assurance": "scripted",
    "regs": [
     "CDISC-SUB",
     "A11-4",
-    "E6R3-DATALIFECYCLE"
+    "A11-10",
+    "E6R3-DATALIFECYCLE",
+    "P11-70"
    ]
   },
   {
    "id": "EDC-03",
    "release": "v1",
-   "text": "Site data entry",
+   "text": "Site data entry: typed values or a missing-data reason (ND/NA/UNK), server UTC time and author on every value, changes with reason, provenance of app-written values, investigator access to site data",
    "gxp_impact": "direct",
    "risk": "high",
    "assurance": "scripted",
    "regs": [
     "EMA-CS-ALCOA",
     "EMA-CS-INVCONTROL",
-    "P11-10h"
+    "P11-10h",
+    "P11-10e",
+    "E6R3-DATALIFECYCLE"
    ]
   },
   {
    "id": "EDC-04",
    "release": "v1",
-   "text": "Declarative edit checks",
+   "text": "Declarative edit checks (required, range, cross-field) stored on the CRF version and evaluated by the database at entry, at form completion and in batch; soft checks open queries, hard checks refuse the value",
    "gxp_impact": "direct",
    "risk": "high",
    "assurance": "scripted",
    "regs": [
     "A11-6",
-    "P11-10f"
+    "P11-10f",
+    "E6R3-DATALIFECYCLE"
    ]
   },
   {
    "id": "EDC-05",
    "release": "v1",
-   "text": "Query workflow",
+   "text": "Query workflow open -> answered -> closed / cancelled as a database state machine, audited, attributable, with times for metrics; no physical deletes",
    "gxp_impact": "direct",
    "risk": "medium",
    "assurance": "scripted",
    "regs": [
     "EMA-CS-ALCOA",
-    "P11-10e"
+    "EMA-CS-AUDIT",
+    "P11-10e",
+    "P11-10f"
    ]
   },
   {
    "id": "EDC-11",
    "release": "v1",
-   "text": "No arm data in blinded eCRF",
+   "text": "No arm data in blinded eCRF: no EDC table, view, function, API response or event carries the arm of a subject",
    "gxp_impact": "direct",
    "risk": "high",
    "assurance": "scripted",
    "regs": [
-    "E6R3-BLINDING"
+    "E6R3-BLINDING",
+    "P11-10d"
    ]
   },
   {
    "id": "EDC-12",
    "release": "v1",
-   "text": "visit.completed event and data-collection metric",
+   "text": "visit.completed event at visit completion and the TA3 data collection time metric (visit date to data available) computed from it",
    "gxp_impact": "indirect",
    "risk": "low",
    "assurance": "automated",
    "regs": [
-    "E6R3-RBQM"
+    "E6R3-RBQM",
+    "E6R3-DATALIFECYCLE"
    ]
   },
   {

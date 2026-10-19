@@ -17,6 +17,10 @@ import { Login } from './pages/Login.tsx';
 import { UiCatalogue } from './pages/UiCatalogue.tsx';
 import { NotFound } from './pages/NotFound.tsx';
 import { ChangeRequests, CHANGE_ADMIN_ROLES } from './pages/ChangeRequests.tsx';
+import { CrfLibrary, CrfVersion } from './pages/EdcLibrary.tsx';
+import { EdcSubjects, EdcCasebook, EdcVisit } from './pages/EdcDataEntry.tsx';
+import { EdcQueries } from './pages/EdcQueries.tsx';
+import { EDC_READER_ROLES } from './components/edc.ts';
 import { api, get } from './api.ts';
 
 /** `roles`: the item is shown only to these roles (the API and the database enforce the same rule). */
@@ -26,6 +30,9 @@ export const NAV: { label: string; href: string; pages: PageKey[]; group: string
   { label: 'Site network', href: '#/sites', pages: ['sites', 'siteDetail'], group: 'Platform' },
   { label: 'Tasks', href: '#/tasks', pages: ['tasks', 'taskDetail'], group: 'Work' },
   { label: 'Applications', href: '#/apps', pages: ['apps'], group: 'Work' },
+  { label: 'Data entry', href: '#/edc', pages: ['edcSubjects', 'edcCasebook', 'edcVisit'], group: 'Data', roles: EDC_READER_ROLES },
+  { label: 'Data queries', href: '#/edc/queries', pages: ['edcQueries'], group: 'Data', roles: EDC_READER_ROLES },
+  { label: 'CRF library', href: '#/edc/crfs', pages: ['crfLibrary', 'crfVersion'], group: 'Data' },
   { label: 'AI ledger', href: '#/ai', pages: ['aiLedger'], group: 'Trust' },
   { label: 'Audit trail', href: '#/audit', pages: ['auditTrail'], group: 'Trust', roles: AUDIT_ROLES },
   { label: 'Change requests', href: '#/change-requests', pages: ['changeRequests'], group: 'Admin', roles: CHANGE_ADMIN_ROLES },
@@ -65,6 +72,8 @@ export function App() {
     protocolEditor: <ProtocolEditor kind={p.kind as 'master' | 'appendix'} id={p.id!} />, sites: <Sites />, siteDetail: <SiteDetail id={p.id!} />,
     tasks: <Tasks />, taskDetail: <TaskDetail id={p.id!} />, apps: <Apps />, oidcAuthorize: <OidcAuthorize />, aiLedger: <AiLedger />, auditTrail: <AuditTrail />,
     changeRequests: <ChangeRequests />,
+    crfLibrary: <CrfLibrary />, crfVersion: <CrfVersion id={p.id!} />, edcSubjects: <EdcSubjects />, edcCasebook: <EdcCasebook id={p.id!} />,
+    edcVisit: <EdcVisit id={p.id!} />, edcQueries: <EdcQueries />,
     notFound: <NotFound />, login: null, loginMfa: null, loginMfaEnrol: null, uiCatalogue: null,
   }[route.page];
   const waiting = inbox.data?.items.filter(t => t.state === 'waiting_review').length ?? 0;
