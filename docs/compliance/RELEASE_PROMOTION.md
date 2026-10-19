@@ -16,7 +16,7 @@ IQ check after every deploy (Annex 11 §4/§10, EMA 2023 computerised systems va
    started the run). After approval it deploys the tagged commit (`netlify deploy --prod --build`, deploy message
    `trialops <tag> <commit>`), then runs the **IQ** (`scripts/iq-check.mjs`):
    anonymous 401 on site and API · the new deploy is the published one, ready, with the commit · deployed files equal
-   the build (SHA-1) · migrations applied = migrations in the repository · `core.audit_verify()` clean · DDL audit active.
+   the build (SHA-1) · migrations applied = migrations in the repository · `core.iq_audit_verify()` clean · DDL audit active.
 6. The **release record** (`iq-evidence/release-<env>-<tag>.json`: environment, tag, commit, deploy id, approvers,
    workflow run, every IQ check, PASS/FAIL, UTC times) is uploaded as an artifact and attached to the GitHub release.
 7. IQ FAIL: the job fails; the release manager opens a deviation and either fixes forward with a new tag or re-promotes
@@ -34,9 +34,23 @@ stack.
      = tags matching `v*`.
    - `test`: required reviewer = release manager or QA; same tag rule.
 2. In each environment add the **secrets** `NETLIFY_AUTH_TOKEN` (a personal access token of the Netlify account,
-   scoped to the TrialOps sites) and `IQ_DATABASE_URL` (a connection string of a read-only role that can read
-   `public.schema_migrations` and execute `core.audit_verify()` and `core.ddl_audit_active()`; on Supabase the session
-   pooler URL), and the **variables** `NETLIFY_SITE_ID` and `TRIALOPS_URL` of that environment's site.
+   scoped to the TrialOps sites) and `IQ_DATABASE_URL`, and the **variables** `NETLIFY_SITE_ID` and `TRIALOPS_URL` of
+   that environment's site. `IQ_DATABASE_URL` connects as the least-privilege role **`iq_reader`** (migration
+   `0029_iq_reader.sql`): select on `public.schema_migrations` (through the policy `iq_reader_read`), execute on
+   `core.iq_audit_verify()` (SECURITY DEFINER wrapper of `core.audit_verify()`, returns only the first broken sequence
+   number) and `core.ddl_audit_active()`; no select on `core.audit_event` nor on any clinical or `sac_enclave` table
+   (blinding). The migration creates the role `NOLOGIN`; enabling the login is an out-of-band step on each database, done
+   once after `0029` is applied, with the owner connection and a newly generated password that is never written to the
+   repository, a file or the chat:
+   ```sql
+   alter role iq_reader login password '<generated>';
+   ```
+   On Supabase the user name in the URL is `iq_reader.<project-ref>` and the host is the **session pooler** (port
+   `5432` of `aws-…pooler.supabase.com`, not the transaction pooler on `6543`):
+   `postgresql://iq_reader.<project-ref>:<generated>@<pooler-host>:5432/postgres`. Put that URL only in the environment
+   secret, then check it with `IQ_DATABASE_URL=… node scripts/iq-check.mjs --require db` (all three `db.*` checks `ok`).
+   Rotating the password = the same `alter role` with a new value and an update of the secret; revoking = `alter role
+   iq_reader nologin`.
 3. Check that `NETLIFY_CLI_VERSION` in `.github/workflows/promote.yml` is a published netlify-cli version and update it
    if needed.
 4. Branch protection on `main` (required `ci`, review by another person) and tag protection for `v*`. On a personal

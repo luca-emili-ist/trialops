@@ -5,7 +5,7 @@ let c;
 before(async () => { c = await db(); });
 after(async () => c.end());
 
-const RUNTIME_ROLES = ['anon', 'authenticated', 'app_service', 'unblinded', 'auth_service', 'audit_sealer', 'trialops_api'];
+const RUNTIME_ROLES = ['anon', 'authenticated', 'app_service', 'unblinded', 'auth_service', 'audit_sealer', 'trialops_api', 'iq_reader'];
 
 test('[CMP-12] DDL on core and sac_enclave is recorded with login, role and statement; the log is append-only', async () => {
   await tx(c, async () => {

@@ -6,7 +6,7 @@
 //   deploy.commit                         that deploy carries the released commit (deploy message / commit_ref)
 //   deploy.files                          every file of the local build is deployed with the same SHA-1, no extra file
 //   db.migrations                         the migrations applied in the database are exactly those of the repository
-//   db.audit_chain                        core.audit_verify() finds no broken link in the audit trail
+//   db.audit_chain                        core.iq_audit_verify() (or core.audit_verify() before 0029) finds no broken link
 //   db.ddl_audit                          the DDL audit event triggers are active (CMP-12)
 // The result is PASS only if every required check ran and passed. The evidence file (JSON) records the release, the
 // checks and the result; the workflow uploads it as an artifact and attaches it to the GitHub release.
@@ -14,7 +14,8 @@
 // Usage: node scripts/iq-check.mjs --url https://<site> --environment test|production --commit <sha> [--tag vX.Y.Z]
 //          [--deploy-id <id> --site-id <id>] [--dist apps/web/dist] [--approvers a,b] [--run-url <url>]
 //          [--require web,deploy,db] [--out <file>]
-// Secrets only from the environment, never from arguments: NETLIFY_AUTH_TOKEN (deploy checks), IQ_DATABASE_URL (db checks).
+// Secrets only from the environment, never from arguments: NETLIFY_AUTH_TOKEN (deploy checks), IQ_DATABASE_URL (db checks,
+// the role iq_reader of migration 0029: see docs/compliance/RELEASE_PROMOTION.md §2).
 import pg from 'pg';
 import { createHash } from 'node:crypto';
 import { readdirSync, readFileSync, statSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
@@ -107,8 +108,12 @@ export async function checkDatabase(client, repo = root) {
   out.push(check('db.migrations', missing.length === 0 && unknown.length === 0,
     `${applied.length} applied, ${expected.length} in the repository; not applied: ${missing.join(', ') || 'none'}; not in the repository: ${unknown.join(', ') || 'none'}`,
     { last: expected.filter(n => !n.startsWith('supabase/')).at(-1) }));
-  const broken = (await client.query('select core.audit_verify() b')).rows[0].b;
-  out.push(check('db.audit_chain', broken === null, broken === null ? 'audit chain intact' : `audit chain broken at seq ${broken}`));
+  // IQ_DATABASE_URL is the least-privilege role iq_reader (0029), which cannot read core.audit_event (blinding): it runs
+  // the chain verification through the SECURITY DEFINER wrapper core.iq_audit_verify(). A database older than 0029 has
+  // no wrapper: fall back to core.audit_verify(), which then needs a role that can read the ledger.
+  const fn = (await client.query("select to_regprocedure('core.iq_audit_verify()') is not null w")).rows[0].w ? 'core.iq_audit_verify' : 'core.audit_verify';
+  const broken = (await client.query(`select ${fn}() b`)).rows[0].b;
+  out.push(check('db.audit_chain', broken === null, `${broken === null ? 'audit chain intact' : `audit chain broken at seq ${broken}`} (${fn})`));
   const ddl = (await client.query('select core.ddl_audit_active() a')).rows[0].a;
   out.push(check('db.ddl_audit', ddl === true, ddl ? 'DDL audit event triggers active' : 'DDL audit event triggers missing or disabled'));
   return out;
