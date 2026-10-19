@@ -8,6 +8,7 @@ import type { Oidc } from './lib/oidc.ts';
 import type { AuthProvider } from './lib/auth-provider.ts';
 import type { AccessConfig } from './lib/access-policy.ts';
 import type { VersionedRecord } from './lib/write-controls.ts';
+import type { DecisionSigner } from './lib/decision-signing.ts';
 
 export type JsonSchema = Record<string, unknown>;
 
@@ -45,6 +46,8 @@ export interface Services {
   devUsers?: () => Promise<Record<string, unknown>[]>;
   /** Starts the worker of an AI job (Netlify: the background function). Absent: the job runs in this process. */
   jobs?: JobDispatcher;
+  /** Signer of the Agent Decision Records (AI-08); default from the environment (decisionSignerFromEnv). */
+  decisions?: DecisionSigner;
 }
 
 /** Hands a queued AI job to a worker. Must return quickly: the worker answers 202 and runs the job on its own. */

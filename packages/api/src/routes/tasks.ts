@@ -10,6 +10,8 @@ import { createArm, newArmSchema, type NewArm } from './arms.ts';
 import { createDraft, getVersion, putSection, validateProtocolContent, PROTOCOL_KINDS, type ProtocolContent } from './protocol.ts';
 import { runnableAgentTask, createPlanTasks, AGENTS } from '../agents/index.ts';
 import { enqueueJob } from './jobs.ts';
+import { decidePendingAction } from '../lib/policy-engine.ts';
+import type { Services } from '../route.ts';
 
 const OPEN = ['created', 'assigned', 'in_progress', 'waiting_review'];
 const TASK_COLS = `t.id, t.platform_id, t.arm_id, a.code arm_code, t.site_id, t.type, t.title, t.subject_ref, t.assignee_kind, t.assignee,
@@ -84,14 +86,20 @@ async function reviewProposal(db: Db, claims: Claims, reauth: Parameters<typeof 
   return { task: await getTask(db, taskId), signature, appendix_version: await getVersion(db, PROTOCOL_KINDS.APPENDIX, appendixId) };
 }
 
-/** AI-10 suggestion-only: a person confirms (the tasks are created) or rejects the onboarding plan the agent proposed. */
-async function confirmPlan(db: Db, claims: Claims, taskId: string, decision: 'accept' | 'reject'): Promise<Row> {
+/** AI-10 suggestion-only or AI-07 CONFIRM: a person confirms (the tasks are created) or rejects the onboarding plan the
+ * agent proposed. When the plan is a pending action of the policy engine (AI-07/AI-08) the decision goes through it. */
+async function confirmPlan(db: Db, services: Services, claims: Claims, taskId: string, decision: 'accept' | 'reject', reason: string | undefined): Promise<Row> {
   requirePerson(claims, 'Confirming an onboarding plan');
   requireRole(claims, ['platform_admin', 'platform_ops_manager'], 'Confirming an onboarding plan');
   const task = await getTask(db, taskId);
   if (!task) throw new HttpError(404, 'not_found', 'task not found');
   if (task.type !== 'arm.onboarding.plan' || task.state !== 'waiting_review' || !task.outputs?.proposal) {
     throw new HttpError(409, 'not_in_review', 'only an onboarding plan proposal waiting for confirmation can be confirmed');
+  }
+  if (task.outputs.pending_action_id) {
+    const d = await decidePendingAction(db, services, claims, task.outputs.pending_action_id, decision === 'accept' ? 'confirm' : 'reject', reason);
+    return { task: await getTask(db, taskId), tasks_created: d.result?.tasks_created ?? 0, pending_action: d.pending_action,
+      decision: d.decision, decision_record_id: d.decision_record_id };
   }
   const aiRequestId = task.outputs.ai_request_id as string;
   let created: string[] = [];
@@ -171,9 +179,9 @@ export const taskRoutes = [
     handler: async ({ db, claims, params, body, services }) => reviewProposal(db, claims, services.reauth, params.id!, body) }),
 
   route<{ decision: 'accept' | 'reject' }>({ method: 'post', path: '/v1/tasks/:id/confirm-plan', needsReason: true, tag: 'tasks',
-    reqs: ['AI-10', 'AI-05'], summary: 'Confirm or reject an onboarding plan left as a proposal while the planner is suggestion-only',
+    reqs: ['AI-10', 'AI-05', 'AI-07', 'AI-08'], summary: 'Confirm or reject an onboarding plan left as a proposal (suggestion-only or CONFIRM tool)',
     body: { type: 'object', additionalProperties: false, required: ['decision'], properties: { decision: { enum: ['accept', 'reject'] } } },
-    handler: async ({ db, claims, params, body }) => confirmPlan(db, claims, params.id!, body.decision) }),
+    handler: async ({ db, claims, params, body, services, reason }) => confirmPlan(db, services, claims, params.id!, body.decision, reason) }),
 
   route({ method: 'get', path: '/v1/platforms/:id/ai-review-stats', summary: 'Acceptance and edit rate of AI proposals per task type',
     tag: 'ai', reqs: ['AI-05'],

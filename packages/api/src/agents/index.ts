@@ -2,12 +2,18 @@
 // An agent works only on a task assigned to it, through the AI runtime, and leaves GxP outcomes in waiting_review.
 // AI-10: when monitoring has sent a task type to suggestion-only, the agent never acts on its output by itself: the
 // Onboarding planner leaves its plan as a proposal for a person to confirm (POST /v1/tasks/{id}/confirm-plan).
+// AI-07/AI-08: an agent acts on platform data only through a registered tool, via the policy engine (invokeTool), which
+// decides ALLOW / REVIEW / BLOCK and writes the signed Agent Decision Record; REVIEW leaves a pending action for a person.
 import type { Db, Row } from '../db.ts';
 import type { Services } from '../route.ts';
 import { HttpError } from '../errors.ts';
 import { agentClaims, asActor } from './identity.ts';
 import { getVersion, approvedVersion, PROTOCOL_KINDS } from '../routes/protocol.ts';
 import { taskTypeMode } from '../lib/ai-monitoring.ts';
+import { invokeTool, type ToolOutcome } from '../lib/policy-engine.ts';
+import { createPlanTasks } from './tools.ts';
+
+export { createPlanTasks };
 
 export const AGENTS = { protocolAuthor: 'protocol-author', onboardingPlanner: 'onboarding-planner' } as const;
 
@@ -34,8 +40,20 @@ async function protocolAuthor(db: Db, services: Services, task: Row): Promise<Ro
   // GxP: the draft is a proposal. It stays in the task until a person accepts it (AI-05, APP-TK-04). In suggestion-only
   // mode (AI-10) the reviewer is told the task type is under closer watch.
   const mode = await taskTypeMode(db, task.platform_id, 'protocol.appendix.draft');
-  await setState(db, task.id, 'waiting_review', { outputs: { ai_request_id: r.ai_request_id, proposal: r.output, monitoring_mode: mode } });
-  return { outcome: r.outcome, ai_request_id: r.ai_request_id };
+  const inv = await invokeTool(db, services, { agentId: AGENTS.protocolAuthor, tool: 'protocol.appendix.propose', platformId: task.platform_id,
+    armId: task.arm_id, taskId: task.id, ai: { ai_request_id: r.ai_request_id, task_type: 'protocol.appendix.draft' },
+    args: { task_id: task.id, ai_request_id: r.ai_request_id, proposal: r.output, monitoring_mode: mode } });
+  if (inv.decision !== 'ALLOW') await holdOutput(db, task.id, r.ai_request_id, inv);
+  return { outcome: inv.decision === 'BLOCK' ? 'blocked' : r.outcome, ai_request_id: r.ai_request_id, ...decisionOf(inv) };
+}
+
+const decisionOf = (inv: ToolOutcome) => ({ decision: inv.decision, decision_record_id: inv.decision_record_id,
+  pending_action_id: inv.pending_action_id, rule_ids: inv.rule_ids });
+
+/** The tool did not run: the task stays with the agent and says why (REVIEW: waiting for a person; BLOCK: refused). */
+async function holdOutput(db: Db, taskId: string, aiRequestId: string, inv: ToolOutcome): Promise<void> {
+  await setState(db, taskId, 'in_progress', { outputs: { ai_request_id: aiRequestId, ...decisionOf(inv),
+    ...(inv.decision === 'BLOCK' ? { blocked: true } : { awaiting_confirmation: true }) } });
 }
 
 async function onboardingPlanner(db: Db, services: Services, task: Row): Promise<Row> {
@@ -50,30 +68,21 @@ async function onboardingPlanner(db: Db, services: Services, task: Row): Promise
     return { outcome: r.outcome, ai_request_id: r.ai_request_id, error: r.error };
   }
   const plan = r.output as { tasks: Row[]; checklist: Row[] };
-  if (await taskTypeMode(db, task.platform_id, 'arm.onboarding.plan') === 'suggestion_only') {
-    // AI-10 fallback: nothing is created; a person confirms or rejects the plan.
-    await setState(db, task.id, 'waiting_review', { outputs: { ai_request_id: r.ai_request_id, proposal: plan, monitoring_mode: 'suggestion_only' } });
-    return { outcome: r.outcome, ai_request_id: r.ai_request_id, tasks_created: 0, suggestion_only: true };
+  const mode = await taskTypeMode(db, task.platform_id, 'arm.onboarding.plan');
+  const inv = await invokeTool(db, services, { agentId: AGENTS.onboardingPlanner, tool: 'onboarding.tasks.create', platformId: task.platform_id,
+    armId: task.arm_id, taskId: task.id, ai: { ai_request_id: r.ai_request_id, task_type: 'arm.onboarding.plan' },
+    args: { task_id: task.id, ai_request_id: r.ai_request_id, plan } });
+  if (inv.decision === 'ALLOW') {
+    return { outcome: r.outcome, ai_request_id: r.ai_request_id, tasks_created: inv.result?.tasks_created ?? 0, ...decisionOf(inv) };
   }
-  const created = await createPlanTasks(db, task, plan, r.ai_request_id);
-  await setState(db, task.id, 'completed', { outputs: { ai_request_id: r.ai_request_id, checklist: plan.checklist, created_task_ids: created } });
-  return { outcome: r.outcome, ai_request_id: r.ai_request_id, tasks_created: created.length };
-}
-
-/** Creates the operational tasks of an onboarding plan, assigned to roles; GxP ones are done and signed by people. */
-export async function createPlanTasks(db: Db, task: Row, plan: { tasks: Row[] }, aiRequestId: string): Promise<string[]> {
-  const sites = (await db.query("select id, site_number from core.site where platform_id = $1 and status = 'active'", [task.platform_id])).rows;
-  const siteBy = new Map(sites.map(s => [s.site_number, s.id]));
-  const created: string[] = [];
-  for (const t of plan.tasks) {
-    created.push((await db.query(`insert into core.task(platform_id, arm_id, site_id, type, title, subject_ref, assignee_kind, assignee,
-        gxp_impact, requires_signature, inputs, state, due_at, priority)
-      values ($1,$2,$3,$4,$5,$6,'role',$7,$8,$8,$9,'assigned', clock_timestamp() + make_interval(days => $10), 'normal') returning id`,
-      [task.platform_id, task.arm_id, siteBy.get(t.site_number) ?? null, t.type, t.title, `arm/${task.arm_id}`, t.assignee_role,
-       t.gxp_impact, JSON.stringify({ source: 'agent:onboarding-planner', plan_task_id: task.id, key: t.key, area: t.area,
-         depends_on: t.depends_on, ai_request_id: aiRequestId, assignee_role: t.assignee_role }), t.due_in_days])).rows[0].id);
+  if (inv.decision === 'BLOCK') {
+    await holdOutput(db, task.id, r.ai_request_id, inv);
+    return { outcome: 'blocked', ai_request_id: r.ai_request_id, tasks_created: 0, ...decisionOf(inv) };
   }
-  return created;
+  // REVIEW (AI-07 CONFIRM, or the AI-10 suggestion-only fallback): nothing is created; a person confirms or rejects the plan.
+  await setState(db, task.id, 'waiting_review', { outputs: { ai_request_id: r.ai_request_id, proposal: plan, monitoring_mode: mode,
+    ...decisionOf(inv) } });
+  return { outcome: r.outcome, ai_request_id: r.ai_request_id, tasks_created: 0, suggestion_only: mode === 'suggestion_only', ...decisionOf(inv) };
 }
 
 const RUNNERS = { [AGENTS.protocolAuthor]: protocolAuthor, [AGENTS.onboardingPlanner]: onboardingPlanner } as Record<string,

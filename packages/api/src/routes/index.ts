@@ -6,6 +6,7 @@ import { signatureRoutes } from './signatures.ts';
 import { siteRoutes } from './sites.ts';
 import { metricRoutes } from './metrics.ts';
 import { aiRoutes } from './ai.ts';
+import { aiGovernanceRoutes } from './ai-governance.ts';
 import { taskRoutes } from './tasks.ts';
 import { appRoutes } from './apps.ts';
 import { devRoutes } from './dev.ts';
@@ -16,4 +17,4 @@ import { changeRoutes } from './changes.ts';
 import { accessLogRoutes } from './access-log.ts';
 import { certifiedCopyRoutes } from './certified-copies.ts';
 
-export const routes: RouteDef[] = [...platformRoutes, ...armRoutes, ...protocolRoutes, ...signatureRoutes, ...siteRoutes, ...metricRoutes, ...aiRoutes, ...jobRoutes, ...taskRoutes, ...appRoutes, ...auditRoutes, ...accessLogRoutes, ...certifiedCopyRoutes, ...changeRoutes, ...authRoutes, ...devRoutes];
+export const routes: RouteDef[] = [...platformRoutes, ...armRoutes, ...protocolRoutes, ...signatureRoutes, ...siteRoutes, ...metricRoutes, ...aiRoutes, ...aiGovernanceRoutes, ...jobRoutes, ...taskRoutes, ...appRoutes, ...auditRoutes, ...accessLogRoutes, ...certifiedCopyRoutes, ...changeRoutes, ...authRoutes, ...devRoutes];

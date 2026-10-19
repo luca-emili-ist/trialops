@@ -10,6 +10,7 @@ import { ajv } from './lib/validate.ts';
 import { routes as allRoutes } from './routes/index.ts';
 import { appProvenance, checkIfMatch, currentVersion, etagOf, idempotencyKey, isApp, isKeyRace, lookupResponse, parseIfMatch,
   requestHash, storeResponse, type StoredResponse } from './lib/write-controls.ts';
+import { decisionSignerFromEnv } from './lib/decision-signing.ts';
 import { accessConfigFromEnv, authTx, enforceAccessPolicy, policyReauth, SYSTEM_AUTH, type Deferred } from './lib/access-policy.ts';
 
 /** ctx.db of a manualTx route: there is no request transaction, the handler must use ctx.tx. */
@@ -28,8 +29,10 @@ export function createApp({ pool, verify, services = {}, routes = allRoutes }: A
   // (IAM-01, CMP-03) and the signature re-authentication wrapped by that policy (MFA step-up, failures counted).
   const access = services.access ?? accessConfigFromEnv();
   let wrapped: { inner: unknown; outer: Services['reauth'] } = { inner: undefined, outer: undefined };
+  const decisions = services.decisions ?? decisionSignerFromEnv();   // AI-08: Ed25519 key from the environment
   const svc: Services = Object.create(services, {
     access: { value: access, enumerable: true },
+    decisions: { value: decisions, enumerable: true },
     reauth: { enumerable: true, get: () => {
       if (wrapped.inner !== services.reauth) wrapped = { inner: services.reauth, outer: services.reauth && policyReauth(services.reauth, pool, access) };
       return wrapped.outer;

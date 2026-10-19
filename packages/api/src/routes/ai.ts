@@ -9,6 +9,7 @@ import type { AiTaskRequest, TaskTypeDef } from '@trialops/ai-runtime';
 import type { Ctx } from '../route.ts';
 import { requirePerson, requireRole } from '../lib/roles.ts';
 import { monitorTaskType, breachReason } from '../lib/ai-monitoring.ts';
+import { signerOf } from '../lib/policy-engine.ts';
 
 /** Platform of a monitoring call: the one asked for, or the only platform of the token. */
 function monitoringPlatform(ctx: Ctx<unknown>, asked: string | undefined): string {
@@ -54,7 +55,7 @@ export const aiRoutes = [
         from core.ai_request where platform_id = $1 order by created_at desc limit 200`, [params.id])).rows,
     }) }),
 
-  route({ method: 'get', path: '/v1/ai/monitoring', tag: 'ai', reqs: ['AI-10'],
+  route({ method: 'get', path: '/v1/ai/monitoring', tag: 'ai', reqs: ['AI-10', 'AI-08'],
     summary: 'Monitoring per AI task type on a platform: review outcomes, validation failures, drift, rules and mode (normal or suggestion-only)',
     query: { platform_id: uuid },
     handler: async ctx => {
@@ -62,7 +63,15 @@ export const aiRoutes = [
       const platform = monitoringPlatform(ctx, ctx.query.platform_id);
       const items = [];
       for (const def of Object.values(registryOf(ctx))) items.push(await monitorTaskType(ctx.db, platform, def));
-      return { platform_id: platform, items };
+      // AI-08: unsigned Agent Decision Records (no signing key configured) are an anomaly to act on, never hidden.
+      const s = signerOf(ctx.services);
+      const d = (await ctx.db.query(`select count(*)::int total, count(*) filter (where signature_status = 'unsigned')::int unsigned
+        from core.agent_decision_record where platform_id = $1`, [platform])).rows[0]!;
+      const anomalies = [
+        ...(s.mode === 'unsigned' ? ['decision signing key not configured: new Agent Decision Records are unsigned (AI-08)'] : []),
+        ...(d.unsigned > 0 ? [`${d.unsigned} unsigned Agent Decision Record(s) on this platform (AI-08)`] : []),
+      ];
+      return { platform_id: platform, items, decision_records: { ...d, signer: { mode: s.mode, key_id: s.keyId }, anomalies } };
     } }),
 
   route<{ platform_id?: string }>({ method: 'post', path: '/v1/ai/monitoring/evaluate', tag: 'ai', reqs: ['AI-10'],
