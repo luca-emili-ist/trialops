@@ -13,3 +13,6 @@ e2e/screens/
 # Stryker mutation testing
 reports/mutation/
 .stryker-tmp/
+
+# IQ evidence of scripts/iq-check.mjs (uploaded by the promote workflow, not versioned)
+iq-evidence/
