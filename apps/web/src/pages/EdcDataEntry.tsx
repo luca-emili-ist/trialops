@@ -4,42 +4,51 @@
 // Blinded by construction: the API never returns the allocation, and these pages never ask for it.
 import { useEffect, useState } from 'react';
 import { PageHeader, Panel, DataTable, StatusPill, Button, Loading, ErrorNote, EmptyState, Modal, TextField, SelectField, ReasonDialog,
-  DefinitionList, useToast } from '@trialops/shell';
+  DefinitionList, useToast, useT } from '@trialops/shell';
 import { api } from '../api.ts';
 import { useData, useSession } from '../session.tsx';
 import { go } from '../router.ts';
 import { human, tone } from '../format.ts';
 import { EDC_REVIEW_ROLES, EDC_SITE_ROLES, queryTone, today, utc, type EdcQuery } from '../components/edc.ts';
 
-// UI strings of these three pages, kept together so they can be localised (rule 15: site-facing pages in English and Japanese).
-const T = {
+// UI strings of these three pages, kept together and translated through t() (NFR-07, rule 15: site-facing pages in English
+// and Japanese; the Japanese is in apps/web/src/i18n/ja.ts). Record content (item labels, questions, answers) is not translated.
+type Tr = (text: string, vars?: Record<string, string | number>) => string;
+const T = (t: Tr) => ({
   subjects: {
-    title: 'Data entry', subtitle: 'Subjects of your sites with their visits and open data queries. Treatment allocation is never shown here (blinded).',
-    code: 'Subject', site: 'Site', status: 'Status', visits: 'Visits completed', queries: 'Open queries', empty: 'No subject in data entry for your sites',
-    queriesPill: (n: number) => `${n} open`,
+    title: t('Data entry'), subtitle: t('Subjects of your sites with their visits and open data queries. Treatment allocation is never shown here (blinded).'),
+    code: t('Subject'), site: t('Site'), status: t('Status'), visits: t('Visits completed'), queries: t('Open queries'),
+    empty: t('No subject in data entry for your sites'), table: t('Subjects in data entry'),
+    queriesPill: (n: number) => t('{n} open', { n }),
   },
   casebook: {
-    crumbs: 'Data entry', title: (code: string) => `Subject ${code}`, subtitle: 'Visit schedule of the Master Protocol and the visits recorded for this subject.',
-    site: 'Site', status: 'Status', visit: 'Visit', name: 'Name', day: 'Planned day', date: 'Visit date', visitStatus: 'Visit status', queries: 'Open queries',
-    notStarted: 'not started', start: 'Start visit', startTitle: (code: string) => `Start visit ${code}`,
-    dateLabel: 'Visit date', dateHint: 'Date of the visit at the site; it cannot be in the future (UTC).', cancel: 'Cancel', confirm: 'Start visit',
+    crumbs: t('Data entry'), title: (code: string) => t('Subject {code}', { code }), subtitle: t('Visit schedule of the Master Protocol and the visits recorded for this subject.'),
+    site: t('Site'), status: t('Status'), visit: t('Visit'), name: t('Name'), day: t('Planned day'), date: t('Visit date'), visitStatus: t('Visit status'),
+    queries: t('Open queries'), table: t('Visit schedule'),
+    notStarted: t('not started'), start: t('Start visit'), startTitle: (code: string) => t('Start visit {code}', { code }),
+    dateLabel: t('Visit date'), dateHint: t('Date of the visit at the site; it cannot be in the future (UTC).'), cancel: t('Cancel'), confirm: t('Start visit'),
   },
   visit: {
-    crumbs: 'Data entry', title: (subject: string, visit: string) => `${subject} · ${visit}`, site: 'Site', date: 'Visit date', status: 'Status',
-    completed: 'Completed', completeVisit: 'Complete visit', completedToast: 'Visit completed: data available (visit.completed)',
-    startForm: 'Start form', formStarted: 'Form started', notStarted: 'Not started', openQueries: (n: number) => `${n} open ${n === 1 ? 'query' : 'queries'}`, version: (n: number) => `CRF version ${n}`,
-    value: 'Value', missing: 'Missing data', missingNone: '—', missingOptions: { ND: 'ND · not done', NA: 'NA · not applicable', UNK: 'UNK · unknown' },
-    entered: (by: string, at: string) => `Entered by ${by} · ${at}`, required: 'required', choose: '— choose —',
-    save: 'Save', saved: 'Saved', savedQueries: (n: number) => `Saved: ${n} edit check ${n === 1 ? 'query' : 'queries'} opened`,
-    reasonTitle: 'Reason for changing saved values', reasonText: 'The previous values stay in the audit trail with this reason.', reasonConfirm: 'Save changes',
-    complete: 'Mark form complete', completeToast: 'Form complete', reopen: 'Reopen form', reopenTitle: 'Reopen the form', reopenConfirm: 'Reopen',
-    queries: 'Data queries', noQueries: 'No queries on this form', answer: 'Answer', answerTitle: 'Answer the query', answerLabel: 'Answer',
-    answerConfirm: 'Send answer', answered: 'Answer sent', close: 'Close', closeTitle: 'Close the query', closeConfirm: 'Close query', closedToast: 'Query closed',
-    opened: (by: string, at: string) => `Opened by ${by} · ${at}`, byCheck: (code: string) => `edit check ${code}`, manual: 'manual query',
+    crumbs: t('Data entry'), title: (subject: string, visit: string) => `${subject} · ${visit}`, site: t('Site'), date: t('Visit date'), status: t('Status'),
+    completed: t('Completed'), completeVisit: t('Complete visit'), completedToast: t('Visit completed: data available (visit.completed)'),
+    startForm: t('Start form'), formStarted: t('Form started'), notStarted: t('Not started'),
+    openQueries: (n: number) => (n === 1 ? t('1 open query') : t('{n} open queries', { n })), version: (n: number) => t('CRF version {n}', { n }),
+    value: t('Value'), missing: t('Missing data'), missingNone: '—',
+    missingOptions: { ND: t('ND · not done'), NA: t('NA · not applicable'), UNK: t('UNK · unknown') },
+    missingFor: (label: string) => t('Missing data: {label}', { label }),
+    entered: (by: string, at: string) => t('Entered by {by} · {at}', { by, at }), required: t('required'), choose: t('— choose —'),
+    save: t('Save'), saved: t('Saved'),
+    savedQueries: (n: number) => (n === 1 ? t('Saved: 1 edit check query opened') : t('Saved: {n} edit check queries opened', { n })),
+    reasonTitle: t('Reason for changing saved values'), reasonText: t('The previous values stay in the audit trail with this reason.'), reasonConfirm: t('Save changes'),
+    complete: t('Mark form complete'), completeToast: t('Form complete'), reopen: t('Reopen form'), reopenTitle: t('Reopen the form'), reopenConfirm: t('Reopen'),
+    reopened: t('Form reopened'),
+    queries: t('Data queries'), noQueries: t('No queries on this form'), answer: t('Answer'), answerTitle: t('Answer the query'), answerLabel: t('Answer'),
+    answerConfirm: t('Send answer'), answered: t('Answer sent'), close: t('Close'), closeTitle: t('Close the query'), closeConfirm: t('Close query'), closedToast: t('Query closed'),
+    opened: (by: string, at: string) => t('Opened by {by} · {at}', { by, at }), byCheck: (code: string) => t('edit check {code}', { code }), manual: t('manual query'),
     answerLine: (a: string, by: string | null) => `${a}${by ? ` (${by})` : ''}`,
-    origin: 'Origin', openedK: 'Opened', answerK: 'Answer', closedK: 'Closed',
+    origin: t('Origin'), openedK: t('Opened'), answerK: t('Answer'), closedK: t('Closed'),
   },
-} as const;
+});
 
 // ===================================================================================================================
 // TRO-072 subjects
@@ -49,15 +58,16 @@ interface SubjectRow { id: string; subject_code: string; site_number: string; st
 export function EdcSubjects() {
   const { platform } = useSession();
   const list = useData<{ items: SubjectRow[] }>(platform ? `/v1/platforms/${platform.id}/edc/subjects` : null);
-  const S = T.subjects;
+  const t = useT();
+  const S = T(t).subjects;
   return (
     <>
       <PageHeader title={S.title} subtitle={S.subtitle} />
       {list.error ? <ErrorNote error={list.error} /> : !list.data ? <Loading /> :
-        <DataTable rows={list.data.items} rowKey={r => r.id} onRowClick={r => go(`/edc/subjects/${r.id}`)} empty={<EmptyState title={S.empty} />} columns={[
+        <DataTable label={S.table} rows={list.data.items} rowKey={r => r.id} onRowClick={r => go(`/edc/subjects/${r.id}`)} empty={<EmptyState title={S.empty} />} columns={[
           { key: 'subject_code', label: S.code, render: r => <span className="t-mono">{r.subject_code}</span> },
           { key: 'site_number', label: S.site },
-          { key: 'status', label: S.status, render: r => human(r.status) },
+          { key: 'status', label: S.status, render: r => t(human(r.status)) },
           { key: 'visits', label: S.visits, align: 'right', render: r => `${r.visits_completed} / ${r.visits}`, sortValue: r => r.visits_completed },
           { key: 'queries_open', label: S.queries, align: 'right', sortValue: r => r.queries_open,
             render: r => r.queries_open ? <StatusPill tone="warn">{S.queriesPill(r.queries_open)}</StatusPill> : '0' },
@@ -79,7 +89,8 @@ export function EdcCasebook({ id }: { id: string }) {
   const cb = useData<Casebook>(`/v1/edc/subjects/${id}`);
   const [starting, setStarting] = useState<ScheduleRow | null>(null);
   const [date, setDate] = useState(today());
-  const C = T.casebook;
+  const t = useT();
+  const C = T(t).casebook;
   if (cb.error) return <ErrorNote error={cb.error} />;
   if (!cb.data) return <Loading />;
   const d = cb.data;
@@ -87,13 +98,13 @@ export function EdcCasebook({ id }: { id: string }) {
   return (
     <>
       <PageHeader crumbs={<a href="#/edc">{C.crumbs}</a>} title={C.title(d.subject_code)} subtitle={C.subtitle}
-        facts={[[C.site, d.site_number], [C.status, human(d.status)]]} />
-      <DataTable rows={d.schedule} rowKey={r => r.visit_definition_id} onRowClick={r => { if (r.id) go(`/edc/visits/${r.id}`); }} columns={[
+        facts={[[C.site, d.site_number], [C.status, t(human(d.status))]]} />
+      <DataTable label={C.table} rows={d.schedule} rowKey={r => r.visit_definition_id} onRowClick={r => { if (r.id) go(`/edc/visits/${r.id}`); }} columns={[
         { key: 'code', label: C.visit, render: r => <span className="t-mono">{r.code}</span> },
         { key: 'name', label: C.name },
         { key: 'planned_day', label: C.day, align: 'right', render: r => r.planned_day ?? '—' },
         { key: 'visit_date', label: C.date, render: r => <span className="t-mono">{r.visit_date ?? '—'}</span> },
-        { key: 'status', label: C.visitStatus, render: r => r.status ? <StatusPill tone={tone(r.status)}>{human(r.status)}</StatusPill>
+        { key: 'status', label: C.visitStatus, render: r => r.status ? <StatusPill tone={tone(r.status)}>{t(human(r.status))}</StatusPill>
           : site ? <Button onClick={e => { e.stopPropagation(); setDate(today()); setStarting(r); }}>{C.start}</Button> : C.notStarted },
         { key: 'queries_open', label: C.queries, align: 'right', render: r => r.queries_open ? <StatusPill tone="warn">{r.queries_open}</StatusPill> : '—' },
       ]} />
@@ -122,7 +133,8 @@ export function EdcVisit({ id }: { id: string }) {
   const toast = useToast();
   const visit = useData<Visit>(`/v1/subject-visits/${id}`);
   const [completing, setCompleting] = useState(false);
-  const V = T.visit;
+  const t = useT();
+  const V = T(t).visit;
   if (visit.error) return <ErrorNote error={visit.error} />;
   if (!visit.data) return <Loading />;
   const d = visit.data;
@@ -131,7 +143,7 @@ export function EdcVisit({ id }: { id: string }) {
     <>
       <PageHeader crumbs={<><a href="#/edc">{V.crumbs}</a> / <a href={`#/edc/subjects/${d.subject_id}`}>{d.subject_code}</a></>}
         title={V.title(d.subject_code, `${d.visit_code} ${d.visit_name}`)}
-        facts={[[V.site, d.site_number], [V.date, d.visit_date], [V.status, human(d.status)], [V.completed, utc(d.completed_at)]]}
+        facts={[[V.site, d.site_number], [V.date, d.visit_date], [V.status, t(human(d.status))], [V.completed, utc(d.completed_at)]]}
         actions={site && d.status === 'in_progress' ? <Button variant="primary" disabled={completing} onClick={() => {
           setCompleting(true);
           api('POST', `/v1/subject-visits/${d.id}/complete`).then(() => { toast(V.completedToast); visit.reload(); },
@@ -145,7 +157,8 @@ export function EdcVisit({ id }: { id: string }) {
 function FormPanel({ visitId, form, canEnter, onChange }: { visitId: string; form: FormBlock; canEnter: boolean; onChange: () => void }) {
   const s = useSession();
   const toast = useToast();
-  const V = T.visit;
+  const t = useT();
+  const V = T(t).visit;
   const saved = Object.fromEntries(form.values.map(v => [v.item_oid, v]));
   const initial = () => Object.fromEntries((form.version?.items ?? []).map(i => [i.oid, { value: saved[i.oid]?.value ?? '', missing: saved[i.oid]?.missing_reason ?? '' }]));
   const [draft, setDraft] = useState<Record<string, { value: string; missing: string }>>(initial);
@@ -171,7 +184,7 @@ function FormPanel({ visitId, form, canEnter, onChange }: { visitId: string; for
   return (
     <Panel title={`${form.name} (${form.oid})`} meta={form.version ? V.version(form.version.version_no) : undefined}
       actions={<>
-        {form.entry ? <StatusPill tone={tone(form.entry.status)}>{human(form.entry.status)}</StatusPill> : <span className="t-muted">{V.notStarted}</span>}
+        {form.entry ? <StatusPill tone={tone(form.entry.status)}>{t(human(form.entry.status))}</StatusPill> : <span className="t-muted">{V.notStarted}</span>}
         {open ? <StatusPill tone="warn">{V.openQueries(open)}</StatusPill> : null}
         {canEnter && !form.entry ? <Button variant="primary" onClick={() => act(api('POST', `/v1/subject-visits/${visitId}/entries`, { body: { crf_form_id: form.form_id } }), V.formStarted)}>{V.startForm}</Button> : null}
         {editable && form.entry!.status === 'in_progress' ? <Button onClick={() => act(api('POST', `/v1/crf-entries/${form.entry!.id}/complete`), V.completeToast)}>{V.complete}</Button> : null}
@@ -186,14 +199,14 @@ function FormPanel({ visitId, form, canEnter, onChange }: { visitId: string; for
           return <div className="form-grid" key={i.oid} data-item={i.oid}>
             {i.data_type === 'coded'
               ? <SelectField label={label} value={x.value} disabled={!editable || !!x.missing} onChange={e => set({ value: e.target.value })}
-                  options={[{ value: '', label: V.choose }, ...i.terms.map(t => ({ value: t.value, label: `${t.decode} (${t.value})` }))]} />
+                  options={[{ value: '', label: V.choose }, ...i.terms.map(term => ({ value: term.value, label: `${term.decode} (${term.value})` }))]} />
               : <TextField label={label} value={x.value} disabled={!editable || !!x.missing} hint={saved[i.oid] ? V.entered(saved[i.oid]!.entered_by, utc(saved[i.oid]!.entered_at)) : i.oid}
                   type={i.data_type === 'date' ? 'date' : 'text'} inputMode={i.data_type === 'integer' || i.data_type === 'decimal' ? 'decimal' : undefined}
                   onChange={e => set({ value: e.target.value })} />}
-            <SelectField label={`${V.missing}: ${i.label}`} value={x.missing} disabled={!editable} onChange={e => set({ missing: e.target.value, value: e.target.value ? '' : x.value })}
+            <SelectField label={V.missingFor(i.label)} value={x.missing} disabled={!editable} onChange={e => set({ missing: e.target.value, value: e.target.value ? '' : x.value })}
               options={[{ value: '', label: V.missingNone }, ...Object.entries(V.missingOptions).map(([k, l]) => ({ value: k, label: l }))]} />
             {itemQueries.length ? <div className="stack-sm">{itemQueries.map(q => <span key={q.id} className="row">
-              <StatusPill tone={queryTone(q.status)}>{human(q.status)}</StatusPill><span>{q.question}</span></span>)}</div> : <span />}
+              <StatusPill tone={queryTone(q.status)}>{t(human(q.status))}</StatusPill><span>{q.question}</span></span>)}</div> : <span />}
           </div>;
         })}
         {editable ? <div className="row"><Button variant="primary" disabled={!changed.length || busy}
@@ -204,9 +217,9 @@ function FormPanel({ visitId, form, canEnter, onChange }: { visitId: string; for
       {dialog === 'reason' ? <ReasonDialog title={V.reasonTitle} description={V.reasonText} confirmLabel={V.reasonConfirm} onClose={() => setDialog(null)}
         onConfirm={reason => save(reason)} /> : null}
       {dialog === 'reopen' ? <ReasonDialog title={V.reopenTitle} confirmLabel={V.reopenConfirm} onClose={() => setDialog(null)}
-        onConfirm={reason => act(api('POST', `/v1/crf-entries/${form.entry!.id}/reopen`, { reason }), V.reopen) as Promise<void>} /> : null}
+        onConfirm={reason => act(api('POST', `/v1/crf-entries/${form.entry!.id}/reopen`, { reason }), V.reopened) as Promise<void>} /> : null}
       {dialog && typeof dialog === 'object' && 'answer' in dialog ? <Modal title={V.answerTitle} onClose={() => setDialog(null)} actions={<>
-          <Button onClick={() => setDialog(null)}>{T.casebook.cancel}</Button>
+          <Button onClick={() => setDialog(null)}>{T(t).casebook.cancel}</Button>
           <Button variant="primary" disabled={!text.trim()} onClick={() => act(api('POST', `/v1/edc-queries/${dialog.answer.id}/answer`, { body: { answer: text.trim() } }), V.answered)}>
             {V.answerConfirm}</Button></>}>
         <p>{dialog.answer.question}</p>
@@ -220,12 +233,13 @@ function FormPanel({ visitId, form, canEnter, onChange }: { visitId: string; for
 
 export function QueryList({ queries, canAnswer, canClose, onAnswer, onClose }: { queries: EdcQuery[]; canAnswer: boolean; canClose: boolean;
   onAnswer: (q: EdcQuery) => void; onClose: (q: EdcQuery) => void }) {
-  const V = T.visit;
+  const t = useT();
+  const V = T(t).visit;
   if (!queries.length) return <p className="t-muted">{V.noQueries}</p>;
   return <div className="stack-sm" aria-label={V.queries}>
     <strong>{V.queries}</strong>
     {queries.map(q => <div key={q.id} className="stack-sm" data-query={q.status}>
-      <span className="row"><StatusPill tone={queryTone(q.status)}>{human(q.status)}</StatusPill>
+      <span className="row"><StatusPill tone={queryTone(q.status)}>{t(human(q.status))}</StatusPill>
         <span className="t-mono">{q.item_oid ?? '—'}</span><span>{q.question}</span>
         {canAnswer && q.status === 'open' ? <Button onClick={() => onAnswer(q)}>{V.answer}</Button> : null}
         {canClose && (q.status === 'open' || q.status === 'answered') ? <Button variant="ghost" onClick={() => onClose(q)}>{V.close}</Button> : null}</span>

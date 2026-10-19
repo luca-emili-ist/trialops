@@ -32,9 +32,15 @@ async function routes(request: APIRequestContext, token: string): Promise<string
   const site = (await get(`/v1/platforms/${plat}/sites`)).items[0].id as string;
   const task = (await get(`/v1/platforms/${plat}/tasks?mine=false&state=all`)).items[0].id as string;
   const appendix = armDetail.appendix_versions?.[0]?.id as string | undefined;
+  // EDC (TRO-070…TRO-075): a CRF version, a subject in data entry and one of its recorded visits, from the synthetic seed
+  const crf = (await get(`/v1/platforms/${plat}/crf-forms`)).items[0]?.versions?.[0]?.id as string | undefined;
+  const subject = (await get(`/v1/platforms/${plat}/edc/subjects`)).items.find((x: { visits: number }) => x.visits > 0)?.id as string | undefined;
+  const visit = subject ? ((await get(`/v1/edc/subjects/${subject}`)).schedule as { id: string | null }[]).find(v => v.id)?.id : undefined;
+  expect(crf && subject && visit, 'the synthetic seed has EDC data for the EDC routes').toBeTruthy();
   return ['/', '/arms', '/arms/new', `/arms/${arm.id}`, ...(appendix ? [`/protocol/appendix/${appendix}`] : []), '/sites', `/sites/${site}`, '/tasks',
     `/tasks/${task}`, '/apps', '/ai', '/ai/monitoring', '/ai/pending', '/audit', '/change-requests', '/quality', '/providers', '/privacy',
-    '/app-validation', '/ui', '/nope-not-a-page'];
+    '/app-validation', '/edc', `/edc/subjects/${subject}`, `/edc/visits/${visit}`, '/edc/queries', '/edc/crfs', `/edc/crfs/${crf}`,
+    '/ui', '/nope-not-a-page'];
 }
 
 /** Waits until the page has loaded its data (no loading line left), or 10 s. */

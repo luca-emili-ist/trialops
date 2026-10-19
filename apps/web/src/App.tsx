@@ -86,7 +86,6 @@ export function App() {
     dashboard: <Dashboard />, arms: <Arms />, armDetail: <ArmDetail id={p.id!} />, armWizard: <ArmWizard />,
     protocolEditor: <ProtocolEditor kind={p.kind as 'master' | 'appendix'} id={p.id!} />, sites: <Sites />, siteDetail: <SiteDetail id={p.id!} />,
     tasks: <Tasks />, taskDetail: <TaskDetail id={p.id!} />, apps: <Apps />, oidcAuthorize: <OidcAuthorize />, aiLedger: <AiLedger />, auditTrail: <AuditTrail />,
-    changeRequests: <ChangeRequests />,
     crfLibrary: <CrfLibrary />, crfVersion: <CrfVersion id={p.id!} />, edcSubjects: <EdcSubjects />, edcCasebook: <EdcCasebook id={p.id!} />,
     edcVisit: <EdcVisit id={p.id!} />, edcQueries: <EdcQueries />,
     changeRequests: <ChangeRequests />, aiMonitoring: <AiMonitoring />, pendingActions: <PendingActions />, quality: <Quality />, providers: <Providers />,

@@ -26,10 +26,11 @@ test('[EDC-01][EDC-03][EDC-05] the EDC pages have their own codes in the Data de
   assert.match(app, /label: 'CRF library', href: '#\/edc\/crfs', pages: \['crfLibrary', 'crfVersion'\], group: 'Data'/);
 });
 
-test('[EDC-03] UI strings of every EDC page are kept in one place per page, ready to be localised (rule 15)', () => {
+test('[EDC-03][NFR-07] UI strings of every EDC page are kept in one place per page and go through t() (rule 15)', () => {
   for (const f of ['EdcLibrary.tsx', 'EdcDataEntry.tsx', 'EdcQueries.tsx']) {
     const p = page(f);
-    assert.match(p, /\nconst T = \{[\s\S]*?\} as const;/, `${f}: strings object`);
+    assert.match(p, /\nconst T = \(t: Tr\) => \(\{[\s\S]*?\n\}\);/, `${f}: strings object built with t()`);
+    assert.match(p, /= T\(t\)/, `${f}: strings taken in the locale of the page`);
     // labels of fields and buttons come from T, not from literals in the JSX
     assert.doesNotMatch(p, /label="[A-Za-z]/, `${f}: literal field label`);
     assert.doesNotMatch(p, /<Button[^>]*>[A-Za-z][^<{]*<\/Button>/, `${f}: literal button text`);

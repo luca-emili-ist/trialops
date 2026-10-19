@@ -112,3 +112,33 @@ test('[NFR-06][CMP-08] an app whose data_residency does not cover the region is 
   assert.equal(r2.status, 422);
   assert.match(r2.body.error.message, /the platform keeps its data in US/);
 });
+
+test('[NFR-06][EDC-03][EDC-05] EDC data follows the region: an EU deployment refuses or hides every EDC record of the US platform', async () => {
+  const a = await api('EU');
+  const plat = await platformId(a.admin);
+  const ids = (await a.admin.query(`select v.subject_id, v.id visit_id, e.id entry_id, e.crf_version_id, q.id query_id
+      from core.subject_visit v join core.crf_entry e on e.subject_visit_id = v.id left join core.edc_query q on q.crf_entry_id = e.id
+     where v.platform_id = $1 order by q.id nulls last limit 1`, [plat])).rows[0];
+  assert.ok(ids, 'the synthetic seed has EDC data on PLAT-001');
+  for (const p of ['edc/subjects', 'crf-forms', 'edc-queries', 'visit-definitions', 'codelists']) {
+    const r = await a.call('GET', `/v1/platforms/${plat}/${p}`, { as: 'demo|pi101' });
+    assert.equal(r.status, 403, `${p}: ${JSON.stringify(r.body)}`);
+    assert.equal(r.body.error.code, 'wrong_region');
+  }
+  // routes addressed by record id: the narrowed perimeter hides the US records (RLS and the EDC perimeter functions)
+  for (const p of [`/v1/edc/subjects/${ids.subject_id}`, `/v1/subject-visits/${ids.visit_id}`, `/v1/crf-versions/${ids.crf_version_id}`]) {
+    assert.equal((await a.call('GET', p, { as: 'demo|admin' })).status, 404, p);
+  }
+  const before = (await a.admin.query("select count(*)::int n from core.audit_event where table_name <> 'region_access_refusal'")).rows[0].n;
+  const w = await a.call('PUT', `/v1/crf-entries/${ids.entry_id}/values`, { as: 'demo|pi101', body: { values: [{ item_oid: 'I.VS.SYSBP', value: '120', missing_reason: null }] } });
+  assert.ok(w.status === 403 || w.status === 404, `write refused: ${w.status} ${JSON.stringify(w.body)}`);
+  const after = (await a.admin.query("select count(*)::int n from core.audit_event where table_name <> 'region_access_refusal'")).rows[0].n;
+  assert.equal(after, before, 'nothing of the US platform was written');
+  if (ids.query_id) assert.ok([403, 404].includes((await a.call('POST', `/v1/edc-queries/${ids.query_id}/answer`, { as: 'demo|pi101', body: { answer: 'synthetic' } })).status));
+  // the US deployment serves the same EDC data as before
+  const us = await api('US');
+  const ok = await us.call('GET', `/v1/platforms/${plat}/edc/subjects`, { as: 'demo|pi101' });
+  assert.equal(ok.status, 200, JSON.stringify(ok.body));
+  assert.ok(ok.body.items.length > 0);
+  assert.equal((await us.call('GET', `/v1/edc/subjects/${ids.subject_id}`, { as: 'demo|pi101' })).status, 200);
+});
