@@ -19,6 +19,7 @@ const NOT_AUDITED = {
   'core.audit_anchor': { immutable: true, reason: 'external copies of the seals (CMP-12): append-only' },
   'core.ddl_event': { immutable: true, reason: 'DDL log written by the event trigger (CMP-12): append-only' },
   'core.oidc_code': { reason: 'single-use authorization codes valid 60 s; stored only as hashes; not a record' },
+  'core.ai_tool_version': { immutable: true, reason: 'version history of the AI tool registry (AI-07), written by trigger from core.ai_tool, which is audited; append-only' },
   'core.idempotency_record': { reason: 'replay cache of API writes (APP-DT-02), kept 24 h, never updated; the write it replays is audited by its own table' },
 };
 
