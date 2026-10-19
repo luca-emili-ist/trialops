@@ -52,7 +52,7 @@ export async function seedEdc(c) {
   const check = (v, code, kind, itemOid, extra, severity, message) => c.query(`insert into core.crf_edit_check(crf_version_id, code, kind, item_oid,
       operator, other_item_oid, min_value, max_value, severity, message) values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)`,
     [v, code, kind, itemOid, extra.op ?? null, extra.other ?? null, extra.min ?? null, extra.max ?? null, severity, message]);
-  const schedule = (v, codes) => Promise.all(codes.map(k => c.query('insert into core.crf_visit(crf_version_id, visit_definition_id) values ($1,$2)', [v, visit[k]])));
+  const schedule = async (v, codes) => { for (const k of codes) await c.query('insert into core.crf_visit(crf_version_id, visit_definition_id) values ($1,$2)', [v, visit[k]]); };
 
   const vsItems = async v => {
     await item(v, 'I.VS.SYSBP', 'SYSBP', 'Systolic blood pressure', 'integer', { unit: UNIT.terms.mmHg, required: true, ordinal: 1 });
@@ -98,16 +98,18 @@ export async function seedEdc(c) {
   const startVisit = async (subject, code, date) => (await one(`insert into core.subject_visit(subject_id, visit_definition_id, visit_date)
     values ($1,$2,$3) returning id`, [subject, visit[code], date])).id;
   const startForm = async (sv, formId) => (await one('insert into core.crf_entry(subject_visit_id, crf_form_id) values ($1,$2) returning id', [sv, formId])).id;
-  const put = (entry, values) => Promise.all(Object.entries(values).map(([oid, v]) => c.query(
-    `insert into core.item_value(crf_entry_id, crf_item_id, item_oid, value) values ($1, (select i.id from core.crf_item i join core.crf_entry e
-       on e.crf_version_id = i.crf_version_id where e.id = $1 and i.oid = $2), $2, $3)`, [entry, oid, String(v)])));
+  const put = async (entry, values) => {
+    for (const [oid, v] of Object.entries(values)) await c.query(`insert into core.item_value(crf_entry_id, crf_item_id, item_oid, value)
+      values ($1, (select i.id from core.crf_item i join core.crf_entry e on e.crf_version_id = i.crf_version_id where e.id = $1 and i.oid = $2), $2, $3)`,
+      [entry, oid, String(v)]);
+  };
   const complete = async (table, id, reason) => {
     await c.query("select set_config('trialops.change_reason', $1, true)", [reason]);
     await c.query(`update core.${table} set status = $2 where id = $1`, [id, table === 'crf_entry' ? 'complete' : 'completed']);
   };
   const vsForm = async (sv, values) => {
     const e = await startForm(sv, fVS);
-    for (const [oid, v] of Object.entries(values)) await put(e, { [oid]: v });    // one at a time: deterministic order of checks
+    await put(e, values);    // one value at a time, in order: deterministic order of the checks
     return e;
   };
 

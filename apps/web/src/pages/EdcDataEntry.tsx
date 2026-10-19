@@ -27,7 +27,7 @@ const T = {
   visit: {
     crumbs: 'Data entry', title: (subject: string, visit: string) => `${subject} · ${visit}`, site: 'Site', date: 'Visit date', status: 'Status',
     completed: 'Completed', completeVisit: 'Complete visit', completedToast: 'Visit completed: data available (visit.completed)',
-    startForm: 'Start form', notStarted: 'Not started', version: (n: number) => `CRF version ${n}`,
+    startForm: 'Start form', formStarted: 'Form started', notStarted: 'Not started', openQueries: (n: number) => `${n} open ${n === 1 ? 'query' : 'queries'}`, version: (n: number) => `CRF version ${n}`,
     value: 'Value', missing: 'Missing data', missingNone: '—', missingOptions: { ND: 'ND · not done', NA: 'NA · not applicable', UNK: 'UNK · unknown' },
     entered: (by: string, at: string) => `Entered by ${by} · ${at}`, required: 'required', choose: '— choose —',
     save: 'Save', saved: 'Saved', savedQueries: (n: number) => `Saved: ${n} edit check ${n === 1 ? 'query' : 'queries'} opened`,
@@ -172,8 +172,8 @@ function FormPanel({ visitId, form, canEnter, onChange }: { visitId: string; for
     <Panel title={`${form.name} (${form.oid})`} meta={form.version ? V.version(form.version.version_no) : undefined}
       actions={<>
         {form.entry ? <StatusPill tone={tone(form.entry.status)}>{human(form.entry.status)}</StatusPill> : <span className="t-muted">{V.notStarted}</span>}
-        {open ? <StatusPill tone="warn">{`${open} ${V.queries.toLowerCase()}`}</StatusPill> : null}
-        {canEnter && !form.entry ? <Button variant="primary" onClick={() => act(api('POST', `/v1/subject-visits/${visitId}/entries`, { body: { crf_form_id: form.form_id } }), V.startForm)}>{V.startForm}</Button> : null}
+        {open ? <StatusPill tone="warn">{V.openQueries(open)}</StatusPill> : null}
+        {canEnter && !form.entry ? <Button variant="primary" onClick={() => act(api('POST', `/v1/subject-visits/${visitId}/entries`, { body: { crf_form_id: form.form_id } }), V.formStarted)}>{V.startForm}</Button> : null}
         {editable && form.entry!.status === 'in_progress' ? <Button onClick={() => act(api('POST', `/v1/crf-entries/${form.entry!.id}/complete`), V.completeToast)}>{V.complete}</Button> : null}
         {editable && form.entry!.status === 'complete' ? <Button variant="ghost" onClick={() => setDialog('reopen')}>{V.reopen}</Button> : null}
       </>}>
