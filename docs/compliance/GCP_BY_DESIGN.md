@@ -208,7 +208,7 @@ Fonte: inventario del codice al commit `45bc4e2` e `docs/SPEC.md` §9–§11. Le
 | Ledger immutabile con hash di input e output, costo, revisore, decisione | ✅ | `core.ai_request` |
 | Proposta firmata da una persona per gli output GxP | ✅ | `task_fsm`, revisione dei task |
 | **Versione del modello bloccata** | 🟡 | `MODEL = 'claude-opus-5-5'` è un alias, non uno snapshot datato: per AI-03 serve un identificativo immutabile e una change request quando cambia |
-| Parametri fissi (AI-04), tool registry AUTO/CONFIRM/BLOCK (AI-07), Agent Decision Record scritto (AI-08), limiti per job (AI-09) | 🟡/❌ | La tabella dell'Agent Decision Record esiste, ma nessuno la scrive; AI-09 è coperto solo in parte |
+| Parametri fissi (AI-04), tool registry AUTO/CONFIRM/BLOCK (AI-07), Agent Decision Record scritto (AI-08), limiti per job (AI-09) | ✅/🟡 | AI-07/AI-08 (0025): `core.ai_tool` versionato e auditato (non registrato = BLOCK, scrittura GxP mai AUTO), azioni in attesa confermate da un ruolo, policy engine interno che scrive per ogni chiamata un Agent Decision Record firmato Ed25519 e concatenato (`/v1/ai/decisions/verify`, `scripts/decision-verify.mjs`); custodia della chiave in produzione da decidere (senza chiave: record non firmati, anomalia di monitoraggio). AI-09 è coperto solo in parte |
 | **Piano e report di credibilità per task type** (FDA, 7 passi) | ❌ | Non presente |
 | Monitoraggio di deriva e prestazioni (AI-10) | ❌ | Non presente |
 | Marcatura persistente "generato da AI" sul contenuto accettato (AI Act art. 50, ricostruibilità) | ✅ | CMP-09 (0017): `ai_provenance` immutabile sulla versione dell'appendice, badge `AiProvenance` |
@@ -290,7 +290,7 @@ Da aggiungere alle "Non-negotiable rules":
 | P1 | CMP-13 (nuovo) | Copie certificate: export di un record o di un intero trial (dati + audit + firme + hash) in formato aperto | §11.10(b), EMA 2023 §4.8 |
 | P1 | APP-DT-02/05 | `If-Match`, idempotenza, provenienza del dato | ALCOA+ |
 | P1 | AI-03/04 | Snapshot del modello bloccato, parametri fissi, change request al cambio di modello con regressione sul dataset di test | Bozza FDA AI, Annex 22 (bozza), GAMP AI |
-| P1 | AI-08/10 | Agent Decision Record scritto davvero; monitoraggio di accettazione e deriva con ritorno automatico a "solo suggerimento" | Principi FDA–EMA 2026 |
+| P1 | AI-08/10 | Agent Decision Record scritto davvero (fatto: 0025, firmato e concatenato); monitoraggio di accettazione e deriva con ritorno automatico a "solo suggerimento" | Principi FDA–EMA 2026 |
 | P1 | CMP-09 | Etichetta persistente "contenuto generato dall'AI, revisionato da X" sul contenuto accettato | AI Act art. 50 (dal 2 dic 2026) |
 | P2 | IAM-06, APP-ID-03 | Revisione periodica degli accessi con firma; SCIM; SSO aziendale | §11.10(d), Annex 11 §12 |
 | P2 | NFR-05 | SAST, scansione delle dipendenze, SBOM in CI; penetration test prima della produzione | Annex 11 §12, EMA 2023 A4, NIS2 |
