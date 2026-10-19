@@ -184,6 +184,7 @@ Fonte: inventario del codice al commit `45bc4e2` e `docs/SPEC.md` §9–§11. Le
 | Archivio documenti immutabile (WORM) | ❌ | Non c'è ancora un archivio file |
 | Accesso indipendente dello sperimentatore ai dati del proprio sito (EMA 2023 §4.6) | ❌ | Da progettare insieme all'EDC (M06b) |
 | **Regioni separate UE / USA / Giappone** (NFR-06) | 🟡 | 0028 + `lib/region.ts` (2026-10-19): un deployment per regione (`TRIALOPS_DEPLOYMENT_REGION`), regione del database impostata una volta (`core.deployment`), piattaforme di altre regioni rifiutate dal database, richieste verso altre regioni rifiutate (403) e registrate, perimetro del token ristretto alla regione, residenza di app e fornitore AI controllata. Ricetta in `REGIONS.md`; nessun deployment regionale ancora creato, review umana in `evidence/2026-10-19_NFR-06_change-review.md` |
+| **Accessibilità e giapponese** (NFR-07) | 🟡 | 2026-10-19: i18n leggera nella shell (inglese di default, giapponese per le pagine di sito: accesso, panoramica, siti, task), date con fuso orario; axe WCAG 2.1 AA su tutte le rotte, inglese e giapponese, 1440 e 375 px: 0 violazioni dopo le correzioni. Traduzioni giapponesi **da rivedere da un madrelingua**; verifica manuale con screen reader da fare. Nota: `evidence/2026-10-19_NFR-07_a11y.md` |
 
 ### 3.5 Validazione e processo — GAMP 5, CSA, Annex 11 §4, EMA 2023 Annex 2
 
