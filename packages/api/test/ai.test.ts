@@ -61,5 +61,5 @@ test('[AI-06][AI-05] a ledger row is immutable except for one human review decis
 test('[AI-01] the task type registry is published with model and prompt versions', async () => {
   const r = await api.call('GET', '/v1/ai/task-types', { as: 'demo|qa' });
   assert.deepEqual(r.body.items.map((t: any) => [t.task_type, t.model, t.prompt_version]).sort(),
-    [['arm.onboarding.plan', 'claude-opus-5-5', 1], ['protocol.appendix.draft', 'claude-opus-5-5', 1]]);
+    [['arm.onboarding.plan', 'claude-opus-5-5', 1], ['protocol.appendix.draft', 'claude-opus-5-5', 2]]);
 });
