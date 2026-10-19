@@ -1,15 +1,39 @@
 // Platform-level reads: health, current user, platforms and the platform overview behind the dashboard.
 import { route } from '../route.ts';
 import { mfaStatus } from '../lib/access-policy.ts';
+import { requirePerson, requireRole } from '../lib/roles.ts';
+import { HttpError } from '../errors.ts';
 
 export const platformRoutes = [
-  route({ method: 'get', path: '/v1/health', summary: 'Liveness', tag: 'system', reqs: [], public: true,
-    handler: async () => ({ status: 'ok' }) }),
+  route({ method: 'get', path: '/v1/health', summary: 'Liveness, and the data region of this deployment and of its database (NFR-06)', tag: 'system',
+    reqs: ['NFR-06'], public: true,
+    handler: async ({ services }) => {
+      // liveness first: a database that cannot be reached leaves the region unknown, it does not fail the health check
+      const region = services.regionGate ? await services.regionGate.status().catch(() => null) : null;
+      return { status: region && !region.ok ? 'region_misconfigured' : 'ok', region };
+    } }),
+
+  route({ method: 'get', path: '/v1/region', summary: 'Data region served by this deployment and the platforms of the caller in it (NFR-06)', tag: 'system',
+    reqs: ['NFR-06'],
+    handler: async ({ db, services }) => {
+      if (!services.regionGate) throw new HttpError(501, 'region_unavailable', 'region gate not configured');
+      const st = await services.regionGate.status();
+      const platforms = (await db.query(`select id, code, data_region from core.platform where status <> 'void' order by code`)).rows;
+      return { ...st, pinned: st.deployment_region !== null, platforms };
+    } }),
+
+  route({ method: 'get', path: '/v1/region/refusals', summary: 'Requests refused because they named a platform of another region (QA auditors, platform admins)',
+    tag: 'system', reqs: ['NFR-06'], query: { limit: { type: 'string', pattern: '^[0-9]{1,4}$' } },
+    handler: async ({ db, claims, query }) => {
+      requirePerson(claims, 'Reading the region refusals');
+      requireRole(claims, ['qa_auditor', 'platform_admin'], 'Reading the region refusals');
+      return { items: (await db.query('select * from core.region_refusal_search($1)', [Number(query.limit ?? 200)])).rows };
+    } }),
 
   // Reachable before the MFA step (aal1), so that the sign-in can show what is still needed (IAM-01).
   route({ method: 'get', path: '/v1/me', summary: 'Current identity and perimeter from the token, MFA status and session policy', tag: 'identity',
-    reqs: ['APP-ID-02', 'IAM-02'], allowBelowMfa: true,
-    handler: async ({ db, claims, access }) => {
+    reqs: ['APP-ID-02', 'IAM-02', 'NFR-06'], allowBelowMfa: true,
+    handler: async ({ db, claims, access, services }) => {
       const person = claims.person_id
         ? (await db.query('select id, full_name, email, org_id from core.person where id = $1', [claims.person_id])).rows[0] ?? null
         : null;
@@ -18,6 +42,7 @@ export const platformRoutes = [
         roles: claims.roles ?? [], platform_ids: claims.platform_ids ?? [], arm_scopes: claims.arm_scopes ?? [],
         site_scopes: claims.site_scopes ?? [], blinding: claims.blinding ?? 'blinded', person,
         mfa: mfaStatus(claims, access), session: { idle_timeout_minutes: access.idleMinutes },
+        deployment_region: services.regionGate?.region ?? null,
       };
     } }),
 

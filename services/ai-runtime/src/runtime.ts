@@ -9,7 +9,7 @@ import { canonical, sha256 } from './canonical.ts';
 import { checkCitations, citationError } from './citation.ts';
 import { anthropicProvider } from './providers/anthropic.ts';
 import { replayProvider, recording } from './providers/replay.ts';
-import type { AiTaskRequest, AiTaskResult, LedgerDb, Outcome, Provider } from './types.ts';
+import type { AiTaskRequest, AiTaskResult, DataClass, LedgerDb, Outcome, Provider } from './types.ts';
 
 /** USD per million tokens (list price). Ledger cost is in EUR at TRIALOPS_USD_EUR. */
 export const PRICE_USD_PER_MTOK: Record<string, { in: number; out: number }> = { 'claude-opus-5-5': { in: 4, out: 20 } };
@@ -22,6 +22,10 @@ export class AiRequestError extends Error {
 
 export interface AiRuntimeOptions {
   provider?: Provider;
+  /** Data region of the deployment (NFR-06); default TRIALOPS_DEPLOYMENT_REGION. */
+  region?: string | null;
+  /** Code of the AI provider in the service provider registry (core.service_provider, CMP-08); default TRIALOPS_AI_PROVIDER_CODE. */
+  providerCode?: string | null;
   registry?: Record<string, TaskTypeDef>;
   usdToEur?: number;
   now?: () => number;
@@ -35,8 +39,15 @@ export function providerFromEnv(env: NodeJS.ProcessEnv = process.env): Provider 
   return env.TRIALOPS_AI_RECORD === '1' ? recording(live) : live;
 }
 
+/** Data class of a request -> category of the service provider registry (0026). PUBLIC data is not restricted. */
+const PROVIDER_CATEGORY: Partial<Record<DataClass, string>> = {
+  INTERNAL: 'operational', CONFIDENTIAL_SPONSOR: 'sponsor_confidential', CLINICAL_PSEUDONYMIZED: 'pseudonymised_clinical',
+};
+
 export function createAiRuntime(opts: AiRuntimeOptions = {}) {
   const provider = opts.provider ?? providerFromEnv();
+  const region = (opts.region !== undefined ? opts.region : process.env.TRIALOPS_DEPLOYMENT_REGION?.trim().toUpperCase()) || null;
+  const providerCode = (opts.providerCode !== undefined ? opts.providerCode : process.env.TRIALOPS_AI_PROVIDER_CODE?.trim()) || null;
   const registry = opts.registry ?? REGISTRY;
   const usdToEur = opts.usdToEur ?? Number(process.env.TRIALOPS_USD_EUR || 0.86);
   const now = opts.now ?? (() => performance.now());
@@ -75,9 +86,29 @@ export function createAiRuntime(opts: AiRuntimeOptions = {}) {
     return d;
   }
 
+  /**
+   * NFR-06 / CMP-08: data of a platform goes to an external AI provider only when that provider is registered, active on
+   * the platform for this data category, processes in the platform region and has its agreements (core.provider_allowed).
+   * Returns the reason of a refusal, or null.
+   */
+  async function residencyRefusal(db: LedgerDb, req: AiTaskRequest): Promise<string | null> {
+    if (provider.local) return null;
+    const category = PROVIDER_CATEGORY[req.data_class];
+    if (!category || !req.platform_id) return null;
+    if (!providerCode) {
+      return region ? `the AI provider ${provider.name} is not registered as a service provider of the ${region} deployment ` +
+        '(TRIALOPS_AI_PROVIDER_CODE, NFR-06)' : null;
+    }
+    const ok = (await db.query('select core.provider_allowed($1, $2, $3) ok', [req.platform_id, providerCode, category])).rows[0]?.ok === true;
+    return ok ? null : `${category} data of this platform may not go to provider ${providerCode}: not active on the platform for it, ` +
+      'outside the platform data region or without a valid agreement (NFR-06, CMP-08)';
+  }
+
   return {
     provider,
     registry,
+    region,
+    providerCode,
     check,
     async run(req: AiTaskRequest, caller: { db: LedgerDb }): Promise<AiTaskResult> {
       const d = check(req);
@@ -91,6 +122,11 @@ export function createAiRuntime(opts: AiRuntimeOptions = {}) {
       if (!provider.accepts.includes(req.data_class)) {
         const id = await ledger(caller.db, req, d, { ...base, outcome: 'blocked' });
         return result('blocked', id, null, d.model, `${req.data_class} data may not be sent to ${provider.name}`);
+      }
+      const refusal = await residencyRefusal(caller.db, req);
+      if (refusal) {
+        const id = await ledger(caller.db, req, d, { ...base, outcome: 'blocked' });   // reason in the job result
+        return result('blocked', id, null, d.model, refusal);
       }
       const t0 = now();
       let r;

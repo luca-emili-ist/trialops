@@ -9,6 +9,7 @@ import type { AuthProvider } from './lib/auth-provider.ts';
 import type { AccessConfig } from './lib/access-policy.ts';
 import type { VersionedRecord } from './lib/write-controls.ts';
 import type { DecisionSigner } from './lib/decision-signing.ts';
+import type { Region, RegionGate } from './lib/region.ts';
 
 export type JsonSchema = Record<string, unknown>;
 
@@ -48,6 +49,10 @@ export interface Services {
   jobs?: JobDispatcher;
   /** Signer of the Agent Decision Records (AI-08); default from the environment (decisionSignerFromEnv). */
   decisions?: DecisionSigner;
+  /** Data region served by this deployment (NFR-06); undefined: TRIALOPS_DEPLOYMENT_REGION, null: not pinned. */
+  region?: Region | null;
+  /** Region gate built by createApp from `region` (read by the routes that report the region). */
+  regionGate?: RegionGate;
 }
 
 /** Hands a queued AI job to a worker. Must return quickly: the worker answers 202 and runs the job on its own. */

@@ -65,7 +65,9 @@ test('[DM-01] every clinical table carries platform_id', async () => {
     // organisation-wide registries (0026, CMP-05/CMP-08/VAL-04): providers, their agreements and oversight, the record of
     // processing activities and app supplier validation serve every platform and hold no clinical data; their use on a
     // platform is core.platform_provider / core.app_installation, which carry platform_id
-    'service_provider', 'provider_agreement', 'provider_oversight_activity', 'ropa_entry', 'app_validation_package', 'app_contract_test_run'];
+    'service_provider', 'provider_agreement', 'provider_oversight_activity', 'ropa_entry', 'app_validation_package', 'app_contract_test_run',
+    // the region of the whole database (0028, NFR-06): one row for the deployment, not for a platform
+    'deployment'];
   const r = (await c.query(`select t.table_name from information_schema.tables t
      where t.table_schema='core' and t.table_type='BASE TABLE' and t.table_name <> all($1)
        and not exists (select 1 from information_schema.columns k where k.table_schema='core' and k.table_name=t.table_name and k.column_name='platform_id')`, [exempt])).rows;

@@ -183,6 +183,7 @@ Fonte: inventario del codice al commit `45bc4e2` e `docs/SPEC.md` §9–§11. Le
 | **Copie certificate ed export leggibile** dell'intero record con audit e firme | ❌ | Non presente |
 | Archivio documenti immutabile (WORM) | ❌ | Non c'è ancora un archivio file |
 | Accesso indipendente dello sperimentatore ai dati del proprio sito (EMA 2023 §4.6) | ❌ | Da progettare insieme all'EDC (M06b) |
+| **Regioni separate UE / USA / Giappone** (NFR-06) | 🟡 | 0028 + `lib/region.ts` (2026-10-19): un deployment per regione (`TRIALOPS_DEPLOYMENT_REGION`), regione del database impostata una volta (`core.deployment`), piattaforme di altre regioni rifiutate dal database, richieste verso altre regioni rifiutate (403) e registrate, perimetro del token ristretto alla regione, residenza di app e fornitore AI controllata. Ricetta in `REGIONS.md`; nessun deployment regionale ancora creato, review umana in `evidence/2026-10-19_NFR-06_change-review.md` |
 
 ### 3.5 Validazione e processo — GAMP 5, CSA, Annex 11 §4, EMA 2023 Annex 2
 

@@ -52,7 +52,7 @@ test('[APP-DT-01] the OpenAPI 3.1 document is generated from the route registry'
   assert.equal(r.status, 200);
   assert.equal(r.body.openapi, '3.1.0');
   assert.ok(r.body.paths['/v1/platforms/{id}'].get);
-  assert.deepEqual(r.body.paths['/v1/me'].get['x-requirements'], ['APP-ID-02', 'IAM-02']);
+  assert.deepEqual(r.body.paths['/v1/me'].get['x-requirements'], ['APP-ID-02', 'IAM-02', 'NFR-06']);
 });
 
 test('[IAM-02] the demo user switch does not exist unless the dev server enables it', async () => {

@@ -12,6 +12,7 @@ import { appProvenance, checkIfMatch, currentVersion, etagOf, idempotencyKey, is
   requestHash, storeResponse, type StoredResponse } from './lib/write-controls.ts';
 import { decisionSignerFromEnv } from './lib/decision-signing.ts';
 import { accessConfigFromEnv, authTx, enforceAccessPolicy, policyReauth, SYSTEM_AUTH, type Deferred } from './lib/access-policy.ts';
+import { RegionGate, regionFromEnv, requestedPlatforms } from './lib/region.ts';
 
 /** ctx.db of a manualTx route: there is no request transaction, the handler must use ctx.tx. */
 const NO_TX = new Proxy({}, { get() { throw new Error('manualTx route: use ctx.tx() to open a transaction'); } }) as Db;
@@ -30,8 +31,11 @@ export function createApp({ pool, verify, services = {}, routes = allRoutes }: A
   const access = services.access ?? accessConfigFromEnv();
   let wrapped: { inner: unknown; outer: Services['reauth'] } = { inner: undefined, outer: undefined };
   const decisions = services.decisions ?? decisionSignerFromEnv();   // AI-08: Ed25519 key from the environment
+  // NFR-06: the data region served by this deployment (TRIALOPS_DEPLOYMENT_REGION), checked on every authenticated route
+  const regionGate = services.regionGate ?? new RegionGate(pool, services.region !== undefined ? services.region : regionFromEnv());
   const svc: Services = Object.create(services, {
     access: { value: access, enumerable: true },
+    regionGate: { value: regionGate, enumerable: true },
     decisions: { value: decisions, enumerable: true },
     reauth: { enumerable: true, get: () => {
       if (wrapped.inner !== services.reauth) wrapped = { inner: services.reauth, outer: services.reauth && policyReauth(services.reauth, pool, access) };
@@ -54,9 +58,12 @@ export function createApp({ pool, verify, services = {}, routes = allRoutes }: A
         const reason = req.header('x-change-reason')?.trim() || undefined;
         if (r.needsReason && !reason) throw new HttpError(400, 'reason_required', 'X-Change-Reason header required for this change (DM-03)');
         const after: (() => Promise<void> | void)[] = [];
-        const claims = r.public ? ANONYMOUS : await verify(bearer(req.header('authorization')));
+        const verified = r.public ? ANONYMOUS : await verify(bearer(req.header('authorization')));
         // IAM-01, CMP-03: lockout, idle timeout and MFA for every authenticated route (lib/access-policy.ts)
-        if (!r.public) await enforceAccessPolicy(pool, claims, access, !!r.allowBelowMfa);
+        if (!r.public) await enforceAccessPolicy(pool, verified, access, !!r.allowBelowMfa);
+        // NFR-06: platforms of another region are refused (recorded) and removed from the perimeter of the token
+        const claims = r.public ? verified : await regionGate.enforce(verified, { method: req.method, path: req.originalUrl,
+          platforms: requestedPlatforms(r.path, req.params as Record<string, string>, req.query as Record<string, unknown>, req.body) });
         // APP-DT-02 / APP-DT-05 write controls (lib/write-controls.ts); manualTx routes run their own transactions and are
         // not replayable (sign-in, worker), public routes have no caller to bind a key to.
         const write = r.method !== 'get' && !r.public && !r.manualTx;

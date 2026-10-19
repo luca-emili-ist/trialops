@@ -37,7 +37,7 @@
       "properties": {
         "slot": { "enum": ["platform.dashboard.card", "arm.detail.tab", "site.detail.tab", "subject.detail.tab", "task.inbox.action"] },
         "title": { "type": "string" }, "url": { "type": "string" } } } },
-    "data_residency": { "type": "array", "minItems": 1, "items": { "enum": ["EU", "US"] } },
+    "data_residency": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "enum": ["EU", "US", "JP"] } },
     "validation_package_url": { "type": "string", "format": "uri" }
   },
   "allOf": [
