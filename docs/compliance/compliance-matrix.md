@@ -1,6 +1,6 @@
 # Compliance matrix
 
-Generated 2026-10-19T08:09:06.331Z by scripts/trace.mjs from docs/compliance/crosswalk.json and docs/requirements.json.
+Generated 2026-10-19T12:46:46.452Z by scripts/trace.mjs from docs/compliance/crosswalk.json and docs/requirements.json.
 Technical clauses are covered by requirements and their tests; procedural clauses are covered by SOPs of the quality system.
 
 ## P11 — US 21 CFR Part 11 — Electronic records; electronic signatures
@@ -114,7 +114,7 @@ Technical clauses are covered by requirements and their tests; procedural clause
 
 | Clause | Ref | Title | Control | Requirements (release: result) | Status |
 | --- | --- | --- | --- | --- | --- |
-| JP-GCP-RECORDS | Retention of essential documents | Retention of records by sponsor and site for the period required by J-GCP | technical | NFR-04 (gxp-p0: PASS), NFR-07 (v1: NO TEST) | partial |
+| JP-GCP-RECORDS | Retention of essential documents | Retention of records by sponsor and site for the period required by J-GCP | technical | NFR-04 (gxp-p0: PASS), NFR-07 (v1: NOT RUN) | partial |
 
 ## GDPR — EU Regulation 2016/679
 
@@ -125,13 +125,13 @@ Technical clauses are covered by requirements and their tests; procedural clause
 | GDPR-30 | Art. 30 | Record of processing activities | procedural | — | SOP |
 | GDPR-32 | Art. 32 | Security of processing | technical | AI-01 (v0: PASS), CMP-08 (v1: PASS), NFR-05 (v1: PASS) | covered |
 | GDPR-35 | Art. 35 | Data protection impact assessment | procedural | — | SOP |
-| GDPR-44 | Art. 44–49 | Transfers outside the EU | technical | CMP-08 (v1: PASS), NFR-06 (v1: NO TEST) | partial |
+| GDPR-44 | Art. 44–49 | Transfers outside the EU | technical | CMP-08 (v1: PASS), NFR-06 (v1: PASS) | covered |
 
 ## HIPAA — US 45 CFR 160/164 (Security Rule technical safeguards)
 
 | Clause | Ref | Title | Control | Requirements (release: result) | Status |
 | --- | --- | --- | --- | --- | --- |
-| HIPAA-312 | 45 CFR 164.312 | Technical safeguards: access control, audit controls, integrity, authentication, transmission security | technical | CMP-01 (foundations: PASS), IAM-02 (foundations: PASS), AI-01 (v0: PASS), IAM-01 (gxp-p0: PASS), CMP-03 (gxp-p0: PASS), CMP-13 (v1: PASS), CMP-08 (v1: PASS), NFR-05 (v1: PASS), NFR-06 (v1: NO TEST) | partial |
+| HIPAA-312 | 45 CFR 164.312 | Technical safeguards: access control, audit controls, integrity, authentication, transmission security | technical | CMP-01 (foundations: PASS), IAM-02 (foundations: PASS), AI-01 (v0: PASS), IAM-01 (gxp-p0: PASS), CMP-03 (gxp-p0: PASS), CMP-13 (v1: PASS), CMP-08 (v1: PASS), NFR-05 (v1: PASS), NFR-06 (v1: PASS) | covered |
 | HIPAA-BAA | 45 CFR 164.504(e) | Business associate agreements with service providers handling PHI | procedural | — | SOP |
 
 ## APPI — JP Act on the Protection of Personal Information (Act 57/2003, rev. 2022)
@@ -139,7 +139,7 @@ Technical clauses are covered by requirements and their tests; procedural clause
 | Clause | Ref | Title | Control | Requirements (release: result) | Status |
 | --- | --- | --- | --- | --- | --- |
 | APPI-SENSITIVE | Special care-required personal information | Health data handled with consent and security controls; pseudonymisation | technical | DM-05 (foundations: PASS), M05-01 (v1: NO TEST), CMP-08 (v1: PASS) | partial |
-| APPI-TRANSFER | Cross-border transfer (Art. 28) | Transfer of personal data outside Japan only with adequacy, safeguards or consent | technical | CMP-08 (v1: PASS), NFR-06 (v1: NO TEST) | partial |
+| APPI-TRANSFER | Cross-border transfer (Art. 28) | Transfer of personal data outside Japan only with adequacy, safeguards or consent | technical | CMP-08 (v1: PASS), NFR-06 (v1: PASS) | covered |
 
 ## AIACT — EU Regulation 2024/1689 (AI Act) as amended by the AI Omnibus (2026)
 

@@ -1,6 +1,6 @@
 # Traceability matrix
 
-Generated 2026-10-19T08:09:06.328Z by scripts/trace.mjs from test tags and test-results.xml.
+Generated 2026-10-19T12:46:46.448Z by scripts/trace.mjs from test tags and test-results.xml.
 
 | Requirement | Release | Description | Tests | Result |
 | --- | --- | --- | --- | --- |
@@ -40,8 +40,8 @@ Generated 2026-10-19T08:09:06.328Z by scripts/trace.mjs from test tags and test-
 | M02-03 | v0 | Per-arm site activation workflow | packages/api/test/sites.test.ts (3) | PASS |
 | APP-TK-01 | v1 | Task model and inbox | — (0) | NO TEST |
 | APP-TK-03 | v1 | Apps claim and close tasks via API | — (0) | NO TEST |
-| AI-07 | v1 | Tool registry AUTO/CONFIRM/BLOCK | db/tests/ai_governance.test.mjs, packages/api/test/ai_governance.test.ts (11) | PASS |
-| AI-08 | v1 | Internal policy engine with signed decision records | db/tests/ai_governance.test.mjs, packages/api/test/ai_governance.test.ts (11) | PASS |
+| AI-07 | v1 | Tool registry AUTO/CONFIRM/BLOCK | apps/web/test/pages.test.ts, db/tests/ai_governance.test.mjs, packages/api/test/ai_governance.test.ts (12) | PASS |
+| AI-08 | v1 | Internal policy engine with signed decision records | apps/web/test/pages.test.ts, db/tests/ai_governance.test.mjs, packages/api/test/ai_governance.test.ts (13) | PASS |
 | M03-01 | v1 | Arm addendum generation | — (0) | NO TEST |
 | M04-02 | v1 | IRB package assembly | — (0) | NO TEST |
 | M05-01 | v1 | AI-assisted pre-screening | — (0) | NO TEST |
@@ -75,23 +75,23 @@ Generated 2026-10-19T08:09:06.328Z by scripts/trace.mjs from test tags and test-
 | CMP-12 | v1 | Audit ledger sealed in blocks with Ed25519 and anchored outside the database; DDL on audited objects recorded; database admin roles segregated | db/tests/ddl_roles.test.mjs, packages/api/test/audit_seal.test.ts (7) | PASS |
 | CMP-13 | v1 | Read access to unblinded data (sac_enclave) and every export recorded and reportable | db/tests/access.test.mjs, db/tests/access_log.test.mjs, packages/api/test/access_log.test.ts (7) | PASS |
 | CMP-14 | v1 | Certified copies: export of a record or a whole trial (data, audit trail, signatures, hashes) in an open, human-readable format | packages/api/test/certified_copies.test.ts (5) | PASS |
-| CMP-05 | v1 | ICH E6(R3) data governance: critical-to-quality factors, RBQM, reconstructability of every decision and adaptation, service provider oversight | db/tests/quality_governance.test.mjs, packages/api/test/quality_privacy_governance.test.ts (9) | PASS |
+| CMP-05 | v1 | ICH E6(R3) data governance: critical-to-quality factors, RBQM, reconstructability of every decision and adaptation, service provider oversight | apps/web/test/pages.test.ts, db/tests/quality_governance.test.mjs, packages/api/test/quality_privacy_governance.test.ts (10) | PASS |
 | CMP-06 | v1 | Each GxP AI task type has a context of use, risk, credibility plan, test results and monitoring (docs/ai/<task_type>.md) | services/ai-runtime/test/credibility.test.ts, services/ai-runtime/test/registry.test.ts (7) | PASS |
 | CMP-07 | v1 | AI test data independent from development, pre-specified metrics, explainability through cited sources, model change control | services/ai-runtime/test/credibility.test.ts, services/ai-runtime/test/registry.test.ts (4) | PASS |
-| CMP-08 | v1 | Privacy by design across GDPR, HIPAA and APPI: pseudonymisation in the core, minimisation, record of processing, DPA/BAA with every provider, data residency per region | db/tests/app_validation.test.mjs, db/tests/privacy.test.mjs, packages/api/test/quality_privacy_governance.test.ts (10) | PASS |
+| CMP-08 | v1 | Privacy by design across GDPR, HIPAA and APPI: pseudonymisation in the core, minimisation, record of processing, DPA/BAA with every provider, data residency per region | apps/web/test/pages.test.ts, db/tests/app_validation.test.mjs, db/tests/privacy.test.mjs, packages/api/test/quality_privacy_governance.test.ts, packages/api/test/regions.test.ts, services/ai-runtime/test/residency.test.ts (14) | PASS |
 | AI-02 | v1 | Every GxP task type registered with intended use, risk, exact approved model and version, versioned prompt, validator, thresholds, test dataset | services/ai-runtime/test/registry.test.ts (5) | PASS |
 | AI-03 | v1 | GxP task types pinned to an immutable model id (a dated snapshot where the provider publishes one); a model change is a change request with regression on the test dataset | services/ai-runtime/test/model-lock.test.ts, services/ai-runtime/test/registry.test.ts (5) | PASS |
 | AI-04 | v1 | Fixed generation parameters, JSON Schema output, mandatory source citation for extraction and classification | db/tests/ai_monitoring.test.mjs, services/ai-runtime/test/citation.test.ts (13) | PASS |
-| AI-10 | v1 | Continuous monitoring per task type (accuracy on reviewed samples, drift, rejection rate); below threshold the task type falls back to suggestion-only | db/tests/ai_monitoring.test.mjs, packages/api/test/ai_monitoring.test.ts (9) | PASS |
+| AI-10 | v1 | Continuous monitoring per task type (accuracy on reviewed samples, drift, rejection rate); below threshold the task type falls back to suggestion-only | apps/web/test/pages.test.ts, db/tests/ai_monitoring.test.mjs, packages/api/test/ai_monitoring.test.ts (10) | PASS |
 | APP-DT-02 | v1 | Writes require Idempotency-Key; optimistic concurrency with If-Match on the version | apps/web/test/api_client.test.ts, packages/api/test/write_controls.test.ts (9) | PASS |
 | APP-DT-05 | v1 | Provenance on every app-written datum: source_app, source_record_id, source_version, transformation_id | db/tests/compliance.test.mjs, packages/api/test/write_controls.test.ts (4) | PASS |
 | NFR-05 | v1 | TLS 1.2+, encryption at rest, server-side secrets, SAST, dependency scanning and SBOM in CI; penetration test before production | db/tests/security_controls.test.mjs (3) | PASS |
-| NFR-06 | v1 | Same code deployable in EU, US and Japan regions with data kept separate per region | — (0) | NO TEST |
-| NFR-07 | v1 | WCAG 2.1 AA; UI localisable, with English and Japanese for site- and subject-facing pages | — (0) | NO TEST |
+| NFR-06 | v1 | Same code deployable in EU, US and Japan regions with data kept separate per region | db/tests/regions.test.mjs, packages/api/test/regions.test.ts, services/ai-runtime/test/residency.test.ts (13) | PASS |
+| NFR-07 | v1 | WCAG 2.1 AA; UI localisable, with English and Japanese for site- and subject-facing pages | apps/web/test/i18n.test.ts, apps/web/test/pages.test.ts (5) | NOT RUN |
 | VAL-01 | v1 | Every test carries the requirement IDs it covers; CI fails when a gated requirement has no passing test | db/tests/trace_gate.test.mjs (3) | PASS |
 | VAL-02 | v1 | No direct change in test or production: promotion only through the pipeline with approval; IQ check after every deploy | db/tests/release_pipeline.test.mjs (6) | PASS |
 | VAL-03 | v1 | Database migrations tested on a synthetic or anonymised copy before promotion | db/tests/migration_check.test.mjs, db/tests/migrations_idempotent.test.mjs (5) | PASS |
-| VAL-04 | v1 | L2–L3 apps not activated in production without the supplier validation package and passing contract tests | db/tests/app_validation.test.mjs, packages/api/test/quality_privacy_governance.test.ts (5) | PASS |
+| VAL-04 | v1 | L2–L3 apps not activated in production without the supplier validation package and passing contract tests | apps/web/test/pages.test.ts, db/tests/app_validation.test.mjs, packages/api/test/quality_privacy_governance.test.ts (6) | PASS |
 | VAL-05 | gxp-p0 | Requirements carry gxp_impact, risk, assurance and regulatory references; CI generates per-regulation compliance matrices from docs/compliance/crosswalk.json | db/tests/compliance.test.mjs (1) | PASS |
 | IAM-06 | v2 | Periodic access review every 90 days generated as a signed task for the platform admin | — (0) | NO TEST |
 | APP-ID-03 | v2 | SCIM 2.0 user provisioning to apps; deactivation propagated within 5 minutes | — (0) | NO TEST |
