@@ -1,12 +1,25 @@
-# Security checks (shared template, installed by ~/Documents/Claude/scripts/ci/install-ci.py — do not
-# edit here, edit the template and re-install).
-#   secrets : gitleaks on the full git history
-#   deps    : OSV-Scanner on package-lock.json (known CVEs)
-#   sast    : Semgrep CE with OWASP / TypeScript / React rules
-# Actions pinned to full commit SHAs (supply-chain safety). # Pinned tool versions, downloaded from the vendors' own GitHub releases / PyPI; no marketplace
-# actions, no secrets. ENFORCE=0 → findings are reported as warnings (first two weeks), 1 → they fail the run.
-# Per-repo override: list job names (secrets, deps, sast), one per line, in .github/ci-enforce to make
-# just those jobs fail on findings while ENFORCE stays 0 (the template itself stays identical in every repo).
+# Security checks and release evidence (shared template, installed by ~/Documents/Claude/scripts/ci/install-ci.py
+# — do not edit here, edit the template and re-install).
+#   secrets         : gitleaks on the full git history
+#   deps            : OSV-Scanner on package-lock.json (known CVEs)
+#   sast            : Semgrep CE with OWASP / TypeScript / React rules
+#   sbom            : Syft, CycloneDX JSON software bill of materials of the repo
+#   vulns           : Grype on that SBOM (known CVEs, second opinion next to OSV)
+#   release-package : on push to main (and on manual dispatch, for testing) bundles every report above + test
+#                     results + commit/run/deploy ids into one archive with a SHA-256 manifest, kept as a CI
+#                     artifact (Compliance Engine, QMS docs/COMPLIANCE_ENGINE.md §3).
+# Actions pinned to full commit SHAs (supply-chain safety). Pinned tool versions, downloaded from the vendors' own
+# GitHub releases / PyPI; no marketplace actions, no secrets. ENFORCE=0 → findings are reported as warnings,
+# 1 → they fail the run. Per-repo override: list job names (secrets, deps, sast, vulns), one per line, in
+# .github/ci-enforce to make just those jobs fail on findings while ENFORCE stays 0 (the template stays identical
+# in every repo). Every scan job always writes its machine-readable report to reports/ and uploads it.
+#
+# Signing: the package is NOT signed yet. Decision 2026-11-11 (Luca): no cosign keyless, because it would write the
+# repository and workflow identity to the PUBLIC Sigstore transparency log (Rekor). TODO: sign with a key held in the
+# IST key store once the QMS IST instance exists (cosign key pair as a secret, SIGN_PACKAGE='1', step adapted).
+# Deploy id: Netlify does not report deploys back to GitHub on these repos, so the package records it as
+# `unavailable`. Decision 2026-11-12 (Luca): no Netlify token secret for now (Netlify personal tokens are account-wide);
+# revisit when the QMS IST instance has its own service identity.
 name: security
 
 on:
@@ -26,9 +39,13 @@ concurrency:
 
 env:
   ENFORCE: '0'
+  SIGN_PACKAGE: '0'
   GITLEAKS_VERSION: '8.21.2'
   OSV_VERSION: '1.9.1'
   SEMGREP_VERSION: '1.90.0'
+  SYFT_VERSION: '1.55.0'
+  GRYPE_VERSION: '0.121.0'
+  COSIGN_VERSION: '3.1.4'
 
 jobs:
   secrets:
@@ -40,8 +57,16 @@ jobs:
           fetch-depth: 0
       - name: gitleaks (full history)
         run: |
+          mkdir -p reports
           curl -sSL "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz" | tar -xz gitleaks
-          ./gitleaks git --redact --verbose --no-banner --exit-code 1 . || { rc=$?; { [ "$ENFORCE" = "1" ] || grep -qx secrets .github/ci-enforce 2>/dev/null; } && exit $rc; echo "::warning::gitleaks found possible secrets (report-only mode)"; }
+          ./gitleaks git --redact --verbose --no-banner --exit-code 1 --report-format json --report-path reports/gitleaks.json . || { rc=$?; { [ "$ENFORCE" = "1" ] || grep -qx secrets .github/ci-enforce 2>/dev/null; } && exit $rc; echo "::warning::gitleaks found possible secrets (report-only mode)"; }
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: ${{ !cancelled() }}
+        with:
+          name: report-secrets
+          path: reports/
+          if-no-files-found: warn
+          retention-days: 30
 
   deps:
     runs-on: ubuntu-latest
@@ -50,9 +75,19 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: OSV-Scanner
         run: |
+          mkdir -p reports
           curl -sSL -o osv-scanner "https://github.com/google/osv-scanner/releases/download/v${OSV_VERSION}/osv-scanner_linux_amd64"
           chmod +x osv-scanner
-          ./osv-scanner --lockfile=package-lock.json || { rc=$?; { [ "$ENFORCE" = "1" ] || grep -qx deps .github/ci-enforce 2>/dev/null; } && exit $rc; echo "::warning::OSV-Scanner found vulnerable dependencies (report-only mode)"; }
+          ./osv-scanner --lockfile=package-lock.json || rc=$?
+          ./osv-scanner --format json --output reports/osv.json --lockfile=package-lock.json >/dev/null 2>&1 || true
+          if [ "${rc:-0}" != "0" ]; then { [ "$ENFORCE" = "1" ] || grep -qx deps .github/ci-enforce 2>/dev/null; } && exit $rc; echo "::warning::OSV-Scanner found vulnerable dependencies (report-only mode)"; fi
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: ${{ !cancelled() }}
+        with:
+          name: report-deps
+          path: reports/
+          if-no-files-found: warn
+          retention-days: 30
 
   sast:
     runs-on: ubuntu-latest
@@ -61,8 +96,154 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Semgrep CE
         run: |
+          mkdir -p reports
           pip install --quiet "semgrep==${SEMGREP_VERSION}"
-          semgrep scan --metrics=off --error \
+          semgrep scan --metrics=off --error --json --output reports/semgrep.json \
             --config p/owasp-top-ten --config p/typescript --config p/react --config p/secrets \
-            --exclude node_modules --exclude dist --exclude '*.test.ts' --exclude '*.test.tsx' \
-            || { rc=$?; { [ "$ENFORCE" = "1" ] || grep -qx sast .github/ci-enforce 2>/dev/null; } && exit $rc; echo "::warning::Semgrep found issues (report-only mode)"; }
+            --exclude node_modules --exclude dist --exclude reports --exclude '*.test.ts' --exclude '*.test.tsx' || rc=$?
+          python3 -c "import json;d=json.load(open('reports/semgrep.json'));[print(f\"{r['path']}:{r['start']['line']} {r['check_id']}\") for r in d.get('results',[])];print(len(d.get('results',[])),'finding(s)')" || true
+          if [ "${rc:-0}" != "0" ]; then { [ "$ENFORCE" = "1" ] || grep -qx sast .github/ci-enforce 2>/dev/null; } && exit $rc; echo "::warning::Semgrep found issues (report-only mode)"; fi
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: ${{ !cancelled() }}
+        with:
+          name: report-sast
+          path: reports/
+          if-no-files-found: warn
+          retention-days: 30
+
+  sbom:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Syft SBOM (CycloneDX JSON)
+        run: |
+          mkdir -p reports tools
+          curl -sSL "https://github.com/anchore/syft/releases/download/v${SYFT_VERSION}/syft_${SYFT_VERSION}_linux_amd64.tar.gz" | tar -xz -C tools syft
+          tools/syft scan dir:. --exclude './tools/**' --exclude './reports/**' --exclude './.git/**' \
+            --source-name "${GITHUB_REPOSITORY}" --source-version "${GITHUB_SHA}" \
+            -o cyclonedx-json=reports/sbom.cdx.json -o table
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: report-sbom
+          path: reports/
+          retention-days: 30
+
+  vulns:
+    needs: sbom
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: report-sbom
+          path: sbom/
+      - name: Grype (on the SBOM)
+        run: |
+          mkdir -p reports tools
+          curl -sSL "https://github.com/anchore/grype/releases/download/v${GRYPE_VERSION}/grype_${GRYPE_VERSION}_linux_amd64.tar.gz" | tar -xz -C tools grype
+          tools/grype sbom:sbom/sbom.cdx.json --fail-on high -o table -o json=reports/grype.json || { rc=$?; { [ "$ENFORCE" = "1" ] || grep -qx vulns .github/ci-enforce 2>/dev/null; } && exit $rc; echo "::warning::Grype found high/critical vulnerabilities (report-only mode)"; }
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: ${{ !cancelled() }}
+        with:
+          name: report-vulns
+          path: reports/
+          if-no-files-found: warn
+          retention-days: 30
+
+  release-package:
+    needs: [secrets, deps, sast, sbom, vulns]
+    if: ${{ !cancelled() && ((github.event_name == 'push' && github.ref == 'refs/heads/main') || github.event_name == 'workflow_dispatch') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 50
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+          cache: npm
+      - name: Test results (same steps as verify.yml, output captured)
+        run: |
+          mkdir -p pkg/tests
+          set +e
+          (
+            npm ci
+            has() { node -e "process.exit(require('./package.json').scripts?.['$1'] ? 0 : 1)"; }
+            if has verify; then npm run verify; else
+              rc=0
+              if has lint;  then npm run lint || rc=$?; fi
+              if has test;  then npm test || rc=$?; fi
+              if has build; then npm run build || rc=$?; fi
+              exit $rc
+            fi
+          ) > pkg/tests/test-output.log 2>&1
+          echo $? > pkg/tests/exit-code.txt
+          tail -n 40 pkg/tests/test-output.log
+          echo "test exit code: $(cat pkg/tests/exit-code.txt)"
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          pattern: report-*
+          path: pkg/reports/
+      - name: Metadata
+        env:
+          JOB_RESULTS: ${{ toJSON(needs) }}
+          TRIGGERING_ACTOR: ${{ github.triggering_actor }}
+        run: |
+          python3 - <<'PY'
+          import json, os, subprocess, datetime
+          e = os.environ
+          git = lambda *a: subprocess.run(["git", *a], capture_output=True, text=True).stdout.strip()
+          needs = json.loads(e["JOB_RESULTS"])
+          meta = {
+            "schema": "cce-release-package/v0",
+            "created_utc": datetime.datetime.now(datetime.timezone.utc).isoformat(timespec="seconds"),
+            "repository": e["GITHUB_REPOSITORY"],
+            "ref": e["GITHUB_REF"],
+            "event": e["GITHUB_EVENT_NAME"],
+            "commit": {"sha": e["GITHUB_SHA"], "subject": git("log", "-1", "--format=%s"),
+                       "author_date": git("log", "-1", "--format=%aI"), "parents": git("log", "-1", "--format=%P").split()},
+            "approver": {"actor": e["GITHUB_ACTOR"], "triggering_actor": e.get("TRIGGERING_ACTOR"),
+                         "note": "GitHub account that pushed/promoted to this ref; formal approval record comes from QMS later"},
+            "ci_run": {"id": e["GITHUB_RUN_ID"], "attempt": e["GITHUB_RUN_ATTEMPT"],
+                       "url": f'{e["GITHUB_SERVER_URL"]}/{e["GITHUB_REPOSITORY"]}/actions/runs/{e["GITHUB_RUN_ID"]}',
+                       "workflow_ref": e.get("GITHUB_WORKFLOW_REF")},
+            "deploy": {"id": "unavailable", "reason": "Netlify does not report deploys to GitHub; needs a read-only Netlify token (TODO)"},
+            "db_posture": {"status": "unavailable", "reason": "no database credentials in CI by design; exported locally (compliance/baseline-v*)"},
+            "jobs": {k: v.get("result") for k, v in needs.items()},
+            "tests_exit_code": int(open("pkg/tests/exit-code.txt").read().strip() or 1),
+            "enforce": e["ENFORCE"],
+            "signed": e["SIGN_PACKAGE"] == "1",
+            "tool_versions": {k.lower(): e[k] for k in ("GITLEAKS_VERSION", "OSV_VERSION", "SEMGREP_VERSION", "SYFT_VERSION", "GRYPE_VERSION")},
+          }
+          json.dump(meta, open("pkg/metadata.json", "w"), indent=2)
+          print(json.dumps(meta, indent=2))
+          PY
+      - name: Manifest and archive
+        run: |
+          cd pkg && find . -type f ! -name SHA256SUMS -print0 | sort -z | xargs -0 sha256sum > SHA256SUMS && cd ..
+          name="release-package-${GITHUB_SHA::12}-run${GITHUB_RUN_ID}"
+          tar -czf "$name.tar.gz" -C pkg .
+          sha256sum "$name.tar.gz" > "$name.tar.gz.sha256"
+          echo "PKG=$name" >> "$GITHUB_ENV"
+          cat pkg/SHA256SUMS; cat "$name.tar.gz.sha256"
+          { echo "### Release package"; echo '```'; cat "$name.tar.gz.sha256"; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+      - name: Sign (cosign keyless, disabled until approved — see header)
+        if: ${{ env.SIGN_PACKAGE == '1' }}
+        run: |
+          curl -sSL -o cosign "https://github.com/sigstore/cosign/releases/download/v${COSIGN_VERSION}/cosign-linux-amd64"
+          chmod +x cosign
+          ./cosign sign-blob --yes --bundle "$PKG.tar.gz.sigstore.json" "$PKG.tar.gz"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: ${{ env.PKG }}
+          path: |
+            ${{ env.PKG }}.tar.gz
+            ${{ env.PKG }}.tar.gz.sha256
+            ${{ env.PKG }}.tar.gz.sigstore.json
+          if-no-files-found: error
+          retention-days: 90
